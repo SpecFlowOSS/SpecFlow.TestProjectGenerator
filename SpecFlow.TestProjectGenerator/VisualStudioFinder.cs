@@ -16,7 +16,7 @@ namespace SpecFlow.TestProjectGenerator
 
         public string Find()
         {
-            string vsWherePath = Path.Combine(_folders.GlobalPackages, "vswhere", "2.2.7", "tools", "vswhere.exe");
+            string vsWherePath = Path.Combine(_folders.GlobalPackages, "vswhere", "2.3.2", "tools", "vswhere.exe");
 
             if (!File.Exists(vsWherePath))
             {

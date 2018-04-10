@@ -27,6 +27,7 @@ namespace SpecFlow.TestProjectGenerator
 
         public void Compile(InputProjectDriver inputProjectDriver)
         {
+            //switch für programmiersprachen
             _programLanguageProjectCompiler = GetProgramLanguageProjectCompiler(inputProjectDriver);
 
             Console.WriteLine("Compiling project '{0}' in '{1}'", inputProjectDriver.ProjectFileName, inputProjectDriver.ProjectFolder);
@@ -134,7 +135,7 @@ namespace SpecFlow.TestProjectGenerator
 
         private void RestoreNugetPackage(InputProjectDriver inputProjectDriver)
         {
-            var processPath = Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine","4.1.0", "tools", "NuGet.exe");
+            var processPath = Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine","4.5.1", "tools", "NuGet.exe");
 
             if (!File.Exists(processPath))
             {
