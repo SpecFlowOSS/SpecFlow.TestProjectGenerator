@@ -57,5 +57,6 @@
   <PropertyGroup>
     <VerboseOutput>true</VerboseOutput>
   </PropertyGroup>
+  <Import Condition="Exists('{SpecFlowRoot}\Tools\TechTalk.SpecFlow.tasks')" Project="{SpecFlowRoot}\Tools\TechTalk.SpecFlow.tasks" />
   <Import Project="{SpecFlowRoot}\Tools\TechTalk.SpecFlow.targets" />
 </Project>
