@@ -42,7 +42,7 @@ namespace SpecFlow.TestProjectGenerator
         public static string Major { get; private set; }
         public static string Minor { get; private set; }
         public static string Patch { get; private set; }
-        public static string NuGetVersion { get; private set; }
+        public static string NuGetVersion { get; set; }
 
         public static string SpecFlowVersion { get; private set; }
         public static int SpecFlowMajor { get; set; }
