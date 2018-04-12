@@ -38,7 +38,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
 
-            projectFileContent.Should().Contain("<PackageReference Include=\"SpecFlow\" Version=\"2.3.1\"/>");
+            projectFileContent.Should().Contain("<PackageReference Include=\"SpecFlow\" Version=\"2.3.1\" />");
         }
 
         [Fact]

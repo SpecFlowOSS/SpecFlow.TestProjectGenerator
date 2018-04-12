@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,12 +18,52 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 throw new ArgumentNullException(nameof(project));
             }
 
-            var commandBuilder = DotNet.New().Project().InFolder(path).WithName(project.Name).UseTemplate("classlib").WithLanguage(project.ProgrammingLanguage).Build();
-            var commandResult = commandBuilder.Execute();
+            var newProjCommand = DotNet.New()
+                                       .Project()
+                                       .InFolder(path)
+                                       .WithName(project.Name)
+                                       .WithLanguage(project.ProgrammingLanguage)
+                                       .Build();
 
-            if (commandResult.ExitCode != 0)
+            var newProjResult = newProjCommand.Execute();
+
+            if (newProjResult.ExitCode != 0)
             {
                 throw new ProjectCreationNotPossibleException();
+            }
+
+            string projFileName;
+            switch (project.ProgrammingLanguage)
+            {
+                case ProgrammingLanguage.CSharp:
+                    projFileName = $"{project.Name}.csproj";
+                    break;
+
+                case ProgrammingLanguage.FSharp:
+                    projFileName = $"{project.Name}.fsproj";
+                    break;
+
+                case ProgrammingLanguage.VB:
+                    projFileName = $"{project.Name}.vbproj";
+                    break;
+
+                default: throw new ProjectCreationNotPossibleException();
+            }
+
+            string projFilePath = Path.Combine(path, projFileName);
+
+            foreach (var nugetPackage in project.NuGetPackages)
+            {
+                var addPackageCommand = DotNet.Add()
+                                              .Reference()
+                                              .WithPackageName(nugetPackage.Name)
+                                              .WithPackageVersion(nugetPackage.Version)
+                                              .ToProject(projFilePath)
+                                              .Build();
+                if (addPackageCommand.Execute().ExitCode != 0)
+                {
+                    throw new ProjectCreationNotPossibleException();
+                }
             }
 
             var fileWriter = new ProjectFileWriter();

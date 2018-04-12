@@ -26,6 +26,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             TargetFrameworks = targetFrameworks;
         }
 
+        // TODO: add property for project type (used for template)
+
         public string Name { get; }
         public string TargetFrameworks { get; } //net45, netcoreapp1.1, net471,
 

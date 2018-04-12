@@ -2,7 +2,7 @@
 {
     public class ProjectFile  //FeatureFiles, Code, App.Config, NuGet.Config, packages.config,
     {
-        public ProjectFile(string path, string content, string buildAction)
+        public ProjectFile(string path, string buildAction, string content)
         {
             Path = path;
             Content = content;
