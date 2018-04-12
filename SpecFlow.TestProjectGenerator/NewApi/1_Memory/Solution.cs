@@ -7,11 +7,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
     public class Solution
     {
         private readonly List<Project> _projects = new List<Project>();
-        private string _v;
 
-        public Solution(string v)
+        public Solution(string name)
         {
-            _v = v;
+            Name = name;
             Projects = new ReadOnlyCollection<Project>(_projects);
         }
 

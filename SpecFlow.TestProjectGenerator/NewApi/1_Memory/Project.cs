@@ -14,7 +14,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
         private readonly List<ProjectFile> _files = new List<ProjectFile>();
 
-        public Project(string v1, ProgrammingLanguage programmingLanguage, string v2, ProjectFormat projectFormat)
+        public Project(string name, ProgrammingLanguage programmingLanguage, string targetFrameworks, ProjectFormat projectFormat)
         {
             ProgrammingLanguage = programmingLanguage;
             ProjectFormat = projectFormat;
@@ -22,10 +22,12 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             ProjectReferences = new ReadOnlyCollection<ProjectReference>(_projectReferences);
             References = new ReadOnlyCollection<Reference>(_references);
             Files = new ReadOnlyCollection<ProjectFile>(_files);
+            Name = name;
+            TargetFrameworks = targetFrameworks;
         }
 
-        public string Name { get; set; }
-        public string TargetFrameworks { get; set; } //net45, netcoreapp1.1, net471,
+        public string Name { get; }
+        public string TargetFrameworks { get; } //net45, netcoreapp1.1, net471,
 
         public ProgrammingLanguage ProgrammingLanguage { get; }
         public ProjectFormat ProjectFormat { get; }
