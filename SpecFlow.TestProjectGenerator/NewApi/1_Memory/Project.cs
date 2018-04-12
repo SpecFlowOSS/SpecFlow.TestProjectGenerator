@@ -14,10 +14,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
         private readonly List<ProjectFile> _files = new List<ProjectFile>();
 
-        public Project(string name, ProgrammingLanguage programmingLanguage, string targetFrameworks, ProjectFormat projectFormat)
+        public Project(string name, ProgrammingLanguage programmingLanguage, string targetFrameworks, ProjectFormat projectFormat, ProjectType projectType = ProjectType.Library)
         {
             ProgrammingLanguage = programmingLanguage;
             ProjectFormat = projectFormat;
+            ProjectType = projectType;
             NuGetPackages = new ReadOnlyCollection<NuGetPackage>(_nuGetPackages);
             ProjectReferences = new ReadOnlyCollection<ProjectReference>(_projectReferences);
             References = new ReadOnlyCollection<Reference>(_references);
@@ -25,11 +26,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             Name = name;
             TargetFrameworks = targetFrameworks;
         }
-
-        // TODO: add property for project type (used for template)
-
+        
         public string Name { get; }
         public string TargetFrameworks { get; } //net45, netcoreapp1.1, net471,
+        public ProjectType ProjectType { get; }
 
         public ProgrammingLanguage ProgrammingLanguage { get; }
         public ProjectFormat ProjectFormat { get; }

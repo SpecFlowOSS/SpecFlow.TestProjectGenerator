@@ -18,7 +18,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
                 _newCommandBuilder = newCommandBuilder;
             }
 
-            public NewProjectCommandBuilder UseTemplate(string templateName)
+            public NewProjectCommandBuilder UsingTemplate(string templateName)
             {
                 _templateName = templateName;
                 return this;

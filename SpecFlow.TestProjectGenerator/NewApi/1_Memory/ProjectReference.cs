@@ -2,11 +2,11 @@
 {
     public class ProjectReference
     {
-        public ProjectReference(string fullPath)
+        public ProjectReference(string path)
         {
-            FullPath = fullPath;
+            Path = path;
         }
 
-        public string FullPath { get; }
+        public string Path { get; }
     }
 }

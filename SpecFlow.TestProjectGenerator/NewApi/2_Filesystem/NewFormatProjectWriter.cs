@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
 
@@ -18,10 +14,13 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 throw new ArgumentNullException(nameof(project));
             }
 
+            string template = project.ProjectType == ProjectType.Exe ? "console" : "classlib";
+
             var newProjCommand = DotNet.New()
                                        .Project()
                                        .InFolder(path)
                                        .WithName(project.Name)
+                                       .UsingTemplate(template)
                                        .WithLanguage(project.ProgrammingLanguage)
                                        .Build();
 
@@ -52,15 +51,31 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             string projFilePath = Path.Combine(path, projFileName);
 
+            // nuget packages
             foreach (var nugetPackage in project.NuGetPackages)
             {
                 var addPackageCommand = DotNet.Add()
-                                              .Reference()
+                                              .Package()
                                               .WithPackageName(nugetPackage.Name)
                                               .WithPackageVersion(nugetPackage.Version)
                                               .ToProject(projFilePath)
                                               .Build();
                 if (addPackageCommand.Execute().ExitCode != 0)
+                {
+                    throw new ProjectCreationNotPossibleException();
+                }
+            }
+
+            // p2p references
+            foreach (var projReference in project.ProjectReferences)
+            {
+                var addReferenceCommand = DotNet.Add()
+                                                .Reference()
+                                                .ReferencingProject(projReference.Path)
+                                                .ToProject(projFilePath)
+                                                .Build();
+
+                if (addReferenceCommand.Execute().ExitCode != 0)
                 {
                     throw new ProjectCreationNotPossibleException();
                 }

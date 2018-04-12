@@ -4,6 +4,8 @@
     {
         internal static AddCommandBuilder Create() => new AddCommandBuilder();
 
-        public AddPackageCommandBuilder Reference() => new AddPackageCommandBuilder();
+        public AddPackageCommandBuilder Package() => new AddPackageCommandBuilder();
+
+        public AddReferenceCommandBuilder Reference() => new AddReferenceCommandBuilder();
     }
 }
