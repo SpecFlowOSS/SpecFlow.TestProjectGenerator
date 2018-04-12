@@ -8,7 +8,7 @@
             Version = version;
         }
 
-        public string Name { get; private set; }
-        public string Version { get; private set; }
+        public string Name { get; }
+        public string Version { get; }
     }
 }

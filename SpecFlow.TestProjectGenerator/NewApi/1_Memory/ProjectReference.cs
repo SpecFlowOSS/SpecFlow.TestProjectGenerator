@@ -7,6 +7,6 @@
             FullPath = fullPath;
         }
 
-        public string FullPath { get; set; }
+        public string FullPath { get; }
     }
 }
