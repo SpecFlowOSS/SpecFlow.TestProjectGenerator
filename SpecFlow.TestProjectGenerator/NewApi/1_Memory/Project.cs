@@ -2,8 +2,13 @@
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
-    class Project
+    public class Project
     {
+        
+        public Project(string v1, ProgrammingLanguage cSharp, string v2, ProjectFormat old)
+        {
+        }
+
         public string Name { get; set; }
         public string TargetFrameworks { get; set; } //net45, netcoreapp1.1, net471,
 
@@ -13,6 +18,21 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public IReadOnlyList<ProjectReference> ProjectReferences { get; }
         public IReadOnlyList<Reference> References { get; }
 
-        public IReadOnlyList<File> Files { get; } 
+        public IReadOnlyList<ProjectFile> Files { get; }
+
+        public void AddNuGetPackage(string specflow, string s)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void AddReference(string systemConfiguration)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void AddFile(ProjectFile projectFile)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

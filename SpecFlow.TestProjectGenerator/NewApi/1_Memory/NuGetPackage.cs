@@ -1,6 +1,6 @@
 ﻿namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
-    internal class NuGetPackage
+    public class NuGetPackage
     {
         public NuGetPackage(string name, string version)
         {

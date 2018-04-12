@@ -2,7 +2,7 @@
 
 namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
-    class SolutionWriter
+    public class SolutionWriter
     {
         public string WriteToFileSystem(Solution solution, string outputPath)
         {

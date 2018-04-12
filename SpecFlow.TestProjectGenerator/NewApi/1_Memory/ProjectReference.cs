@@ -1,6 +1,6 @@
 ﻿namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
-    internal class ProjectReference
+    public class ProjectReference
     {
         public ProjectReference(string fullPath)
         {

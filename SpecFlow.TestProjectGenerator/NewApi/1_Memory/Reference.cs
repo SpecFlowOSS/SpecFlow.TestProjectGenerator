@@ -1,6 +1,6 @@
 ﻿namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
-    internal class Reference
+    public class Reference
     {
         public Reference(string name)
         {
