@@ -5,9 +5,9 @@ using System.Reflection;
 
 namespace SpecFlow.TestProjectGenerator
 {
-    public static class CurrentVersionDriver
+    public class CurrentVersionDriver
     {
-        static CurrentVersionDriver()
+        CurrentVersionDriver()
         {
             var assembly = Assembly.GetExecutingAssembly();
             var assemblyName = assembly.GetName().Name;
@@ -37,15 +37,15 @@ namespace SpecFlow.TestProjectGenerator
             }
         }
 
-        public static string SpecFlowVersionDash { get; private set; }
+        public string SpecFlowVersionDash { get; private set; }
 
-        public static string Major { get; private set; }
-        public static string Minor { get; private set; }
-        public static string Patch { get; private set; }
-        public static string NuGetVersion { get; set; }
+        public string Major { get; private set; }
+        public string Minor { get; private set; }
+        public string Patch { get; private set; }
+        public string NuGetVersion { get; set; }
 
-        public static string SpecFlowVersion { get; private set; }
-        public static int SpecFlowMajor { get; set; }
-        public static int SpecFlowMinor { get; set; }
+        public string SpecFlowVersion { get; private set; }
+        public int SpecFlowMajor { get; set; }
+        public int SpecFlowMinor { get; set; }
     }
 }

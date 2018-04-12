@@ -209,5 +209,8 @@ namespace SpecFlow.TestProjectGenerator
         }
 
         public string TestingFrameworkPackage { get; set; }
+        public string PreMsBuild { get; set; }
+        public string PostMsBuild { get; set; }
+        public string BindingRedirects { get; set; }
     }
 }

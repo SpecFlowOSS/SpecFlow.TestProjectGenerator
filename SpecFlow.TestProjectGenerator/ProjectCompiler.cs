@@ -15,14 +15,16 @@ namespace SpecFlow.TestProjectGenerator
     {
         protected readonly Folders _folders;
         protected readonly ProjectCompilerHelper _projectCompilerHelper;
+        private readonly CurrentVersionDriver _currentVersionDriver;
         protected readonly VisualStudioFinder _visualStudioFinder;
         protected IProgramLanguageProjectCompiler _programLanguageProjectCompiler;
 
-        public ProjectCompiler(Folders folders, VisualStudioFinder visualStudioFinder, ProjectCompilerHelper projectCompilerHelper)
+        public ProjectCompiler(Folders folders, VisualStudioFinder visualStudioFinder, ProjectCompilerHelper projectCompilerHelper, CurrentVersionDriver currentVersionDriver)
         {
             _folders = folders;
             _visualStudioFinder = visualStudioFinder;
             _projectCompilerHelper = projectCompilerHelper;
+            _currentVersionDriver = currentVersionDriver;
         }
 
         public void Compile(InputProjectDriver inputProjectDriver)
@@ -34,7 +36,16 @@ namespace SpecFlow.TestProjectGenerator
 
             EnsureCompilationFolder(inputProjectDriver.ProjectFolder);
 
+
+            AddNugetStuff(inputProjectDriver);
+            RestoreNugetPackage(inputProjectDriver);
+
+
             Project project = CreateProject(inputProjectDriver, inputProjectDriver.ProjectFileName);
+
+
+            project.AddItem("None", "packages.config");
+            project.AddItem("None", "..\\NuGet.config");
 
             AddAdditionalStuff(inputProjectDriver, project);
 
@@ -43,7 +54,7 @@ namespace SpecFlow.TestProjectGenerator
             AddMsTestTestSettings(inputProjectDriver, project);
 
 
-            AddNugetStuff(inputProjectDriver, project);
+            
 
 
             var references = new List<string>(inputProjectDriver.AdditionalReferences);
@@ -116,8 +127,7 @@ namespace SpecFlow.TestProjectGenerator
 
             project.Save();
 
-            RestoreNugetPackage(inputProjectDriver);
-
+            
             CompileOutProc(project, inputProjectDriver);
 
             ProjectCollection.GlobalProjectCollection.UnloadAllProjects();
@@ -142,11 +152,11 @@ namespace SpecFlow.TestProjectGenerator
                 throw new FileNotFoundException("NuGet.exe could not be found! Is the version number correct?", processPath);
             }
 
-            var commandLineArgs = $"restore {inputProjectDriver.SolutionPath}";
+            var commandLineArgs = $"restore Project\\packages.config -SolutionDirectory . ";
 
 
             var nugetRestore = new ProcessHelper();
-            int nugetExitCode = nugetRestore.RunProcess(processPath, commandLineArgs);
+            int nugetExitCode = nugetRestore.RunProcess(inputProjectDriver.SolutionFolder, processPath, commandLineArgs);
 
             if (nugetExitCode > 0)
             {
@@ -160,7 +170,7 @@ namespace SpecFlow.TestProjectGenerator
             switch (inputProjectDriver.ProgrammingLanguage)
             {
                 case ProgrammingLanguage.CSharp:
-                    return new CSharpProgramLanguageProjectCompiler(_projectCompilerHelper);
+                    return new CSharpProgramLanguageProjectCompiler(_projectCompilerHelper, _currentVersionDriver);
                 case ProgrammingLanguage.VB:
                     return new VBNetProjectCompiler(_projectCompilerHelper);
                 default:
@@ -168,20 +178,19 @@ namespace SpecFlow.TestProjectGenerator
             }
         }
 
-        private void AddNugetStuff(InputProjectDriver inputProjectDriver, Project project)
+        private void AddNugetStuff(InputProjectDriver inputProjectDriver)
         {
             _projectCompilerHelper.SaveFileFromResourceTemplate(inputProjectDriver.SolutionFolder, "NuGet.config", "NuGet.config", new Dictionary<string, string>()
             {
                 {"FeedPath", _folders.NuGetFolder}
             });
-            project.AddItem("None", "..\\NuGet.config");
-
+            
             _projectCompilerHelper.SaveFileFromResourceTemplate(inputProjectDriver.ProjectFolder, "packages.config", "packages.config", new Dictionary<string, string>()
             {
-                {"NuGetVersion", CurrentVersionDriver.NuGetVersion},
+                {"NuGetVersion", _currentVersionDriver.NuGetVersion},
                 {"TestingFrameworkPackage", inputProjectDriver.TestingFrameworkPackage}
             });
-            project.AddItem("None", "packages.config");
+
         }
 
 
@@ -197,23 +206,15 @@ namespace SpecFlow.TestProjectGenerator
         {
             string msBuildPath = _visualStudioFinder.FindMSBuild();
             Console.WriteLine("Invoke MsBuild from {0}", msBuildPath);
-            ProcessStartInfo psi = new ProcessStartInfo(msBuildPath, $"/nologo /v:m \"{inputProjectDriver.SolutionPath}\"")
+
+
+            var processHelper = new ProcessHelper();
+            int msBuildExitCode = processHelper.RunProcess(inputProjectDriver.SolutionFolder, msBuildPath, $"/bl /nologo /v:m \"{inputProjectDriver.SolutionPath}\"");
+
+            
+            if (msBuildExitCode > 0)
             {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            var p = Process.Start(psi);
-
-            var buildOutput = p.StandardOutput.ReadToEnd();
-            Console.WriteLine(buildOutput);
-
-            p.WaitForExit();
-
-            if (p.ExitCode > 0)
-            {
-                var firstErrorLine = buildOutput.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(l => l.Contains("): error "));
+                var firstErrorLine = processHelper.ConsoleOutput.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(l => l.Contains("): error "));
                 throw new Exception($"Build failed: {firstErrorLine}");
             }
         }
@@ -230,6 +231,7 @@ namespace SpecFlow.TestProjectGenerator
                 {"UnitTestProvider", GetUnitTestProvider(inputProjectDriver)},
                 {"AdditionalSpecFlowPlugins", inputProjectDriver.AdditionalSpecFlowPlugins},
                 {"AdditionalSpecFlowSettings", inputProjectDriver.AdditionalSpecFlowSettings},
+                {"BindingRedirects", inputProjectDriver.BindingRedirects }
             };
             _projectCompilerHelper.SaveFileFromResourceTemplate(inputProjectDriver.ProjectFolder, "App.config", "App.config", replacements);
             project.AddItem("None", "App.config");
@@ -288,7 +290,9 @@ namespace SpecFlow.TestProjectGenerator
                 {"ProjectGuid", projectId.ToString("B")},
                 {"ProjectName", Path.GetFileNameWithoutExtension(outputFileName)},
                 {"NetFrameworkVersion", inputProjectDriver.NetFrameworkVersion},
-                {"TestingFramework", inputProjectDriver.TestingFrameworkReference}
+                {"TestingFramework", inputProjectDriver.TestingFrameworkReference},
+                {"PreMsBuild", inputProjectDriver.PreMsBuild },
+                {"PostMsBuild", inputProjectDriver.PostMsBuild }
             });
 
 

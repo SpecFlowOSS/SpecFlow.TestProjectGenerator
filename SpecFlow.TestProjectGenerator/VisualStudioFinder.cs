@@ -24,7 +24,7 @@ namespace SpecFlow.TestProjectGenerator
             }
 
             var ph = new ProcessHelper();
-            ph.RunProcess(vsWherePath, VsWhereParameter);
+            ph.RunProcess(".", vsWherePath, VsWhereParameter);
             var output = ph.ConsoleOutput;
 
 

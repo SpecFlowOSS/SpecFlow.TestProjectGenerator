@@ -6,10 +6,11 @@ namespace SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
 {
     class CSharpProgramLanguageProjectCompiler : ProgramLanguageProjectCompiler
     {
+        private readonly CurrentVersionDriver _currentVersionDriver;
 
-        public CSharpProgramLanguageProjectCompiler(ProjectCompilerHelper projectCompilerHelper) : base(projectCompilerHelper)
+        public CSharpProgramLanguageProjectCompiler(ProjectCompilerHelper projectCompilerHelper, CurrentVersionDriver currentVersionDriver) : base(projectCompilerHelper)
         {
-
+            _currentVersionDriver = currentVersionDriver;
         }
 
         public override string FileEnding => ".cs";
@@ -17,7 +18,7 @@ namespace SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
         {
             get
             {
-                if (CurrentVersionDriver.SpecFlowMajor < 2)
+                if (_currentVersionDriver.SpecFlowMajor < 2)
                 {
                     return "TestProjectFile_Before20.csproj";
                 }

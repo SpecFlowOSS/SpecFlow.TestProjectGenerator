@@ -12,16 +12,18 @@ namespace SpecFlow.TestProjectGenerator
 
         public string ConsoleOutput { get; private set; }
 
-        public int RunProcess(string executablePath, string argumentsFormat, params object[] arguments)
+        public int RunProcess(string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
         {
             var parameters = string.Format(argumentsFormat, arguments);
 
-            Console.WriteLine($"Starting external program: \"{executablePath}\" {parameters}");
+            Console.WriteLine("Starting external program: \"{0}\" {1}", executablePath, parameters);
             ProcessStartInfo psi = new ProcessStartInfo(executablePath, parameters);
             psi.RedirectStandardOutput = true;
             psi.RedirectStandardError = true;
             psi.UseShellExecute = false;
             psi.CreateNoWindow = true;
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
+            psi.WorkingDirectory = workingDirectory;
 
 
             var process = new Process
@@ -32,7 +34,7 @@ namespace SpecFlow.TestProjectGenerator
             };
 
             StringBuilder output = new StringBuilder();
-            
+
 
             using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
             {
@@ -75,7 +77,7 @@ namespace SpecFlow.TestProjectGenerator
                     }
                     else
                     {
-                        throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete");
+                        throw new TimeoutException(string.Format("Process {0} {1} took longer than {2} min to complete", psi.FileName, psi.Arguments, _timeout.TotalMinutes));
                     }
 
                 }

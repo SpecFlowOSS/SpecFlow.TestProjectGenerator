@@ -11,10 +11,12 @@ namespace SpecFlow.TestProjectGenerator
     public class ProjectCompilerHelper
     {
         protected readonly Folders _folders;
+        private readonly CurrentVersionDriver _currentVersionDriver;
 
-        protected ProjectCompilerHelper(Folders folders)
+        protected ProjectCompilerHelper(Folders folders, CurrentVersionDriver currentVersionDriver)
         {
             _folders = folders;
+            _currentVersionDriver = currentVersionDriver;
         }
 
         public string SaveFileFromResourceTemplate(string compilationFolder, string templateName, string outputFileName, Dictionary<string, string> replacements = null)
@@ -70,7 +72,7 @@ namespace SpecFlow.TestProjectGenerator
         {
             return fileContent
                 .Replace("{SpecFlowRoot}", _folders.SpecFlow)
-                .Replace("{SupportedFramework}", CurrentVersionDriver.SpecFlowMajor >= 2 ? "NET45" : "NET35")
+                .Replace("{SupportedFramework}", _currentVersionDriver.SpecFlowMajor >= 2 ? "NET45" : "NET35")
                 .Replace("{SpecFlowDev}", Path.Combine(_folders.TestFolder, "SpecFlowDevelopment"));
         }
     }
