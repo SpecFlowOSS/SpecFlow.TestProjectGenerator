@@ -17,7 +17,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands
         {
             var solutionCreateProcessHelper = new ProcessHelper();
 
-            int exitCode = solutionCreateProcessHelper.RunProcess(ExecutablePath, ArgumentsFormat);
+            int exitCode = solutionCreateProcessHelper.RunProcess(".", ExecutablePath, ArgumentsFormat);
             if (exitCode > 0)
             {
                 var innerException = new Exception(solutionCreateProcessHelper.ConsoleOutput);
