@@ -1,38 +1,58 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class Project
     {
-        
-        public Project(string v1, ProgrammingLanguage cSharp, string v2, ProjectFormat old)
+        private readonly List<NuGetPackage> _nuGetPackages = new List<NuGetPackage>();
+
+        private readonly List<ProjectReference> _projectReferences = new List<ProjectReference>();
+
+        private readonly List<Reference> _references = new List<Reference>();
+
+        private readonly List<ProjectFile> _files = new List<ProjectFile>();
+
+        public Project(string v1, ProgrammingLanguage programmingLanguage, string v2, ProjectFormat projectFormat)
         {
+            ProgrammingLanguage = programmingLanguage;
+            ProjectFormat = projectFormat;
+            NuGetPackages = new ReadOnlyCollection<NuGetPackage>(_nuGetPackages);
+            ProjectReferences = new ReadOnlyCollection<ProjectReference>(_projectReferences);
+            References = new ReadOnlyCollection<Reference>(_references);
+            Files = new ReadOnlyCollection<ProjectFile>(_files);
         }
 
         public string Name { get; set; }
         public string TargetFrameworks { get; set; } //net45, netcoreapp1.1, net471,
 
-        public ProgrammingLanguage ProgrammingLanguage { get; set; }
+        public ProgrammingLanguage ProgrammingLanguage { get; }
+        public ProjectFormat ProjectFormat { get; }
 
-        public IReadOnlyList<NuGetPackage> NuGetPackages { get;  }
+        public IReadOnlyList<NuGetPackage> NuGetPackages { get; }
         public IReadOnlyList<ProjectReference> ProjectReferences { get; }
         public IReadOnlyList<Reference> References { get; }
-
         public IReadOnlyList<ProjectFile> Files { get; }
 
-        public void AddNuGetPackage(string specflow, string s)
+        public void AddNuGetPackage(string name, string version)
         {
-            throw new System.NotImplementedException();
+            _nuGetPackages.Add(new NuGetPackage(name, version));
         }
 
-        public void AddReference(string systemConfiguration)
+        public void AddReference(string name)
         {
-            throw new System.NotImplementedException();
+            _references.Add(new Reference(name));
         }
 
         public void AddFile(ProjectFile projectFile)
         {
-            throw new System.NotImplementedException();
+            _files.Add(projectFile ?? throw new ArgumentNullException(nameof(projectFile)));
+        }
+
+        public void AddProjectReference(string fullPath)
+        {
+            _projectReferences.Add(new ProjectReference(fullPath));
         }
     }
 }

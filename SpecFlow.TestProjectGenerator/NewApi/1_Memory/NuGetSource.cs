@@ -6,7 +6,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
     {
         public NuGetSource(string key, string value)
         {
-            throw new NotImplementedException();
+            Key = key;
+            Value = value;
         }
+
+        public string Key { get; }
+        public string Value { get; }
     }
 }
