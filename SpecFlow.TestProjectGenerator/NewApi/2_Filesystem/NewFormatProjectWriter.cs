@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Xml;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
@@ -31,23 +33,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 throw new ProjectCreationNotPossibleException();
             }
 
-            string projFileName;
-            switch (project.ProgrammingLanguage)
-            {
-                case ProgrammingLanguage.CSharp:
-                    projFileName = $"{project.Name}.csproj";
-                    break;
-
-                case ProgrammingLanguage.FSharp:
-                    projFileName = $"{project.Name}.fsproj";
-                    break;
-
-                case ProgrammingLanguage.VB:
-                    projFileName = $"{project.Name}.vbproj";
-                    break;
-
-                default: throw new ProjectCreationNotPossibleException();
-            }
+            string projFileName = $"{project.Name}.{project.ProgrammingLanguage.ToProjectFileExtension()}";
 
             string projFilePath = Path.Combine(path, projFileName);
 
@@ -81,8 +67,52 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 }
             }
 
-            var fileWriter = new ProjectFileWriter();
+            var doc = new XmlDocument();
+            doc.Load(projFilePath);
+            var projRoot = doc.SelectSingleNode("//Project") ?? throw new ProjectCreationNotPossibleException();
 
+            // GAC and library references cannot be added in new Csproj format (via dotnet CLI)
+            // see https://github.com/dotnet/sdk/issues/987
+            // Therefore, write them manually into the project file
+            if (project.References.Count > 0)
+            {
+                var referencesNode = doc.CreateElement("ItemGroup");
+
+                foreach (var reference in project.References)
+                {
+                    var node = doc.CreateElement("Reference");
+                    node.SetAttribute("Include", reference.Name);
+                    referencesNode.AppendChild(node);
+                }
+
+                projRoot.AppendChild(referencesNode);
+            }
+
+            // set target framework moniker
+            var targetFrameworkNode =
+                projRoot.SelectSingleNode("//PropertyGroup/TargetFramework") ?? throw new ProjectCreationNotPossibleException();
+
+            var newTargetFrameworks = project.TargetFrameworks.Split(';');
+            switch (newTargetFrameworks.Length)
+            {
+                case int i when i > 1:
+                    var targetFrameworkParentGroup =
+                        targetFrameworkNode.ParentNode ?? throw new ProjectCreationNotPossibleException();
+                    var multipleTargetFrameworksNode = doc.CreateElement("TargetFrameworks");
+                    multipleTargetFrameworksNode.InnerText = project.TargetFrameworks;
+                    targetFrameworkParentGroup.RemoveChild(targetFrameworkNode);
+                    targetFrameworkParentGroup.AppendChild(multipleTargetFrameworksNode);
+                    break;
+
+                case int i when i == 1:
+                    targetFrameworkNode.InnerText = project.TargetFrameworks;
+                    break;
+            }
+            
+            doc.Save(projFilePath);
+
+            // write project files
+            var fileWriter = new ProjectFileWriter();
             foreach (var file in project.Files)
             {
                 fileWriter.Write(file, path);
