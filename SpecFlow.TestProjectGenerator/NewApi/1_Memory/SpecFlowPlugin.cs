@@ -2,22 +2,26 @@
 {
     public class SpecFlowPlugin
     {
-        private string v;
-        private string v1;
-        private string v2;
-
-        public SpecFlowPlugin(string v)
+        public SpecFlowPlugin(string name)
         {
-            this.v = v;
+            Name = name;
         }
 
-        public SpecFlowPlugin(string v1, string v2)
+        public SpecFlowPlugin(string name, string path)
         {
-            this.v1 = v1;
-            this.v2 = v2;
+            Name = name;
+            Path = path;
         }
 
-        public string Name { get; set; }
-        public string Path { get; set; }
+        public SpecFlowPlugin(string name, string path, SpecFlowPluginType type)
+        {
+            Name = name;
+            Path = path;
+            Type = type;
+        }
+
+        public string Name { get; }
+        public string Path { get; }
+        public SpecFlowPluginType Type { get; } = SpecFlowPluginType.Generator | SpecFlowPluginType.Runtime;
     }
 }

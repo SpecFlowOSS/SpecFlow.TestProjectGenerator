@@ -2,11 +2,11 @@
 {
     public class StepAssembly
     {
-        private string v;
-
-        public StepAssembly(string v)
+        public StepAssembly(string assembly)
         {
-            this.v = v;
+            Assembly = assembly;
         }
+
+        public string Assembly { get; }
     }
 }

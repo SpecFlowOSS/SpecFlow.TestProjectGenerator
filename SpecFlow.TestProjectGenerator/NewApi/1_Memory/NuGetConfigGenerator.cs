@@ -25,8 +25,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                         writer.WriteAttributeString("value", source.Value);
                         writer.WriteEndElement();
                     }
-
-                    // <add key="Nuget.org" value="https://api.nuget.org/v3/index.json" />
+                    
                     writer.WriteStartElement("add");
                     writer.WriteAttributeString("key", "Nuget.org");
                     writer.WriteAttributeString("value", "https://api.nuget.org/v3/index.json");
