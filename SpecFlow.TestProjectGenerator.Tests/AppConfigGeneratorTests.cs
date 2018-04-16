@@ -51,7 +51,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         }
 
         [Fact]
-        public void Multiplelugins()
+        public void MultiplePlugins()
         {
             var projectFile = _appConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun"), new SpecFlowPlugin("SpecFlow+Excel") });
 
