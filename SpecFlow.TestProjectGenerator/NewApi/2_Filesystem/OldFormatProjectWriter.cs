@@ -75,8 +75,59 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
                 if (project.NuGetPackages.Count > 0)
                 {
+                    // <Reference Include="TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL">\r\n      <HintPath>..\\packages\\SpecFlow.2.3.1\\lib\\net45\\TechTalk.SpecFlow.dll</HintPath>\r\n    </Reference>
+                    // <Import Project=\"..\packages\SpecFlow.2.3.1\build\SpecFlow.targets\" Condition=\"Exists('..\packages\SpecFlow.2.3.1\build\SpecFlow.targets')\" />
+                    xw.WriteStartElement("ItemGroup");
+
+                    foreach (var package in project.NuGetPackages)
+                    {
+                        foreach (var assembly in package.Assemblies)
+                        {
+                            xw.WriteStartElement("Reference");
+                            xw.WriteAttributeString("Include", assembly.PublicAssemblyName);
+
+                            xw.WriteElementString(
+                                "HintPath",
+                                Path.Combine(
+                                    "..",
+                                    "packages",
+                                    $"{package.Name}.{package.Version}",
+                                    "lib",
+                                    assembly.RelativeHintPath));
+
+                            xw.WriteEndElement();
+                        }
+                    }
+
+                    xw.WriteEndElement();
+
+                    var pkgConf = new PackagesConfigGenerator().Generate(project.NuGetPackages, project.TargetFrameworks);
+                    project.AddFile(pkgConf);
+
+                    foreach (var package in project.NuGetPackages)
+                    {
+                        string packagePath =
+                            Path.Combine(
+                                "..",
+                                "packages",
+                                $"{package.Name}.{package.Version}");
+
+                        string targetsFile = Path.Combine(packagePath, "build", $"{package.Name}.targets");
+                        string propsFile = Path.Combine(packagePath, "build", $"{package.Name}.props");
+
+                        xw.WriteStartElement("Import");
+                        xw.WriteAttributeString("Project", propsFile);
+                        xw.WriteAttributeString("Condition", $"Exists('{propsFile}')");
+                        xw.WriteEndElement();
+
+                        xw.WriteStartElement("Import");
+                        xw.WriteAttributeString("Project", targetsFile);
+                        xw.WriteAttributeString("Condition", $"Exists('{targetsFile}')");
+                        xw.WriteEndElement();
+                    }
                     // TODO: add NuGet reference to packages.config
                 }
+
 
                 if (project.Files.Count > 0)
                 {

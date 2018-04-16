@@ -29,7 +29,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
-            project.AddNuGetPackage("SpecFlow", "2.3.1");
+            project.AddNuGetPackage("SpecFlow", "2.3.1", new[] {("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll") });
 
 
             new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
@@ -47,7 +47,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
-            project.AddNuGetPackage("SpecFlow", "2.3.1");
+            project.AddNuGetPackage("SpecFlow", "2.3.1", new[] { ("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll") });
 
 
             new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
@@ -56,7 +56,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
 
 
             projectFileContent.Should().Contain("<Import Project=\"..\\packages\\SpecFlow.2.3.1\\build\\SpecFlow.targets\" Condition=\"Exists(\'..\\packages\\SpecFlow.2.3.1\\build\\SpecFlow.targets\')\" />");
-            projectFileContent.Should().Contain("<Reference Include=\"TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL\">\r\n      <HintPath>..\\packages\\SpecFlow.2.3.1\\lib\\net45\\TechTalk.SpecFlow.dll</HintPath>\r\n    </Reference>");
+            projectFileContent.Should().Contain("<Reference Include=\"TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL\"><HintPath>..\\packages\\SpecFlow.2.3.1\\lib\\net45\\TechTalk.SpecFlow.dll</HintPath></Reference>");
         }
 
 
@@ -67,7 +67,9 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
-            project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", "2.3.2-preview20180328");
+            project.AddNuGetPackage(
+                "SpecFlow.Tools.MsBuild.Generation",
+                "2.3.2-preview20180328");
 
 
             new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
@@ -222,20 +224,43 @@ namespace SpecFlow.TestProjectGenerator.Tests
             return Path.Combine(solutionFolder, project.Name);
         }
 
-        [Theory]
-        [InlineData(ProgrammingLanguage.CSharp)]
-        [InlineData(ProgrammingLanguage.VB)]
-        [InlineData(ProgrammingLanguage.FSharp)]
-        public void CreateEmtpyProjectInNewFormat(ProgrammingLanguage programmingLanguage)
+        [Fact]
+        public void CreateEmtpyCSharpProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, programmingLanguage, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
             new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should().Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFrameworks>net45</TargetFrameworks>\r\n  </PropertyGroup>\r\n</Project>");
-            // TODO: VB & F# projects have different templates than the C# project. therefore these tests will never pass
+            projectFileContent.Should()
+                              .Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFrameworks>net45</TargetFrameworks>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmtpyFSharpProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp, TargetFramework.Net45);
+
+            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                              .Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFrameworks>net45</TargetFrameworks>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmtpyVbProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB, TargetFramework.Net45);
+
+            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                              .Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFrameworks>net45</TargetFrameworks>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
