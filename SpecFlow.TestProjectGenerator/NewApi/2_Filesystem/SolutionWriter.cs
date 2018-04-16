@@ -37,29 +37,35 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             if (createSolutionResult.ExitCode != 0)
             {
-                throw new ProjectCreationNotPossibleException();
+                throw new ProjectCreationNotPossibleException("Could not create solution.");
             }
+
+            string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
             
             BaseProjectWriter newFormatProjectWriter = new NewFormatProjectWriter();
             BaseProjectWriter oldFormatProjectWriter = new OldFormatProjectWriter();
 
             foreach (var project in solution.Projects)
             {
-                if (project.ProjectFormat == ProjectFormat.New)
+                string projPath;
+                switch (project.ProjectFormat)
                 {
-                    newFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
+                    case ProjectFormat.New:
+                        projPath = newFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
+                        break;
+                    case ProjectFormat.Old:
+                        projPath = oldFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
+                        break;
+
+                    default: throw new ProjectCreationNotPossibleException("Unknown project format.");
                 }
-                else if (project.ProjectFormat == ProjectFormat.Old)
+
+                var addProjCommand = DotNet.Sln().AddProject().Project(projPath).ToSolution(solutionFilePath).Build();
+                if (addProjCommand.Execute().ExitCode != 0)
                 {
-                    oldFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
-                }
-                else
-                {
-                    throw new ProjectCreationNotPossibleException();
+                    throw new ProjectCreationNotPossibleException("Could not add project to solution.");
                 }
             }
-
-
             //see ProjectCompiler.Compile
 
             return Path.Combine(outputPath, $"{solution.Name}.sln"); //path to solution file

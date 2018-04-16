@@ -9,7 +9,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class NewFormatProjectWriter : BaseProjectWriter
     {
-        public override void WriteProject(Project project, string path)
+        public override string WriteProject(Project project, string path)
         {
             if (project is null)
             {
@@ -109,6 +109,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             {
                 fileWriter.Write(file, path);
             }
+
+            return projFilePath;
         }
     }
 }

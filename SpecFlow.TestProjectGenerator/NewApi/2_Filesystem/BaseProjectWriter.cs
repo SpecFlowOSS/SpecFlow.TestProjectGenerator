@@ -9,6 +9,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public abstract class BaseProjectWriter
     {
-        public abstract void WriteProject(Project project, string path);
+        public abstract string WriteProject(Project project, string path);
     }
 }

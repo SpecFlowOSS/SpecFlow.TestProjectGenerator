@@ -9,7 +9,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class OldFormatProjectWriter : BaseProjectWriter
     {
-        public override void WriteProject(Project project, string path)
+        public override string WriteProject(Project project, string path)
         {
             if (project is null)
             {
@@ -114,6 +114,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
                 // TODO: call nuget.exe to add packages
             }
+
+            return projFilePath;
         }
     }
 }
