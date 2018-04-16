@@ -75,8 +75,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
                 if (project.NuGetPackages.Count > 0)
                 {
-                    // <Reference Include="TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL">\r\n      <HintPath>..\\packages\\SpecFlow.2.3.1\\lib\\net45\\TechTalk.SpecFlow.dll</HintPath>\r\n    </Reference>
-                    // <Import Project=\"..\packages\SpecFlow.2.3.1\build\SpecFlow.targets\" Condition=\"Exists('..\packages\SpecFlow.2.3.1\build\SpecFlow.targets')\" />
+                    // open item group for nuget packages
                     xw.WriteStartElement("ItemGroup");
 
                     foreach (var package in project.NuGetPackages)
@@ -99,6 +98,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                         }
                     }
 
+                    // close item group for nuget packages
                     xw.WriteEndElement();
 
                     var pkgConf = new PackagesConfigGenerator().Generate(project.NuGetPackages, project.TargetFrameworks);
@@ -125,9 +125,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                         xw.WriteAttributeString("Condition", $"Exists('{targetsFile}')");
                         xw.WriteEndElement();
                     }
-                    // TODO: add NuGet reference to packages.config
                 }
-
 
                 if (project.Files.Count > 0)
                 {
@@ -151,19 +149,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 // close project tag
                 xw.WriteEndElement();
                 xw.WriteEndDocument();
-            }
-
-            if (project.References.Count > 0)
-            {
-                using (var pkgConf = new XmlTextWriter(
-                    File.Open(Path.Combine(path, "packages.config"), FileMode.Create, FileAccess.Write, FileShare.Read),
-                    Encoding.UTF8))
-                {
-                    // TODO: write packages.config
-
-                }
-
-                // TODO: call nuget.exe to add packages
             }
 
             return projFilePath;
