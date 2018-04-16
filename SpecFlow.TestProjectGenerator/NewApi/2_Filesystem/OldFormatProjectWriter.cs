@@ -1,18 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
-using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class OldFormatProjectWriter : BaseProjectWriter
     {
-        public static readonly Regex TargetFrameworkRegex = new Regex(@"v[0-9].[0-9](.[0-9])?");
-
         public override void WriteProject(Project project, string path)
         {
             if (project is null)
@@ -20,15 +16,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 throw new ArgumentNullException(nameof(project));
             }
 
-            var targetFrameworks = project.TargetFrameworks.Split(';');
-            if (targetFrameworks.Length > 1)
+            string targetFramework;
+            try
             {
-                throw new ProjectCreationNotPossibleException("Multiple target frameworks don't work with the old csproj format");
+                targetFramework = project.TargetFrameworks.ToOldNetVersion();
             }
-
-            if (!TargetFrameworkRegex.IsMatch(project.TargetFrameworks))
+            catch (InvalidOperationException exc)
             {
-                throw new ProjectCreationNotPossibleException("Wrong target framework format. In the old project format, the target framework has to be like \"v4.6.2\".");
+                throw new ProjectCreationNotPossibleException("Multiple target frameworks don't work with the old csproj format", exc);
             }
 
             string outputType = project.ProjectType == ProjectType.Exe ? "WinExe" : "Library";
@@ -56,7 +51,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 xw.WriteElementString("RootNamespace", project.Name);
                 xw.WriteElementString("AssemblyName", project.Name);
                 xw.WriteElementString("FileAlignment", "512");
-                xw.WriteElementString("TargetFrameworkVersion", project.TargetFrameworks);
+                xw.WriteElementString("TargetFrameworkVersion", targetFramework);
 
                 // close main property group
                 xw.WriteEndElement();
@@ -78,9 +73,9 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                     xw.WriteEndElement();
                 }
 
-                if (project.References.Count > 0)
+                if (project.NuGetPackages.Count > 0)
                 {
-                    // TODO: add file reference to packages.config
+                    // TODO: add NuGet reference to packages.config
                 }
 
                 if (project.Files.Count > 0)

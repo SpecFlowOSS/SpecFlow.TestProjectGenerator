@@ -92,22 +92,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             var targetFrameworkNode =
                 projRoot.SelectSingleNode("//PropertyGroup/TargetFramework") ?? throw new ProjectCreationNotPossibleException();
 
-            var newTargetFrameworks = project.TargetFrameworks.Split(';');
-            switch (newTargetFrameworks.Length)
-            {
-                case int i when i > 1:
-                    var targetFrameworkParentGroup =
-                        targetFrameworkNode.ParentNode ?? throw new ProjectCreationNotPossibleException();
-                    var multipleTargetFrameworksNode = doc.CreateElement("TargetFrameworks");
-                    multipleTargetFrameworksNode.InnerText = project.TargetFrameworks;
-                    targetFrameworkParentGroup.RemoveChild(targetFrameworkNode);
-                    targetFrameworkParentGroup.AppendChild(multipleTargetFrameworksNode);
-                    break;
+            string newTargetFrameworks = project.TargetFrameworks.ToTargetFrameworkMoniker();
+            var targetFrameworkParentGroup =
+                targetFrameworkNode.ParentNode ?? throw new ProjectCreationNotPossibleException();
+            var multipleTargetFrameworksNode = doc.CreateElement("TargetFrameworks");
+            multipleTargetFrameworksNode.InnerText = newTargetFrameworks;
 
-                case int i when i == 1:
-                    targetFrameworkNode.InnerText = project.TargetFrameworks;
-                    break;
-            }
+            targetFrameworkParentGroup.RemoveChild(targetFrameworkNode);
+            targetFrameworkParentGroup.AppendChild(multipleTargetFrameworksNode);
             
             doc.Save(projFilePath);
 

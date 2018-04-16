@@ -10,7 +10,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
 {
     public class ProjectTests
     {
-        public (Solution, Project, string) CreateEmptySolutionAndProject(ProjectFormat projectFormat, ProgrammingLanguage programmingLanguage, string targetFramework)
+        public (Solution, Project, string) CreateEmptySolutionAndProject(ProjectFormat projectFormat, ProgrammingLanguage programmingLanguage, TargetFramework targetFramework)
         {
             var folder = Path.Combine(Path.GetTempPath(), "SpecFlow.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
 
@@ -26,7 +26,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddNuGetPackageToProjectInNewFormat()
         {
             
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, "net45");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
             project.AddNuGetPackage("SpecFlow", "2.3.1");
@@ -44,7 +44,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddNuGetPackageToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, "v4.5");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
             project.AddNuGetPackage("SpecFlow", "2.3.1");
@@ -64,7 +64,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddNuGetPackageWithMSBuildFilesToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, "v4.5");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
             project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", "2.3.2-preview20180328");
@@ -84,7 +84,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddReferenceToProjectInNewFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, "net45");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
             project.AddReference("System.Configuration");
@@ -102,7 +102,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddReferenceToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, "v4.5");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
             project.AddReference("System.Configuration");
@@ -121,7 +121,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddFileToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, "v4.5");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
             var projectFile = new ProjectFile("File.cs", "Compile", "//no code");
 
@@ -144,7 +144,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddFileToProjectInNewFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, "net45");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
             var projectFile = new ProjectFile("File.cs", "Compile", "//no code");
 
@@ -167,7 +167,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddFileInFolderToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, "v4.5");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
             var projectFile = new ProjectFile(Path.Combine("Folder","File.cs"), "Compile", "//no code");
 
@@ -190,7 +190,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void AddFileInFolderToProjectInNewFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, "net45");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
             var projectFile = new ProjectFile(Path.Combine("Folder", "File.cs"), "Compile", "//no code");
 
@@ -228,20 +228,23 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [InlineData(ProgrammingLanguage.FSharp)]
         public void CreateEmtpyProjectInNewFormat(ProgrammingLanguage programmingLanguage)
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, programmingLanguage, "net45");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, programmingLanguage, TargetFramework.Net45);
 
             new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should().Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net45</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+            projectFileContent.Should().Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFrameworks>net45</TargetFrameworks>\r\n  </PropertyGroup>\r\n</Project>");
             // TODO: VB & F# projects have different templates than the C# project. therefore these tests will never pass
         }
 
         [Fact]
         public void CreateEmtpyProjectWithMultipleFrameworksInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, "net45;netstandard2.0");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(
+                ProjectFormat.New,
+                ProgrammingLanguage.CSharp,
+                TargetFramework.Net45 | TargetFramework.NetStandard20);
 
             new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
@@ -253,7 +256,10 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void MultipleFrameworksInOldFormatNotPossible()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, "net45;netstandard2.0");
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(
+                ProjectFormat.Old,
+                ProgrammingLanguage.CSharp,
+                TargetFramework.Net45 | TargetFramework.NetStandard20);
 
             Action createSolution = () => new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
