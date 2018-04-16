@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 
@@ -9,17 +6,17 @@ namespace SpecFlow.TestProjectGenerator.Tests
 {
     public class JsonConfigGeneratorTests
     {
-        private readonly JsonConfigGenerator _JsonConfigGenerator;
+        private readonly JsonConfigGenerator _jsonConfigGenerator;
 
         public JsonConfigGeneratorTests()
         {
-            _JsonConfigGenerator = new JsonConfigGenerator();
+            _jsonConfigGenerator = new JsonConfigGenerator();
         }
 
         [Fact]
         public void UnitTestProvider()
         {
-            var projectFile = _JsonConfigGenerator.Generate("SpecRun");
+            var projectFile = _jsonConfigGenerator.Generate("SpecRun");
 
             projectFile.Content.Should().Contain("\"unitTestProvider\":{\"name\":\"SpecRun\"}");
         }
@@ -28,7 +25,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void SinglePlugin()
         {
-            var projectFile = _JsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun") });
+            var projectFile = _jsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun") });
 
             projectFile.Content.Should().Contain(@"{""name"":""SpecRun""}");
         }
@@ -36,7 +33,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void MultiplePlugins()
         {
-            var projectFile = _JsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun"), new SpecFlowPlugin("SpecFlow+Excel") });
+            var projectFile = _jsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun"), new SpecFlowPlugin("SpecFlow+Excel") });
 
             projectFile.Content.Should().Contain(@"{""name"":""SpecRun""}");
             projectFile.Content.Should().Contain(@"{""name"":""SpecFlow+Excel""}");
@@ -45,7 +42,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void PluginWithPath()
         {
-            var projectFile = _JsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun", "pathToPluginFolder") });
+            var projectFile = _jsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun", "pathToPluginFolder") });
 
             projectFile.Content.Should().Contain(@"{""name"":""SpecRun"",""path"":""pathToPluginFolder""}");
         }
@@ -53,7 +50,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void SingleAdditionalStepAssembly()
         {
-            var projectFile = _JsonConfigGenerator.Generate("SpecRun", stepAssemblies: new StepAssembly[] { new StepAssembly("AdditionalStepAssembly") });
+            var projectFile = _jsonConfigGenerator.Generate("SpecRun", stepAssemblies: new StepAssembly[] { new StepAssembly("AdditionalStepAssembly") });
 
             projectFile.Content.Should().Contain(@"[{""assembly"":""AdditionalStepAssembly""}]");
         }

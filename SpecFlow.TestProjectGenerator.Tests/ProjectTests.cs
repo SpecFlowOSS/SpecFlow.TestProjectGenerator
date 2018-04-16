@@ -6,6 +6,8 @@ using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
 using Xunit;
 
+// ReSharper disable InconsistentNaming
+
 namespace SpecFlow.TestProjectGenerator.Tests
 {
     public class ProjectTests
@@ -281,7 +283,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void MultipleFrameworksInOldFormatNotPossible()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(
+            var (solution, _, solutionFolder) = CreateEmptySolutionAndProject(
                 ProjectFormat.Old,
                 ProgrammingLanguage.CSharp,
                 TargetFramework.Net45 | TargetFramework.NetStandard20);
