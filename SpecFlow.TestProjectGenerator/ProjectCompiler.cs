@@ -160,7 +160,8 @@ namespace SpecFlow.TestProjectGenerator
 
             if (nugetExitCode > 0)
             {
-                throw new Exception("NuGet restore failed - rebuild solution to generate latest packages " + Environment.NewLine + nugetRestore.ConsoleOutput);
+                throw new Exception("NuGet restore failed - rebuild solution to generate latest packages " + Environment.NewLine +
+                                    $"{inputProjectDriver.SolutionFolder} {processPath} {commandLineArgs}" + Environment.NewLine + nugetRestore.ConsoleOutput);
             }
         }
 
