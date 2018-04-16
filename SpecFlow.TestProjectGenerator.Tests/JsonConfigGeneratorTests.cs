@@ -21,7 +21,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         {
             var projectFile = _JsonConfigGenerator.Generate("SpecRun");
 
-            projectFile.Content.Should().Contain("\"unitTestProvider\":{ \"name\"=\"SpecRun\"} />");
+            projectFile.Content.Should().Contain("\"unitTestProvider\":{\"name\":\"SpecRun\"}");
         }
 
 
@@ -30,7 +30,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         {
             var projectFile = _JsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun") });
 
-            projectFile.Content.Should().Contain(@"{ ""name"": ""SpecRun"" }");
+            projectFile.Content.Should().Contain(@"{""name"":""SpecRun""}");
         }
 
         [Fact]
@@ -38,8 +38,8 @@ namespace SpecFlow.TestProjectGenerator.Tests
         {
             var projectFile = _JsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun"), new SpecFlowPlugin("SpecFlow+Excel") });
 
-            projectFile.Content.Should().Contain(@"{ ""name"": ""SpecRun"" }");
-            projectFile.Content.Should().Contain(@"{ ""name"": ""SpecFlow+Excel"" }");
+            projectFile.Content.Should().Contain(@"{""name"":""SpecRun""}");
+            projectFile.Content.Should().Contain(@"{""name"":""SpecFlow+Excel""}");
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         {
             var projectFile = _JsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun", "pathToPluginFolder") });
 
-            projectFile.Content.Should().Contain(@"{ ""name"": ""SpecRun"", ""path"": ""pathToPluginFolder"" }");
+            projectFile.Content.Should().Contain(@"{""name"":""SpecRun"",""path"":""pathToPluginFolder""}");
         }
 
         [Fact]
@@ -55,10 +55,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         {
             var projectFile = _JsonConfigGenerator.Generate("SpecRun", stepAssemblies: new StepAssembly[] { new StepAssembly("AdditionalStepAssembly") });
 
-            projectFile.Content.Should().Contain(@"[ {""assembly"": ""AdditionalStepAssembly""} ]/>");
-            
+            projectFile.Content.Should().Contain(@"[{""assembly"":""AdditionalStepAssembly""}]");
         }
     }
-
-
 }
