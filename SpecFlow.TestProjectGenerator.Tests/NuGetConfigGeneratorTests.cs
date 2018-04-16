@@ -37,7 +37,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var projectFile = _nuGetConfigGenerator.Generate();
             projectFile.Content.Should()
                 .Be(
-                    "<configuration>\r\n  <packageSources>\r\n    <add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />\r\n  </packageSources>\r\n</configuration>");
+                    "<configuration><packageSources><add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" /></packageSources></configuration>");
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var projectFile = _nuGetConfigGenerator.Generate(new NuGetSource[] { new NuGetSource("localPackages", "LocalPackages") });
             projectFile.Content.Should()
                 .Be(
-                    "<configuration>\r\n  <packageSources>\r\n    <add key=\"localPackages\" value=\"LocalPackages\" />\r\n    <add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />\r\n  </packageSources>\r\n</configuration>");
+                    "<configuration><packageSources><add key=\"localPackages\" value=\"LocalPackages\" /><add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" /></packageSources></configuration>");
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             });
             projectFile.Content.Should()
                 .Be(
-                    "<configuration>\r\n  <packageSources>\r\n    <add key=\"localPackages\" value=\"LocalPackages\" />\r\n    <add key=\"Gherkin CI\" value=\"https://ci.appveyor.com/nuget/gherkin-pgwyovw4bucb/\" />\r\n    <add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />\r\n  </packageSources>\r\n</configuration>");
+                    "<configuration><packageSources><add key=\"localPackages\" value=\"LocalPackages\" /><add key=\"Gherkin CI\" value=\"https://ci.appveyor.com/nuget/gherkin-pgwyovw4bucb/\" /><add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" /></packageSources></configuration>");
         }
     }
 
