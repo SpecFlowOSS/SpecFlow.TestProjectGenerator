@@ -17,14 +17,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands
         {
             var solutionCreateProcessHelper = new ProcessHelper();
 
-            int exitCode = solutionCreateProcessHelper.RunProcess(".", ExecutablePath, ArgumentsFormat);
-            if (exitCode > 0)
+            var processResult = solutionCreateProcessHelper.RunProcess(".", ExecutablePath, ArgumentsFormat);
+            if (processResult.ExitCode > 0)
             {
-                var innerException = new Exception(solutionCreateProcessHelper.ConsoleOutput);
+                var innerException = new Exception(processResult.CombinedOutput);
                 throw new Exception($"Error while executing {ExecutablePath} {ArgumentsFormat}", innerException);
             }
 
-            return new CommandResult(exitCode, solutionCreateProcessHelper.ConsoleOutput);
+            return new CommandResult(processResult.ExitCode, processResult.CombinedOutput);
         }
     }
 }

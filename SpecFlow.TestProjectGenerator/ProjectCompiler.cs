@@ -156,12 +156,12 @@ namespace SpecFlow.TestProjectGenerator
 
 
             var nugetRestore = new ProcessHelper();
-            int nugetExitCode = nugetRestore.RunProcess(inputProjectDriver.SolutionFolder, processPath, commandLineArgs);
+            var processResult = nugetRestore.RunProcess(inputProjectDriver.SolutionFolder, processPath, commandLineArgs);
 
-            if (nugetExitCode > 0)
+            if (processResult.ExitCode > 0)
             {
                 throw new Exception("NuGet restore failed - rebuild solution to generate latest packages " + Environment.NewLine +
-                                    $"{inputProjectDriver.SolutionFolder} {processPath} {commandLineArgs}" + Environment.NewLine + nugetRestore.ConsoleOutput);
+                                    $"{inputProjectDriver.SolutionFolder} {processPath} {commandLineArgs}" + Environment.NewLine + processResult.CombinedOutput);
             }
         }
 
@@ -210,12 +210,12 @@ namespace SpecFlow.TestProjectGenerator
 
 
             var processHelper = new ProcessHelper();
-            int msBuildExitCode = processHelper.RunProcess(inputProjectDriver.SolutionFolder, msBuildPath, $"/bl /nologo /v:m \"{inputProjectDriver.SolutionPath}\"");
+            var msBuildExitCode = processHelper.RunProcess(inputProjectDriver.SolutionFolder, msBuildPath, $"/bl /nologo /v:m \"{inputProjectDriver.SolutionPath}\"");
 
             
-            if (msBuildExitCode > 0)
+            if (msBuildExitCode.ExitCode > 0)
             {
-                var firstErrorLine = processHelper.ConsoleOutput.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(l => l.Contains("): error "));
+                var firstErrorLine = msBuildExitCode.CombinedOutput.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(l => l.Contains("): error "));
                 throw new Exception($"Build failed: {firstErrorLine}");
             }
         }

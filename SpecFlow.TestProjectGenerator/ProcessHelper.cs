@@ -5,25 +5,34 @@ using System.Threading;
 
 namespace SpecFlow.TestProjectGenerator
 {
+
+    public class ProcessResult
+    {
+        public ProcessResult(int exitCode, string stdOutput, string stdError, string combinedOutput)
+        {
+            ExitCode = exitCode;
+            StdOutput = stdOutput;
+            StdError = stdError;
+            CombinedOutput = combinedOutput;
+        }
+
+        public string StdOutput { get; }
+        public string StdError { get; }
+        public string CombinedOutput { get; }
+        public int ExitCode { get; }
+    }
+
     public class ProcessHelper
     {
         private static TimeSpan _timeout = TimeSpan.FromMinutes(10);
-        private static int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
+        private static readonly int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
 
-        public string ConsoleOutput { get; private set; }
-
-        public int RunProcess(string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
+        public ProcessResult RunProcess(string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
         {
             var parameters = string.Format(argumentsFormat, arguments);
 
             Console.WriteLine("Starting external program: \"{0}\" {1}", executablePath, parameters);
-            ProcessStartInfo psi = new ProcessStartInfo(executablePath, parameters);
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
-            psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
-            psi.WorkingDirectory = workingDirectory;
+            var psi = CreateProcessStartInfo(workingDirectory, executablePath, parameters);
 
 
             var process = new Process
@@ -33,7 +42,9 @@ namespace SpecFlow.TestProjectGenerator
 
             };
 
-            StringBuilder output = new StringBuilder();
+            StringBuilder combinedOutput = new StringBuilder();
+            StringBuilder stdOutput = new StringBuilder();
+            StringBuilder stdError = new StringBuilder();
 
 
             using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
@@ -48,7 +59,8 @@ namespace SpecFlow.TestProjectGenerator
                         }
                         else
                         {
-                            output.AppendLine(e.Data);
+                            combinedOutput.AppendLine(e.Data);
+                            stdOutput.AppendLine(e.Data);
                         }
                     };
                     process.ErrorDataReceived += (sender, e) =>
@@ -59,7 +71,8 @@ namespace SpecFlow.TestProjectGenerator
                         }
                         else
                         {
-                            output.AppendLine(e.Data);
+                            combinedOutput.AppendLine(e.Data);
+                            stdError.AppendLine(e.Data);
                         }
                     };
 
@@ -69,23 +82,28 @@ namespace SpecFlow.TestProjectGenerator
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
-                    if (process.WaitForExit(_timeOutInMilliseconds) &&
-                        outputWaitHandle.WaitOne(_timeOutInMilliseconds) &&
-                        errorWaitHandle.WaitOne(_timeOutInMilliseconds))
+                    if (!process.WaitForExit(_timeOutInMilliseconds) || !outputWaitHandle.WaitOne(_timeOutInMilliseconds) ||
+                        !errorWaitHandle.WaitOne(_timeOutInMilliseconds))
                     {
-                        ConsoleOutput = output.ToString();
+                        throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete");
                     }
-                    else
-                    {
-                        throw new TimeoutException(string.Format("Process {0} {1} took longer than {2} min to complete", psi.FileName, psi.Arguments, _timeout.TotalMinutes));
-                    }
-
                 }
             }
-            Console.WriteLine(ConsoleOutput);
 
+            return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), combinedOutput.ToString());
+        }
 
-            return process.ExitCode;
+        private ProcessStartInfo CreateProcessStartInfo(string workingDirectory, string executablePath, string parameters)
+        {
+            return new ProcessStartInfo(executablePath, parameters)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                WorkingDirectory = workingDirectory
+            };
         }
     }
 }

@@ -24,11 +24,10 @@ namespace SpecFlow.TestProjectGenerator
             }
 
             var ph = new ProcessHelper();
-            ph.RunProcess(".", vsWherePath, VsWhereParameter);
-            var output = ph.ConsoleOutput;
+            var processResult = ph.RunProcess(".", vsWherePath, VsWhereParameter);
 
 
-            var lines = output.Split(new string[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+            var lines = processResult.CombinedOutput.Split(new string[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
             return lines.First();
         }
 
