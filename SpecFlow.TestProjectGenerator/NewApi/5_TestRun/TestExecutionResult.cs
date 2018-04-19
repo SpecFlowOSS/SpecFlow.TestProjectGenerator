@@ -2,7 +2,7 @@
 
 namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 {
-    internal class TestExecutionResult
+    public class TestExecutionResult
     {
         public int Total { get; set; }
         public int TotalSucceeded { get; set; }

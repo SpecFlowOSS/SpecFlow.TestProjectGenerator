@@ -7,14 +7,11 @@ namespace SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
         public override string GetBindingCode(string eventType, string code)
         {
             var staticKeyword = IsStaticEvent(eventType) ? "static" : "";
-            return string.Format(@"[{0}] {1} public void {0}() 
+            return $@"[{eventType}] {staticKeyword} public void {eventType}() 
                                 {{
-                                    Console.WriteLine(""BindingExecuted:{0}"");
-                                    {2}
-                                }}", 
-                                eventType, 
-                                staticKeyword, 
-                                code);
+                                    Console.WriteLine(""BindingExecuted:{eventType}"");
+                                    {code}
+                                }}";
         }
 
         public override string GetProjectFileName(string projectName)

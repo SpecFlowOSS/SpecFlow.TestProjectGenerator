@@ -6,6 +6,7 @@ namespace SpecFlow.TestProjectGenerator
 {
     public class Folders
     {
+        private readonly AppConfigDriver _appConfigDriver;
         protected string _nugetFolder;
         protected string _packageFolder;
         protected string _sourceRoot;
@@ -15,6 +16,11 @@ namespace SpecFlow.TestProjectGenerator
         protected bool _vsAdapterFolderChanged;
 
         public string TestFolder => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+
+        public Folders(AppConfigDriver appConfigDriver)
+        {
+            _appConfigDriver = appConfigDriver;
+        }
 
         public virtual string SourceRoot
         {
@@ -42,7 +48,7 @@ namespace SpecFlow.TestProjectGenerator
 
         public virtual string NuGetFolder
         {
-            get => !string.IsNullOrWhiteSpace(_nugetFolder) ? _nugetFolder : Path.GetFullPath(Path.Combine(SourceRoot, "Installer", "NuGetPackages", "bin", "Debug"));
+            get => !string.IsNullOrWhiteSpace(_nugetFolder) ? _nugetFolder : Path.GetFullPath(Path.Combine(SourceRoot, "Installer", "NuGetPackages", "bin"));
             set => _nugetFolder = value;
         }
 
@@ -60,6 +66,6 @@ namespace SpecFlow.TestProjectGenerator
             set => _specFlow = value;
         }
 
-        public virtual string TestProjectRootFolder => Path.Combine(Path.GetTempPath(), "SpecFlow");
+        public virtual string FolderToSaveGeneratedSolutions => Path.Combine(Path.GetTempPath(), _appConfigDriver.TestProjectFolderName);
     }
 }

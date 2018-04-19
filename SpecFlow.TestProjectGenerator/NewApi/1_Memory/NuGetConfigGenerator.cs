@@ -33,7 +33,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
         }
 
-        public void WriteNuGetSources(XmlWriter writer, NuGetSource[] nuGetSources)
+        private void WriteNuGetSources(XmlWriter writer, NuGetSource[] nuGetSources)
         {
             foreach (var source in nuGetSources ?? new NuGetSource[0])
             {
@@ -41,7 +41,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
         }
 
-        public void WriteNuGetSource(XmlWriter writer, NuGetSource nuGetSource)
+        private void WriteNuGetSource(XmlWriter writer, NuGetSource nuGetSource)
         {
             writer.WriteStartElement("add");
             writer.WriteAttributeString("key", nuGetSource.Key);
@@ -49,14 +49,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             writer.WriteEndElement();
         }
 
-        public void WriteNuGetOrgSource(XmlWriter writer)
+        private void WriteNuGetOrgSource(XmlWriter writer)
         {
             var nuGetOrg = new NuGetSource("Nuget.org", "https://api.nuget.org/v3/index.json");
 
             WriteNuGetSource(writer, nuGetOrg);
         }
 
-        public ProjectFile GenerateProjectFile(MemoryStream ms)
+        private ProjectFile GenerateProjectFile(MemoryStream ms)
         {
             ms.Seek(0, SeekOrigin.Begin);
 

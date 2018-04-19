@@ -110,7 +110,7 @@ namespace SpecFlow.TestProjectGenerator
 
         internal string DetermineDirectoryForTestProjects()
         {
-            return Path.Combine(_folders.TestProjectRootFolder, Environment.ExpandEnvironmentVariables(_appConfigDriver.ProjectName));
+            return Path.Combine(_folders.FolderToSaveGeneratedSolutions, Environment.ExpandEnvironmentVariables(_appConfigDriver.TestProjectFolderName));
         }
 
         private string GetFeatureFileName()

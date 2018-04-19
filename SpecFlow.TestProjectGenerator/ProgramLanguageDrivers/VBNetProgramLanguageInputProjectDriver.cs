@@ -8,7 +8,6 @@ namespace SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
         {
             var staticKeyword = IsStaticEvent(eventType) ? "Shared" : "";
             return string.Format(@"<{0}> {1} Public Sub {0}() 
-                                {{
                                     Console.WriteLine(""BindingExecuted:{0}"")
                                     {2}
                                 End Sub",

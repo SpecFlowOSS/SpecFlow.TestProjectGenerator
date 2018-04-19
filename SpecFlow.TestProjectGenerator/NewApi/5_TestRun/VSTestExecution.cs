@@ -11,7 +11,7 @@ using SpecFlow.TestProjectGenerator.Helpers;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 {
-    class VSTestExecution
+    public class VSTestExecution
     {
         private readonly VisualStudioFinder _visualStudioFinder;
         private readonly AppConfigDriver _appConfigDriver;

@@ -16,7 +16,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
         public string Name { get; set; }
         public IReadOnlyList<Project> Projects { get; } 
-        public ProjectFile NugetConfig { get; set; }
+        public ProjectFile NugetConfig { get; set; } //TODO tests & add to solutionwriter
 
         public void AddProject(Project project)
         {

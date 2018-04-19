@@ -1,6 +1,8 @@
 ﻿namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
 {
-    internal class CompileResult
+    public class CompileResult
     {
+        public bool Successful { get; set; }
+        public string Output { get; set; }
     }
 }

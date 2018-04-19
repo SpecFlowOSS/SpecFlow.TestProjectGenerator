@@ -1,4 +1,6 @@
 ﻿using System;
+using SpecFlow.TestProjectGenerator.Helpers;
+using SpecFlow.TestProjectGenerator.NewApi.Driver;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
 {
@@ -21,6 +23,36 @@ End Class";
         {
             string randomClassName = $"BindingsClass_{Guid.NewGuid():N}";
             return new ProjectFile($"{randomClassName}.cs", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
+        }
+
+        protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)
+        {
+            string parameter = "";
+
+            if (argumentName.IsNullOrWhiteSpace())
+            {
+                switch (parameterType)
+                {
+                    case ParameterType.Normal:
+                        parameter = $"{argumentName} As Object";
+                        break;
+                    case ParameterType.Table:
+                        parameter = $"{argumentName} As Table";
+                        break;
+                    case ParameterType.DocString:
+                        parameter = $"{argumentName} As String";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(parameterType), parameterType, null);
+                }
+            }
+
+
+
+            return $@"<{attributeName}(@""{regex}"")> Public Sub {methodName}({parameter}) 
+                                
+                                    {methodImplementation}
+                                End Sub";
         }
     }
 }

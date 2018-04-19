@@ -1,10 +1,39 @@
-﻿namespace SpecFlow.TestProjectGenerator.NewApi._3_NuGet
+﻿using System;
+using System.IO;
+
+namespace SpecFlow.TestProjectGenerator.NewApi._3_NuGet
 {
-    class NuGet
+    public class NuGet
     {
-        public void Restore(string solutionPath)
+        private readonly Folders _folders;
+        private readonly TestProjectFolders _testProjectFolders;
+
+        public NuGet(Folders folders, TestProjectFolders testProjectFolders)
         {
-            //nuget restore | dotnet restore
+            _folders = folders;
+            _testProjectFolders = testProjectFolders;
+        }
+
+        public void Restore()
+        {
+            var processPath = Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine", "4.5.1", "tools", "NuGet.exe");
+
+            if (!File.Exists(processPath))
+            {
+                throw new FileNotFoundException("NuGet.exe could not be found! Is the version number correct?", processPath);
+            }
+
+            var commandLineArgs = $"restore {_testProjectFolders.SolutionFileName} -SolutionDirectory . ";
+
+
+            var nugetRestore = new ProcessHelper();
+            var processResult = nugetRestore.RunProcess(_testProjectFolders.PathToSolutionDirectory, processPath, commandLineArgs);
+
+            if (processResult.ExitCode > 0)
+            {
+                throw new Exception("NuGet restore failed - rebuild solution to generate latest packages " + Environment.NewLine +
+                                    $"{_testProjectFolders.PathToSolutionDirectory} {processPath} {commandLineArgs}" + Environment.NewLine + processResult.CombinedOutput);
+            }
         }
     }
 }
