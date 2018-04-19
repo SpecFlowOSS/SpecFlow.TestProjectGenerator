@@ -31,7 +31,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
-            project.AddNuGetPackage("SpecFlow", "2.3.1", new[] {("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll") });
+            project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
 
 
             new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
@@ -49,7 +49,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
 
-            project.AddNuGetPackage("SpecFlow", "2.3.1", new[] { ("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll") });
+            project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
 
 
             new SolutionWriter().WriteToFileSystem(solution, solutionFolder);

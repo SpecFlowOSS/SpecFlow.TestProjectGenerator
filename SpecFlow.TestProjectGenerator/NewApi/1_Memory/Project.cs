@@ -39,7 +39,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public IReadOnlyList<Reference> References { get; }
         public IReadOnlyList<ProjectFile> Files { get; }
 
-        public void AddNuGetPackage(string name, string version, params (string PublicAssemblyName, string RelativeHintPath)[] assemblies)
+        public void AddNuGetPackage(string name, string version, params NuGetPackageAssembly[] assemblies)
         {
             _nuGetPackages.Add(new NuGetPackage(name, version, assemblies));
         }
