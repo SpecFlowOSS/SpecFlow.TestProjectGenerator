@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
 
@@ -10,6 +8,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class SolutionWriter
     {
+        private readonly ProjectWriterFactory _projectWriterFactory = new ProjectWriterFactory();
         public string WriteToFileSystem(Solution solution, string outputPath)
         {
             if (solution is null)
@@ -25,34 +24,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
 
-            BaseProjectWriter newFormatProjectWriter = new NewFormatProjectWriter();
-            BaseProjectWriter oldFormatProjectWriter = new OldFormatProjectWriter();
-
-            foreach (var project in solution.Projects)
-            {
-                string projPath;
-                switch (project.ProjectFormat)
-                {
-                    case ProjectFormat.New:
-                        projPath = newFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
-                        break;
-                    case ProjectFormat.Old:
-                        projPath = oldFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
-                        break;
-
-                    default: throw new ProjectCreationNotPossibleException("Unknown project format.");
-                }
-
-                var addProjCommand = DotNet.Sln().AddProject().Project(projPath).ToSolution(solutionFilePath).Build();
-                if (addProjCommand.Execute().ExitCode != 0)
-                {
-                    throw new ProjectCreationNotPossibleException("Could not add project to solution.");
-                }
-            }
+            WriteProjects(solution, outputPath, solutionFilePath);
 
             //see ProjectCompiler.Compile
 
-            return solutionFilePath; //path to solution file
+            return solutionFilePath;
         }
 
         public CommandResult ExecuteCommandBuilder(CommandBuilder cb, Exception ex)
@@ -69,46 +45,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         public void WriteProjects(Solution solution, string outputPath, string solutionFilePath)
         {
-            BaseProjectWriter newFormatProjectWriter = new NewFormatProjectWriter();
-            BaseProjectWriter oldFormatProjectWriter = new OldFormatProjectWriter();
-
             foreach (var project in solution.Projects)
             {
-                string projPath;
-                switch (project.ProjectFormat)
-                {
-                    case ProjectFormat.New:
-                        projPath = newFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
-                        break;
-                    case ProjectFormat.Old:
-                        projPath = oldFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
-                        break;
+                var formatProjectWriter = _projectWriterFactory.FromProjectFormat(project.ProjectFormat);
 
-                    default: throw new ProjectCreationNotPossibleException("Unknown project format.");
-                }
-
-                var addProjCommand = DotNet.Sln().AddProject().Project(projPath).ToSolution(solutionFilePath).Build();
-                if (addProjCommand.Execute().ExitCode != 0)
-                {
-                    throw new ProjectCreationNotPossibleException("Could not add project to solution.");
-                }
+                WriteProject(project, outputPath, formatProjectWriter, solutionFilePath);
             }
         }
 
-        public void WriteProject(Project project, string outputPath, )
+        public void WriteProject(Project project, string outputPath, BaseProjectWriter formatProjectWriter, string solutionFilePath)
         {
-            string projPath;
-            switch (project.ProjectFormat)
-            {
-                case ProjectFormat.New:
-                    projPath = newFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
-                    break;
-                case ProjectFormat.Old:
-                    projPath = oldFormatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
-                    break;
-
-                default: throw new ProjectCreationNotPossibleException("Unknown project format.");
-            }
+            string projPath = formatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
 
             var addProjCommand = DotNet.Sln().AddProject().Project(projPath).ToSolution(solutionFilePath).Build();
             if (addProjCommand.Execute().ExitCode != 0)

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+﻿using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
@@ -13,6 +8,12 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         {
             switch (projectFormat)
             {
+                case ProjectFormat.Old:
+                    return new OldFormatProjectWriter();
+                case ProjectFormat.New:
+                    return new NewFormatProjectWriter();
+                default:
+                    throw new ProjectCreationNotPossibleException("Unknown project format.");
             }
         }
     }
