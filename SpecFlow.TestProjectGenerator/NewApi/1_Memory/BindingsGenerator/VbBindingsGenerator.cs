@@ -12,7 +12,7 @@ Public Class {0}
     {1}
 End Class";
 
-        public override ProjectFile GenerateBindingClass(string name, string content)
+        public override ProjectFile GenerateBindingClassFile(string name, string content)
         {
             return new ProjectFile(name, "Compile", content);
         }

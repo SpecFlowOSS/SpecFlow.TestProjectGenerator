@@ -2,7 +2,7 @@
 {
     public abstract class BaseBindingsGenerator
     {
-        public abstract ProjectFile GenerateBindingClass(string name, string content);
+        public abstract ProjectFile GenerateBindingClassFile(string name, string fileContent);
 
         public abstract ProjectFile GenerateStepDefinition(string method);
     }

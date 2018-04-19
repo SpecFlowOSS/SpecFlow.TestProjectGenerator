@@ -9,6 +9,8 @@ namespace SpecFlow.TestProjectGenerator.Tests
 {
     public class BindingsGeneratorTests
     {
+        private readonly BindingsGeneratorFactory _bindingsGeneratorFactory = new BindingsGeneratorFactory();
+
         [Theory(DisplayName = "BindingsGenerator should generate step definitions")]
         [InlineData(ProgrammingLanguage.CSharp, @"[Given(""Some method"")]public void SomeMethod(){}")]
         [InlineData(ProgrammingLanguage.FSharp, @"let [<Given>] `Some method` () = ()")]
@@ -18,26 +20,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             string stepDefinition)
         {
             // ARRANGE
-            BaseBindingsGenerator generator;
-            switch (targetLanguage)
-            {
-                case ProgrammingLanguage.CSharp:
-                    generator = new CSharpBindingsGenerator();
-                    break;
-
-                case ProgrammingLanguage.FSharp:
-                    generator = new FSharpBindingsGenerator();
-                    break;
-
-                case ProgrammingLanguage.VB:
-                    generator = new VbBindingsGenerator();
-                    break;
-
-                default:
-                    throw new ArgumentException(
-                        $"Target language generator not defined for {targetLanguage}.",
-                        nameof(targetLanguage));
-            }
+            var generator = _bindingsGeneratorFactory.FromLanguage(targetLanguage);
 
             // ACT
             var bindingsFile = generator.GenerateStepDefinition(stepDefinition);
