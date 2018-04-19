@@ -37,8 +37,9 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
                 return;
             }
 
-            _project = new Project(ProjectName, _programmingLanguage, _targetFrameworks, _projectFormat);
+            _project = new Project(ProjectName, ProjectGuid,  _programmingLanguage, _targetFrameworks, _projectFormat);
             _project.AddNuGetPackage("SpecFlow", "1.0.0-alpha", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll")); //TODO change after GitVersion adding
+            _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", "1.0.0-alpha"); //TODO change after GitVersion adding
             _project.AddFile(_appConfigGenerator.Generate("xunit"));
             
             _solutionDriver.AddProject(_project);

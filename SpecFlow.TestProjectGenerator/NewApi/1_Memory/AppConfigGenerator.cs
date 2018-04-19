@@ -8,11 +8,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class AppConfigGenerator
     {
-        public ProjectFile Generate(
-            string unitTestProvider,
-            StepAssembly[] stepAssemblies = null,
-            SpecFlowPlugin[] plugins = null,
-            CultureInfo featureLanguage = null)
+        public ProjectFile Generate(string unitTestProvider, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
         {
             featureLanguage = featureLanguage ?? CultureInfo.GetCultureInfo("en-US");
 
@@ -32,12 +28,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
         }
 
-        public void WriteSpecFlow(
-            XmlWriter writer, 
-            string unitTestProvider,
-            StepAssembly[] stepAssemblies = null,
-            SpecFlowPlugin[] plugins = null,
-            CultureInfo featureLanguage = null)
+        public void WriteSpecFlow(XmlWriter writer, string unitTestProvider, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
         {
             writer.WriteStartElement("specFlow");
 
@@ -66,7 +57,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             writer.WriteEndElement();
         }
 
-        public void WriteStepAssemblies(XmlWriter writer, StepAssembly [] stepAssemblies)
+        public void WriteStepAssemblies(XmlWriter writer, StepAssembly[] stepAssemblies)
         {
             if (stepAssemblies is null) return;
             writer.WriteStartElement("stepAssemblies");

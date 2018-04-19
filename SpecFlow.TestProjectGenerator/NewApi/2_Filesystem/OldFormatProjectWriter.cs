@@ -22,31 +22,32 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             const string msbuildNamespace = "http://schemas.microsoft.com/developer/msbuild/2003";
 
-            using (var xw = new XmlTextWriter(
-                File.Open(projFilePath, FileMode.Create, FileAccess.Write, FileShare.Read),
-                Encoding.UTF8))
+            var xmlWriterSettings = new XmlWriterSettings()
+            {
+                Indent = true,
+                NewLineOnAttributes = false,
+                Encoding = Encoding.UTF8,
+            };
+
+            using (var xw = XmlTextWriter.Create(projFilePath, xmlWriterSettings))
             {
                 xw.WriteStartDocument();
 
                 // project tag
                 xw.WriteStartElement(string.Empty, "Project", msbuildNamespace);
-                xw.WriteAttributeString("ToolsVersion", "14.0");
+                xw.WriteAttributeString("ToolsVersion", "15.0");
                 xw.WriteAttributeString("DefaultTargets", "Build");
 
-                // write main project properties
+                WriteNuGetPackagePropsImports(xw, project);
+
                 WriteProjectProperties(xw, project);
-
-                // write GAC & assembly references
                 WriteProjectReferences(xw, project);
-
-                // write NuGet package references
                 WriteProjectNuGetPackages(xw, project);
-
-                // write imports from NuGet packages
-                WriteProjectNuGetPackageImports(xw, project);
-
-                // write project files
                 WriteProjectFiles(xw, project, path);
+
+                WriteMSBuildImport(xw, "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
+
+                WriteNuGetPackageTargetImports(xw, project);
 
                 // close project tag
                 xw.WriteEndElement();
@@ -72,11 +73,28 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             // main property group
             xw.WriteStartElement("PropertyGroup");
+            xw.WriteElementString("Configuration", "Debug");
+            xw.WriteElementString("Platform", "AnyCPU");
+            xw.WriteElementString("ProductVersion", null);
+            xw.WriteElementString("SchemaVersion", "2.0");
+            xw.WriteElementString("ProjectGuid", project.ProjectGuid.ToString("B"));
+            xw.WriteElementString("AppDesignerFolder", "Properties");
+            xw.WriteElementString("ProjectTypeGuids", "{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
+            xw.WriteElementString("ShowTrace", "true");
             xw.WriteElementString("OutputType", outputType);
             xw.WriteElementString("RootNamespace", project.Name);
             xw.WriteElementString("AssemblyName", project.Name);
             xw.WriteElementString("FileAlignment", "512");
             xw.WriteElementString("TargetFrameworkVersion", targetFramework);
+
+
+            xw.WriteElementString("DebugSymbols", "true");
+            xw.WriteElementString("DebugType", "full");
+            xw.WriteElementString("Optimize", "false");
+            xw.WriteElementString("OutputPath", "bin\\Debug");
+            xw.WriteElementString("DefineConstants", "DEBUG;TRACE");
+            xw.WriteElementString("ErrorReport", "prompt");
+            xw.WriteElementString("WarningLevel", "4");
 
             // close main property group
             xw.WriteEndElement();
@@ -84,6 +102,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         private void WriteProjectReferences(XmlWriter xw, Project project)
         {
+
+
             if (project.References.Count <= 0) return;
 
             // open item group for library & GAC references
@@ -127,44 +147,43 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 xw.WriteStartElement("Reference");
                 xw.WriteAttributeString("Include", assembly.PublicAssemblyName);
 
-                xw.WriteElementString(
-                    "HintPath",
-                    Path.Combine(
-                        "..",
-                        "packages",
-                        $"{package.Name}.{package.Version}",
-                        "lib",
-                        assembly.RelativeHintPath));
+                xw.WriteElementString("HintPath", Path.Combine("..","packages",$"{package.Name}.{package.Version}","lib",assembly.RelativeHintPath));
 
                 xw.WriteEndElement();
             }
         }
 
-        private void WriteProjectNuGetPackageImports(XmlWriter xw, Project project)
+        private void WriteNuGetPackageTargetImports(XmlWriter xw, Project project)
+        {
+            WriteNuGetPackageMSBuildImports(xw, project, "targets");
+        }
+
+        private void WriteNuGetPackagePropsImports(XmlWriter xw, Project project)
+        {
+            WriteNuGetPackageMSBuildImports(xw, project, "props");
+        }
+
+        private void WriteNuGetPackageMSBuildImports(XmlWriter xw, Project project, string extension)
         {
             if (project.NuGetPackages.Count <= 0) return;
 
             foreach (var package in project.NuGetPackages)
             {
-                string packagePath =
-                    Path.Combine(
-                        "..",
-                        "packages",
-                        $"{package.Name}.{package.Version}");
+                string packagePath = Path.Combine("..", "packages", $"{package.Name}.{package.Version}");
 
-                string targetsFile = Path.Combine(packagePath, "build", $"{package.Name}.targets");
-                string propsFile = Path.Combine(packagePath, "build", $"{package.Name}.props");
+                string targetsFile = Path.Combine(packagePath, "build", $"{package.Name}.{extension}");
 
-                xw.WriteStartElement("Import");
-                xw.WriteAttributeString("Project", propsFile);
-                xw.WriteAttributeString("Condition", $"Exists('{propsFile}')");
-                xw.WriteEndElement();
 
-                xw.WriteStartElement("Import");
-                xw.WriteAttributeString("Project", targetsFile);
-                xw.WriteAttributeString("Condition", $"Exists('{targetsFile}')");
-                xw.WriteEndElement();
+                WriteMSBuildImport(xw, targetsFile);
             }
+        }
+
+        private void WriteMSBuildImport(XmlWriter xw, string file)
+        {
+            xw.WriteStartElement("Import");
+            xw.WriteAttributeString("Project", file);
+            xw.WriteAttributeString("Condition", $"Exists('{file}')");
+            xw.WriteEndElement();
         }
 
         private void WriteProjectFiles(XmlWriter xw, Project project, string projectRootPath)
@@ -178,7 +197,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             var fileWriter = new ProjectFileWriter();
             foreach (var file in project.Files)
             {
-                xw.WriteStartElement("Compile");
+                xw.WriteStartElement(file.BuildAction);
                 xw.WriteAttributeString("Include", file.Path);
                 xw.WriteEndElement();
                 fileWriter.Write(file, projectRootPath);

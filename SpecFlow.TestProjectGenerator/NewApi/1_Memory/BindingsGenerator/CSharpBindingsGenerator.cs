@@ -31,7 +31,7 @@ public class {0}
         {
             string parameter = "";
 
-            if (argumentName.IsNullOrWhiteSpace())
+            if (argumentName.IsNotNullOrWhiteSpace())
             {
                 switch (parameterType)
                 {

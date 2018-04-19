@@ -24,7 +24,7 @@ namespace SpecFlow.TestProjectGenerator
 
         public virtual string SourceRoot
         {
-            get => !string.IsNullOrWhiteSpace(_sourceRoot) ? _sourceRoot : Path.GetFullPath(Path.Combine(TestFolder, "..", "..", ".."));
+            get => !string.IsNullOrWhiteSpace(_sourceRoot) ? _sourceRoot : Path.GetFullPath(Path.Combine(TestFolder, "..", "..", "..", "..", ".."));
             set => _sourceRoot = value;
         }
 

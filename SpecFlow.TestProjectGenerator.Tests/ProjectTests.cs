@@ -17,7 +17,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             var folder = Path.Combine(Path.GetTempPath(), "SpecFlow.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
 
             var solution = new Solution("SolutionName");
-            var project = new Project("ProjectName", programmingLanguage, targetFramework, projectFormat);
+            var project = new Project("ProjectName", Guid.NewGuid(), programmingLanguage, targetFramework, projectFormat);
 
             solution.AddProject(project);
 
