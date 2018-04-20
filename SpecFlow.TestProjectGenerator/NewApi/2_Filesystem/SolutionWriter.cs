@@ -23,9 +23,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
 
             var createSolutionCommand = DotNet.New().Solution().InFolder(outputPath).WithName(solution.Name).Build();
-
             createSolutionCommand.Execute(new ProjectCreationNotPossibleException("Could not create solution."));
-
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
 
             WriteProjects(solution, outputPath, solutionFilePath);

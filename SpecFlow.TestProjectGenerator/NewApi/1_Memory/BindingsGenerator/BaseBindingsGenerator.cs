@@ -8,8 +8,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
 
         public abstract ProjectFile GenerateStepDefinition(string method);
 
-        
-
         public ProjectFile GenerateStepDefinition(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType = ParameterType.Normal, string argumentName = null)
         {
             var method = GetBindingCode(methodName, methodImplementation, attributeName, regex, parameterType, argumentName);

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SpecFlow.TestProjectGenerator.Inputs;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
 
@@ -28,7 +25,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public Guid ProjectGuid { get; } = Guid.NewGuid();
         public string ProjectName => $"TestProject_{ProjectGuid:N}";
-
 
         private void EnsureProjectExists()
         {
@@ -59,8 +55,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             EnsureProjectExists();
 
             var methodImplementation = GetCode(_project.ProgrammingLanguage, csharpcode, vbnetcode);
-
-
             var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
 
             _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, scenarioBlock, regex));

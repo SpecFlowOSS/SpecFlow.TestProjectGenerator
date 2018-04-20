@@ -2,7 +2,13 @@
 {
     public class CompileResult
     {
-        public bool Successful { get; set; }
-        public string Output { get; set; }
+        public CompileResult(bool successful, string output)
+        {
+            Successful = successful;
+            Output = output;
+        }
+
+        public bool Successful { get; }
+        public string Output { get; }
     }
 }

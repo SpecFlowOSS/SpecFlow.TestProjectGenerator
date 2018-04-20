@@ -48,15 +48,11 @@ public class {0}
                         throw new ArgumentOutOfRangeException(nameof(parameterType), parameterType, null);
                 }
             }
-
-
+            
             return $@"[{attributeName}(@""{regex}"")] public void {methodName}({parameter}) 
-                                {{ 
-                                
+                                {{
                                     {methodImplementation}
                                 }}";
         }
-
-        
     }
 }

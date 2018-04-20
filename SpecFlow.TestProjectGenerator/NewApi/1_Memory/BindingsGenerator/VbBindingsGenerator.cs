@@ -47,8 +47,6 @@ End Class";
                 }
             }
 
-
-
             return $@"<{attributeName}(@""{regex}"")> Public Sub {methodName}({parameter}) 
                                 
                                     {methodImplementation}
