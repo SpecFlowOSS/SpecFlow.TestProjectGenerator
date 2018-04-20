@@ -26,5 +26,19 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands
 
             return new CommandResult(processResult.ExitCode, processResult.CombinedOutput);
         }
+
+        public CommandResult Execute(Exception ex)
+        {
+            var solutionCreateProcessHelper = new ProcessHelper();
+
+            var processResult = solutionCreateProcessHelper.RunProcess(".", ExecutablePath, ArgumentsFormat);
+            if (processResult.ExitCode != 0)
+            {
+                var innerException = new Exception(processResult.CombinedOutput);
+                throw ex;
+            }
+
+            return new CommandResult(processResult.ExitCode, processResult.CombinedOutput);
+        }
     }
 }
