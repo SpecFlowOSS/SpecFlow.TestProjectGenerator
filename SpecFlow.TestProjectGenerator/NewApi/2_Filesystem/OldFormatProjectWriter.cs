@@ -9,6 +9,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class OldFormatProjectWriter : BaseProjectWriter
     {
+        private readonly ProjectFileWriter _fileWriter = new ProjectFileWriter();
+
         public override string WriteProject(Project project, string path)
         {
             if (project is null)
@@ -29,7 +31,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 Encoding = Encoding.UTF8,
             };
 
-            using (var xw = XmlTextWriter.Create(projFilePath, xmlWriterSettings))
+            using (var xw = XmlWriter.Create(projFilePath, xmlWriterSettings))
             {
                 xw.WriteStartDocument();
 
@@ -70,9 +72,9 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
 
             string outputType = project.ProjectType == ProjectType.Exe ? "WinExe" : "Library";
-
-            // main property group
+            
             xw.WriteStartElement("PropertyGroup");
+
             xw.WriteElementString("Configuration", "Debug");
             xw.WriteElementString("Platform", "AnyCPU");
             xw.WriteElementString("ProductVersion", null);
@@ -96,14 +98,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             xw.WriteElementString("ErrorReport", "prompt");
             xw.WriteElementString("WarningLevel", "4");
 
-            // close main property group
             xw.WriteEndElement();
         }
 
         private void WriteProjectReferences(XmlWriter xw, Project project)
         {
-
-
             if (project.References.Count <= 0) return;
 
             // open item group for library & GAC references
@@ -124,8 +123,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         private void WriteProjectNuGetPackages(XmlWriter xw, Project project)
         {
             if (project.NuGetPackages.Count <= 0) return;
-
-            // open item group for nuget packages
+            
             xw.WriteStartElement("ItemGroup");
 
             foreach (var package in project.NuGetPackages)
@@ -133,7 +131,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 WriteNuGetPackage(xw, package);
             }
 
-            // close item group for nuget packages
             xw.WriteEndElement();
 
             var pkgConf = new PackagesConfigGenerator().Generate(project.NuGetPackages, project.TargetFrameworks);
@@ -155,25 +152,22 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         private void WriteNuGetPackageTargetImports(XmlWriter xw, Project project)
         {
-            WriteNuGetPackageMSBuildImports(xw, project, "targets");
+            WriteNuGetPackageMsBuildImports(xw, project, "targets");
         }
 
         private void WriteNuGetPackagePropsImports(XmlWriter xw, Project project)
         {
-            WriteNuGetPackageMSBuildImports(xw, project, "props");
+            WriteNuGetPackageMsBuildImports(xw, project, "props");
         }
 
-        private void WriteNuGetPackageMSBuildImports(XmlWriter xw, Project project, string extension)
+        private void WriteNuGetPackageMsBuildImports(XmlWriter xw, Project project, string extension)
         {
             if (project.NuGetPackages.Count <= 0) return;
 
             foreach (var package in project.NuGetPackages)
             {
                 string packagePath = Path.Combine("..", "packages", $"{package.Name}.{package.Version}");
-
                 string targetsFile = Path.Combine(packagePath, "build", $"{package.Name}.{extension}");
-
-
                 WriteMSBuildImport(xw, targetsFile);
             }
         }
@@ -190,20 +184,16 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         {
             if (project.Files.Count <= 0) return;
 
-            // open item group for files
             xw.WriteStartElement("ItemGroup");
 
-            // write project files
-            var fileWriter = new ProjectFileWriter();
             foreach (var file in project.Files)
             {
                 xw.WriteStartElement(file.BuildAction);
                 xw.WriteAttributeString("Include", file.Path);
                 xw.WriteEndElement();
-                fileWriter.Write(file, projectRootPath);
+                _fileWriter.Write(file, projectRootPath);
             }
 
-            // close item group for files
             xw.WriteEndElement();
         }
     }

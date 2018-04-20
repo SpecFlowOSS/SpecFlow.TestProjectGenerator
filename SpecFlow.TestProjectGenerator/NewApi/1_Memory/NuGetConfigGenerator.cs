@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Xml;
 
@@ -8,6 +6,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class NuGetConfigGenerator
     {
+        private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
+
         public ProjectFile Generate(NuGetSource[] nuGetSources = null)
         {
             using (var ms = new MemoryStream())
@@ -27,8 +27,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     writer.WriteEndElement();
                     writer.Flush();
 
-                    return GenerateProjectFile(ms);
-
+                    return _projectFileFactory.FromStream(ms, "nuget.config", "None");
                 }
             }
         }
@@ -54,16 +53,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             var nuGetOrg = new NuGetSource("Nuget.org", "https://api.nuget.org/v3/index.json");
 
             WriteNuGetSource(writer, nuGetOrg);
-        }
-
-        private ProjectFile GenerateProjectFile(MemoryStream ms)
-        {
-            ms.Seek(0, SeekOrigin.Begin);
-
-            using (var sr = new StreamReader(ms))
-            {
-                return new ProjectFile("nuget.config", "None", sr.ReadToEnd());
-            }
         }
     }
 }

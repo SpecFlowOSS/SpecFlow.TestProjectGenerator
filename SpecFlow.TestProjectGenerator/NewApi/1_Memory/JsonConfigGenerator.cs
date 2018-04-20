@@ -27,7 +27,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
         }
 
-        public void WriteUnitTestProvider(JsonWriter jsonWriter, string unitTestProvider)
+        private void WriteUnitTestProvider(JsonWriter jsonWriter, string unitTestProvider)
         {
             // open unitTestProvider object
             jsonWriter.WritePropertyName("unitTestProvider");
@@ -40,7 +40,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             jsonWriter.WriteEndObject();
         }
 
-        public void WriteLanguage(JsonWriter jsonWriter, CultureInfo featureLanguage)
+        private void WriteLanguage(JsonWriter jsonWriter, CultureInfo featureLanguage)
         {
             // open language object
             jsonWriter.WritePropertyName("language");
@@ -53,7 +53,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             jsonWriter.WriteEndObject();
         }
 
-        public void WriteStepAssemblies(JsonWriter jsonWriter, StepAssembly[] stepAssemblies)
+        private void WriteStepAssemblies(JsonWriter jsonWriter, StepAssembly[] stepAssemblies)
         {
             if (!(stepAssemblies is null))
             {
@@ -71,7 +71,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
         }
 
-        public void WriteStepAssembly(JsonWriter jsonWriter, StepAssembly stepAssembly)
+        private void WriteStepAssembly(JsonWriter jsonWriter, StepAssembly stepAssembly)
         {
             // open stepAssembly object
             jsonWriter.WriteStartObject();
@@ -83,7 +83,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             jsonWriter.WriteEndObject();
         }
 
-        public void WritePlugins(JsonWriter jsonWriter, SpecFlowPlugin[] plugins)
+        private void WritePlugins(JsonWriter jsonWriter, SpecFlowPlugin[] plugins)
         {
             if (plugins is null) return;
 
@@ -100,7 +100,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             jsonWriter.WriteEndArray();
         }
 
-        public void WritePlugin(JsonWriter jsonWriter, SpecFlowPlugin plugin)
+        private void WritePlugin(JsonWriter jsonWriter, SpecFlowPlugin plugin)
         {
             // open add object
             jsonWriter.WriteStartObject();
@@ -123,7 +123,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             jsonWriter.WriteEndObject();
         }
 
-        public void WriteSpecFlow(JsonWriter jsonWriter, string unitTestProvider = null, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
+        private void WriteSpecFlow(JsonWriter jsonWriter, string unitTestProvider = null, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
         {
             featureLanguage = featureLanguage ?? CultureInfo.GetCultureInfo("en-US");
             unitTestProvider = unitTestProvider ?? "MsTest";

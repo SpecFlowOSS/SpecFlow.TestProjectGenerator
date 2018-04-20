@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
@@ -25,7 +24,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             var createSolutionCommand = DotNet.New().Solution().InFolder(outputPath).WithName(solution.Name).Build();
 
-            ExecuteCommandBuilder(createSolutionCommand, new ProjectCreationNotPossibleException("Could not create solution."));
+            createSolutionCommand.Execute(new ProjectCreationNotPossibleException("Could not create solution."));
 
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
 
@@ -37,18 +36,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
 
             return solutionFilePath;
-        }
-
-        private CommandResult ExecuteCommandBuilder(CommandBuilder cb, Exception ex)
-        {
-            var result = cb.Execute();
-
-            if (result.ExitCode != 0)
-            {
-                throw ex;
-            }
-
-            return result;
         }
 
         private void WriteProjects(Solution solution, string outputPath, string solutionFilePath)
