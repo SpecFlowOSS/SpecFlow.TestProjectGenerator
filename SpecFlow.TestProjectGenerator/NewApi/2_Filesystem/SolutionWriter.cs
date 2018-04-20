@@ -9,7 +9,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
     public class SolutionWriter
     {
         private readonly ProjectWriterFactory _projectWriterFactory = new ProjectWriterFactory();
-        private ProjectFileWriter _projectFileWriter;
+        private readonly ProjectFileWriter _projectFileWriter;
 
         public SolutionWriter()
         {
@@ -31,8 +31,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             WriteProjects(solution, outputPath, solutionFilePath);
 
-            _projectFileWriter.Write(solution.NugetConfig, outputPath);
-            
+            if (solution.NugetConfig != null)
+            {
+                _projectFileWriter.Write(solution.NugetConfig, outputPath);
+            }
 
             return solutionFilePath;
         }
@@ -54,7 +56,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             foreach (var project in solution.Projects)
             {
                 var formatProjectWriter = _projectWriterFactory.FromProjectFormat(project.ProjectFormat);
-
                 WriteProject(project, outputPath, formatProjectWriter, solutionFilePath);
             }
         }
