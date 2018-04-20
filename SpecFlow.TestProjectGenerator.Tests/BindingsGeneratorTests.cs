@@ -38,26 +38,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             string stepDefinition)
         {
             // ARRANGE
-            BaseBindingsGenerator generator;
-            switch (targetLanguage)
-            {
-                case ProgrammingLanguage.CSharp:
-                    generator = new CSharpBindingsGenerator();
-                    break;
-
-                case ProgrammingLanguage.FSharp:
-                    generator = new FSharpBindingsGenerator();
-                    break;
-
-                case ProgrammingLanguage.VB:
-                    generator = new VbBindingsGenerator();
-                    break;
-
-                default:
-                    throw new ArgumentException(
-                        $"Target language generator not defined for {targetLanguage}.",
-                        nameof(targetLanguage));
-            }
+            var generator = _bindingsGeneratorFactory.FromLanguage(targetLanguage);
 
             // ACT
             var bindingsFile = generator.GenerateStepDefinition(stepDefinition);
