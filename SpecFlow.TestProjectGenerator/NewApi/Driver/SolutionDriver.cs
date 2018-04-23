@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
 
@@ -17,13 +19,13 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _nuGetConfigGenerator = nuGetConfigGenerator;
             _folders = folders;
             _testProjectFolders = testProjectFolders;
+            NuGetSources = new List<NuGetSource> { new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder), new NuGetSource("LocalExternalPackages", _folders.ExternalNuGetFolder) };
             _solution = new Solution(SolutionName);
-
-            var nugetConfig = _nuGetConfigGenerator.Generate(new[] {new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)});
-            _solution.NugetConfig = nugetConfig;
         }
 
         public Guid SolutionGuid { get; } = Guid.NewGuid();
+
+        public IList<NuGetSource> NuGetSources { get; }
 
         public string SolutionName => $"TestSolution_{SolutionGuid:N}";
 
@@ -34,6 +36,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public void WriteToDisk()
         {
+            _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
+
             var solutionWriter = new SolutionWriter();
             string solutionDirectoryPath = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName);
             _testProjectFolders.PathToSolutionFile =  solutionWriter.WriteToFileSystem(_solution, solutionDirectoryPath);

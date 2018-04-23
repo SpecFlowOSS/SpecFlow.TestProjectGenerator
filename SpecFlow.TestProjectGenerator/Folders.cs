@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SpecFlow.TestProjectGenerator.Helpers;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -14,6 +15,7 @@ namespace SpecFlow.TestProjectGenerator
         protected string _vsAdapterFolder;
 
         protected bool _vsAdapterFolderChanged;
+        private string _externalNuGetFolder;
 
         public string TestFolder => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
 
@@ -48,9 +50,12 @@ namespace SpecFlow.TestProjectGenerator
 
         public virtual string NuGetFolder
         {
-            get => !string.IsNullOrWhiteSpace(_nugetFolder) ? _nugetFolder : Path.GetFullPath(Path.Combine(SourceRoot, "Installer", "NuGetPackages", "bin", "Debug", "net45", "Debug", "NuGetPackages"));
+            get => !_nugetFolder.IsNullOrWhiteSpace() ? _nugetFolder : Path.GetFullPath(Path.Combine(SourceRoot, "Installer", "NuGetPackages", "bin", "Debug", "net45", "Debug", "NuGetPackages"));
             set => _nugetFolder = value;
         }
+
+        public virtual string ExternalNuGetFolder
+            => _externalNuGetFolder = _externalNuGetFolder ?? Path.GetFullPath(Path.Combine(SourceRoot, "NuGet", "feed"));
 
         public string PackageFolder
         {

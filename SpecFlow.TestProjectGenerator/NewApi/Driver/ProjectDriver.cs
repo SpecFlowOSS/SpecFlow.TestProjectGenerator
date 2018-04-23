@@ -34,8 +34,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             }
 
             _project = new Project(ProjectName, ProjectGuid,  _programmingLanguage, _targetFrameworks, _projectFormat);
+            _project.AddNuGetPackage("BoDi", "1.4.0-alpha", new NuGetPackageAssembly("BoDi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
             _project.AddNuGetPackage("SpecFlow", "1.0.0-alpha", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll")); //TODO change after GitVersion adding
             _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", "1.0.0-alpha"); //TODO change after GitVersion adding
+            _project.AddNuGetPackage("xunit.core", "2.3.1");
+            _project.AddNuGetPackage("xunit.extensibility.core", "2.3.1", new NuGetPackageAssembly("xunit.core, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.core.dll"));
+            _project.AddNuGetPackage("xunit.assert", "2.3.1", new NuGetPackageAssembly("xunit.assert, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
+            _project.AddNuGetPackage("xunit.abstractions", "2.0.1", new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
+            _project.AddNuGetPackage("xunit.runner.visualstudio", "2.3.1");
             _project.AddFile(_appConfigGenerator.Generate("xunit"));
             
             _solutionDriver.AddProject(_project);
