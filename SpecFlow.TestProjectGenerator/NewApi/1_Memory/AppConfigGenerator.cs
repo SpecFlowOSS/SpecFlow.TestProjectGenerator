@@ -21,6 +21,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 {
                     writer.WriteStartElement("configuration");
 
+                    WriteConfigSections(writer, appConfigSections);
+
                     WriteSpecFlow(writer, unitTestProvider, stepAssemblies, plugins, featureLanguage);
 
                     writer.WriteEndElement();
@@ -40,6 +42,26 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             WriteStepAssemblies(writer, stepAssemblies);
             WritePlugins(writer, plugins);
 
+            writer.WriteEndElement();
+        }
+
+        private void WriteConfigSections(XmlWriter writer, AppConfigSection[] appConfigSections)
+        {
+            writer.WriteStartElement("configSections");
+
+            foreach (var appConfigSection in appConfigSections)
+            {
+                WriteConfigSection(writer, appConfigSection);
+            }
+
+            writer.WriteEndElement();
+        }
+
+        private void WriteConfigSection(XmlWriter writer, AppConfigSection appConfigSection)
+        {
+            writer.WriteStartElement("section");
+            writer.WriteAttributeString("name", appConfigSection.Name);
+            writer.WriteAttributeString("type", appConfigSection.Type);
             writer.WriteEndElement();
         }
 
