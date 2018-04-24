@@ -1,10 +1,9 @@
 ﻿using System.IO;
-using System.Text;
 using System.Xml;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
-    public class NuGetConfigGenerator
+    public class NuGetConfigGenerator : XmlFileGeneratorBase
     {
         private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
 
@@ -12,7 +11,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
         {
             using (var ms = new MemoryStream())
             {
-                using (var writer = new XmlTextWriter(ms, Encoding.UTF8))
+                using (var writer = GenerateDefaultXmlWriter(ms))
                 {
                     writer.WriteStartElement("configuration");
 

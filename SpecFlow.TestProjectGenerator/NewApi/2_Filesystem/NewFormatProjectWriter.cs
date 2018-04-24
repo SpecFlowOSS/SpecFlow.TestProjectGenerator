@@ -7,9 +7,9 @@ using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
-    public class NewFormatProjectWriter : BaseProjectWriter
+    public class NewFormatProjectWriter : IProjectWriter
     {
-        public override string WriteProject(Project project, string projRootPath)
+        public virtual string WriteProject(Project project, string projRootPath)
         {
             if (project is null)
             {

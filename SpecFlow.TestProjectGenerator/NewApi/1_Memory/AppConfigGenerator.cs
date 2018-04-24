@@ -6,17 +6,18 @@ using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
-    public class AppConfigGenerator
+    public class AppConfigGenerator : XmlFileGeneratorBase
     {
         private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
 
-        public ProjectFile Generate(string unitTestProvider, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
+        public ProjectFile Generate(string unitTestProvider, AppConfigSection[] appConfigSections = null, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
         {
             featureLanguage = featureLanguage ?? CultureInfo.GetCultureInfo("en-US");
+            appConfigSections = appConfigSections ?? new[] { new AppConfigSection(name: "specFlow", type: "TechTalk.SpecFlow.Configuration.ConfigurationSectionHandler, TechTalk.SpecFlow") };
 
             using (var ms = new MemoryStream())
             {
-                using (var writer = new XmlTextWriter(ms, Encoding.UTF8))
+                using (var writer = GenerateDefaultXmlWriter(ms))
                 {
                     writer.WriteStartElement("configuration");
 

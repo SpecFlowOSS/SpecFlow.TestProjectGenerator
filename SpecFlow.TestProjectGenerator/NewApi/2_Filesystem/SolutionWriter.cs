@@ -45,7 +45,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
         }
 
-        private void WriteProject(Project project, string outputPath, BaseProjectWriter formatProjectWriter, string solutionFilePath)
+        private void WriteProject(Project project, string outputPath, IProjectWriter formatProjectWriter, string solutionFilePath)
         {
             string projPath = formatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
 

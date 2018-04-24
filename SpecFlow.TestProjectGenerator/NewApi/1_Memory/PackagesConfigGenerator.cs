@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Xml;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
-    public class PackagesConfigGenerator
+    public class PackagesConfigGenerator : XmlFileGeneratorBase
     {
+        private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
 
         public ProjectFile Generate(IEnumerable<NuGetPackage> nuGetPackages, TargetFramework targetFramework)
         {
             using (var ms = new MemoryStream())
             {
-                using (var xw = new XmlTextWriter(ms, Encoding.UTF8))
+                using (var xw = GenerateDefaultXmlWriter(ms))
                 {
                     xw.WriteStartDocument();
                     xw.WriteStartElement("packages");
@@ -38,11 +37,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     xw.WriteEndDocument();
                     xw.Flush();
 
-                    ms.Seek(0, SeekOrigin.Begin);
-                    using (var sr = new StreamReader(ms))
-                    {
-                        return new ProjectFile("packages.config", "None", sr.ReadToEnd());
-                    }
+                    return _projectFileFactory.FromStream(ms, "packages.config", "None");
                 }
             }
         }

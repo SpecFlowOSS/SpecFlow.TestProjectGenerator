@@ -1,17 +1,16 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Xml;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
-    public class OldFormatProjectWriter : BaseProjectWriter
+    public class OldFormatProjectWriter : XmlFileGeneratorBase, IProjectWriter
     {
         private readonly ProjectFileWriter _fileWriter = new ProjectFileWriter();
 
-        public override string WriteProject(Project project, string path)
+        public virtual string WriteProject(Project project, string path)
         {
             if (project is null)
             {
@@ -24,14 +23,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             const string msbuildNamespace = "http://schemas.microsoft.com/developer/msbuild/2003";
 
-            var xmlWriterSettings = new XmlWriterSettings()
-            {
-                Indent = true,
-                NewLineOnAttributes = false,
-                Encoding = Encoding.UTF8,
-            };
-
-            using (var xw = XmlWriter.Create(projFilePath, xmlWriterSettings))
+            using (var xw = GenerateDefaultXmlWriter(projFilePath))
             {
                 xw.WriteStartDocument();
 

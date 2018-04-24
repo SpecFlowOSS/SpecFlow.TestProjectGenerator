@@ -4,7 +4,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class ProjectWriterFactory
     {
-        public BaseProjectWriter FromProjectFormat(ProjectFormat projectFormat)
+        public IProjectWriter FromProjectFormat(ProjectFormat projectFormat)
         {
             switch (projectFormat)
             {
