@@ -10,8 +10,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi
     {
         private string _pathToSolutionFile;
         public string ProjectFolder { get; set; }
+        public string ProjectBinOutputPath { get; set; }
         public string CompiledAssemblyPath { get; set; }
         public string PathToSolutionDirectory => Path.GetDirectoryName(PathToSolutionFile);
+        public string TestAssemblyFileName { get; set; }
 
         public string PathToSolutionFile
         {
@@ -28,5 +30,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi
         }
 
         public string SolutionFileName => Path.GetFileName(PathToSolutionFile);
+
+        public string PathToNuGetPackages { get; set; }
     }
 }

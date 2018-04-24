@@ -99,7 +99,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
         private string GenereateVsTestsArguments(string filter)
         {
-            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx /TestAdapterPath:\"{_folders.VSAdapterFolder}\"";
+            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
 
             if (filter.IsNotNullOrEmpty())
             {

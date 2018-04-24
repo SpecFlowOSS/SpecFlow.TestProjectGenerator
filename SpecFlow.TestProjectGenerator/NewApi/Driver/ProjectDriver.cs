@@ -12,7 +12,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         private readonly AppConfigGenerator _appConfigGenerator;
         private Project _project;
         private ProgrammingLanguage _programmingLanguage = ProgrammingLanguage.CSharp;
-        private TargetFramework _targetFrameworks = TargetFramework.Net45;
+        private TargetFramework _targetFrameworks = TargetFramework.Net452;
         private ProjectFormat _projectFormat = ProjectFormat.Old;
 
         public ProjectDriver(FeatureFileGenerator featureFileGenerator, SolutionDriver solutionDriver, BindingsGeneratorFactory bindingsGeneratorFactory, AppConfigGenerator appConfigGenerator)
@@ -39,6 +39,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", "1.0.0-alpha"); //TODO change after GitVersion adding
             _project.AddNuGetPackage("xunit.core", "2.3.1");
             _project.AddNuGetPackage("xunit.extensibility.core", "2.3.1", new NuGetPackageAssembly("xunit.core, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.core.dll"));
+            _project.AddNuGetPackage("xunit.extensibility.execution", "2.3.1", new NuGetPackageAssembly("xunit.execution.desktop, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
             _project.AddNuGetPackage("xunit.assert", "2.3.1", new NuGetPackageAssembly("xunit.assert, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
             _project.AddNuGetPackage("xunit.abstractions", "2.0.1", new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
             _project.AddNuGetPackage("xunit.runner.visualstudio", "2.3.1");

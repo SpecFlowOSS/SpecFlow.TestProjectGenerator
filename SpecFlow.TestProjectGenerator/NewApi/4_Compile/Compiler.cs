@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
 {
@@ -20,6 +21,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
 
             var processHelper = new ProcessHelper();
             var msBuildProcess = processHelper.RunProcess(_testProjectFolders.PathToSolutionDirectory, msBuildPath, $"/bl /nologo /v:m \"{_testProjectFolders.PathToSolutionFile}\"");
+
+            if (msBuildProcess.ExitCode == 0)
+            {
+                _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
+            }
 
             return new CompileResult(successful: msBuildProcess.ExitCode == 0, output: msBuildProcess.CombinedOutput);
 
