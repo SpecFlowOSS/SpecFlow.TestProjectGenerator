@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -29,18 +27,16 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             _folders = folders;
         }
 
-        public TestExecutionResult ExecuteTests()
+        public TestExecutionResult LastTestExecutionResult { get; private set; }
+
+        public void ExecuteTests()
         {
             string vsFolder = _visualStudioFinder.Find();
-
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
 
             var vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetTestAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
 
             var processHelper = new ProcessHelper();
-
-
-
             string arguments = GenereateVsTestsArguments(null);
             ProcessResult processResult;
             try
@@ -52,8 +48,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 Console.WriteLine($"running vstest.console.exe failed - {_testProjectFolders.CompiledAssemblyPath} {vsTestConsoleExePath} {arguments}");
                 throw;
             }
-
-
+            
             var output = processResult.CombinedOutput;
 
             var lines = output.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
@@ -65,9 +60,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
             var trxFile = trxFiles.Single().Substring(BeginnOfTrxFileLine.Length);
             var testResult = XDocument.Load(trxFile);
-
-
-
+            
             TestExecutionResult executionResult = new TestExecutionResult();
 
             XmlNameTable nameTable = new NameTable();
@@ -85,7 +78,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Output = output;
             }
 
-            return executionResult;
+            LastTestExecutionResult = executionResult;
         }
 
         private IEnumerable<string> FindFilePath(string[] lines, string ending, string starting)
