@@ -29,6 +29,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
                     return AppendMoniker(tf & ~TargetFramework.NetStandard20, stringBuilder.AppendTargetFrameworkMoniker("netstandard2.0"));
                 }
 
+                if ((tf & TargetFramework.Net452) == TargetFramework.Net452)
+                {
+                    return AppendMoniker(tf & ~TargetFramework.Net452, stringBuilder.AppendTargetFrameworkMoniker("net452"));
+                }
+
                 return stringBuilder;
             }
 
@@ -43,6 +48,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
                 {
                     throw new InvalidOperationException(
                         "The old project format only supports one target framework version.");
+                }
+
+                if ((tf & TargetFramework.Net452) == TargetFramework.Net452)
+                {
+                    return AppendMoniker(tf & ~TargetFramework.Net452, stringBuilder.AppendTargetFrameworkMoniker("v4.5.2"));
                 }
 
                 if ((tf & TargetFramework.Net45) == TargetFramework.Net45)
