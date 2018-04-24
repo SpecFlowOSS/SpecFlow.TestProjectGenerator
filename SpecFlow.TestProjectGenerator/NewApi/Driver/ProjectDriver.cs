@@ -35,7 +35,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
             _project = new Project(ProjectName, ProjectGuid,  _programmingLanguage, _targetFrameworks, _projectFormat);
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha", new NuGetPackageAssembly("BoDi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
+#if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
             _project.AddNuGetPackage("SpecFlow", "1.0.0-alpha", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll")); //TODO change after GitVersion adding
+#else
+            _project.AddNuGetPackage("SpecFlow", "1.0.0-alpha", new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll")); //TODO change after GitVersion adding
+#endif
             _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", "1.0.0-alpha"); //TODO change after GitVersion adding
             _project.AddNuGetPackage("xunit.core", "2.3.1");
             _project.AddNuGetPackage("xunit.extensibility.core", "2.3.1", new NuGetPackageAssembly("xunit.core, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.core.dll"));
@@ -80,6 +84,15 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
                 default:
                     throw new ArgumentOutOfRangeException(nameof(language), language, null);
             }
+        }
+
+        public void AddBindingCode(string bindingCode)
+        {
+            EnsureProjectExists();
+
+            
+            var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
+            _project.AddFile(bindingsGenerator.GenerateStepDefinition(bindingCode));
         }
     }
 

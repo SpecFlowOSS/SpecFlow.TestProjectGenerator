@@ -7,6 +7,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
     public class CSharpBindingsGenerator : BaseBindingsGenerator
     {
         private const string BindingsClassTemplate = @"
+using System;
 using TechTalk.SpecFlow;
 
 [Binding]
