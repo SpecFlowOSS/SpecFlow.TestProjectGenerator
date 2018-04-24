@@ -9,7 +9,7 @@ using SpecFlow.TestProjectGenerator.Helpers;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 {
-    public class VSTestExecution
+    public class VSTestExecutionDriver
     {
         private readonly VisualStudioFinder _visualStudioFinder;
         private readonly AppConfigDriver _appConfigDriver;
@@ -19,7 +19,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         private const string BeginnOfTrxFileLine = "Results File: ";
         private const string BeginnOfLogFileLine = "Log file: ";
 
-        public VSTestExecution(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, Folders folders)
+        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, Folders folders)
         {
             _visualStudioFinder = visualStudioFinder;
             _appConfigDriver = appConfigDriver;
@@ -71,13 +71,13 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             if (summaryElement != null)
             {
                 executionResult.Total = int.Parse(summaryElement.Attribute("total").Value);
-                executionResult.TotalSucceeded = int.Parse(summaryElement.Attribute("passed").Value);
-                executionResult.TotalFailure = int.Parse(summaryElement.Attribute("failed").Value);
-                executionResult.TotalPending = int.Parse(summaryElement.Attribute("inconclusive").Value);
-                executionResult.TotalIgnored = 0; // mstest does not support ignored in the report
+                executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
+                executionResult.Failed = int.Parse(summaryElement.Attribute("failed").Value);
+                executionResult.Pending = int.Parse(summaryElement.Attribute("inconclusive").Value);
+                executionResult.Ignored = 0; // mstest does not support ignored in the report
                 executionResult.Output = output;
             }
-
+            
             LastTestExecutionResult = executionResult;
         }
 
