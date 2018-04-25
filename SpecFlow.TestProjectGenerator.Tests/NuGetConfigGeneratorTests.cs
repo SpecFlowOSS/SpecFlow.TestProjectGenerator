@@ -32,18 +32,15 @@ namespace SpecFlow.TestProjectGenerator.Tests
         public void NoSourcesAdded()
         {
             var projectFile = _nuGetConfigGenerator.Generate();
-            projectFile.Content.Should()
-                .Be(
-                    "<configuration><packageSources><add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" /></packageSources></configuration>");
+            projectFile.Content.Should().Contain(
+                    "<add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />");
         }
 
         [Fact]
         public void OneSourceAdded()
         {
             var projectFile = _nuGetConfigGenerator.Generate(new NuGetSource[] { new NuGetSource("localPackages", "LocalPackages") });
-            projectFile.Content.Should()
-                .Be(
-                    "<configuration><packageSources><add key=\"localPackages\" value=\"LocalPackages\" /><add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" /></packageSources></configuration>");
+            projectFile.Content.Should().Contain("<add key=\"localPackages\" value=\"LocalPackages\" />").And.Contain("<add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />");
         }
 
         [Fact]
@@ -55,8 +52,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
                 new NuGetSource("Gherkin CI", "https://ci.appveyor.com/nuget/gherkin-pgwyovw4bucb/"),
             });
             projectFile.Content.Should()
-                .Be(
-                    "<configuration><packageSources><add key=\"localPackages\" value=\"LocalPackages\" /><add key=\"Gherkin CI\" value=\"https://ci.appveyor.com/nuget/gherkin-pgwyovw4bucb/\" /><add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" /></packageSources></configuration>");
+                .Contain("<add key=\"localPackages\" value=\"LocalPackages\" />").And.Contain("<add key=\"Gherkin CI\" value=\"https://ci.appveyor.com/nuget/gherkin-pgwyovw4bucb/\" />").And.Contain("<add key=\"Nuget.org\" value=\"https://api.nuget.org/v3/index.json\" />");
         }
     }
 
