@@ -11,15 +11,15 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly AppConfigGenerator _appConfigGenerator;
         private readonly Configuration _configuration;
+        private readonly CurrentVersionDriver _currentVersionDriver;
         private Project _project;
         private ProgrammingLanguage _programmingLanguage = ProgrammingLanguage.CSharp;
         private TargetFramework _targetFrameworks = TargetFramework.Net452;
         private ProjectFormat _projectFormat = ProjectFormat.Old;
 
-
-
-        public ProjectDriver(FeatureFileGenerator featureFileGenerator, SolutionDriver solutionDriver, BindingsGeneratorFactory bindingsGeneratorFactory, AppConfigGenerator appConfigGenerator, Configuration configuration)
+        public ProjectDriver(FeatureFileGenerator featureFileGenerator, SolutionDriver solutionDriver, BindingsGeneratorFactory bindingsGeneratorFactory, AppConfigGenerator appConfigGenerator, Configuration configuration, CurrentVersionDriver currentVersionDriver)
         {
+            _currentVersionDriver = currentVersionDriver;
             _featureFileGenerator = featureFileGenerator;
             _solutionDriver = solutionDriver;
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
@@ -40,11 +40,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _project = new Project(ProjectName, ProjectGuid,  _programmingLanguage, _targetFrameworks, _projectFormat);
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha", new NuGetPackageAssembly("BoDi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
 #if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
-            _project.AddNuGetPackage("SpecFlow", "1.0.0-alpha", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll")); //TODO change after GitVersion adding
+            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly($"TechTalk.SpecFlow, Version={_currentVersionDriver.GitVersionInfo.MajorMinorPatch}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
 #else
-            _project.AddNuGetPackage("SpecFlow", "1.0.0-alpha", new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll")); //TODO change after GitVersion adding
+            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
 #endif
-            _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", "1.0.0-alpha"); //TODO change after GitVersion adding
+            _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", _currentVersionDriver.GitVersionInfo.NuGetVersion);
 
 
             switch (_configuration.UnitTestProvider)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -7,22 +8,21 @@ namespace SpecFlow.TestProjectGenerator
 {
     public class CurrentVersionDriver
     {
-        CurrentVersionDriver()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var assemblyName = assembly.GetName().Name;
-            var gitVersionInformationType = assembly.GetType(assemblyName + ".GitVersionInformation");
-            var fields = gitVersionInformationType.GetFields();
-            Major = (string)gitVersionInformationType?.GetField("Major")?.GetValue(null);
-            Minor = (string)gitVersionInformationType?.GetField("Minor")?.GetValue(null);
-            Patch = (string)gitVersionInformationType?.GetField("Patch")?.GetValue(null);
-            NuGetVersion = (string)gitVersionInformationType?.GetField("NuGetVersion")?.GetValue(null);
+        private readonly Folders _folders;
 
-            foreach (var field in fields)
+        public CurrentVersionDriver(Folders folders)
+        {
+            _folders = folders;
+            string pathToGitVersionDir = Path.Combine(_folders.GlobalPackages, "gitversion.commandline", "3.6.5", "tools");
+            string pathToGitVersionExe = Path.Combine(pathToGitVersionDir, "GitVersion.exe");
+            var processResult = new ProcessHelper().RunProcess(_folders.SourceRoot, pathToGitVersionExe, "");
+
+            if (processResult.ExitCode != 0)
             {
-                Debug.WriteLine(string.Format("{0}: {1}", field.Name, field.GetValue(null)));
+                throw new InvalidOperationException("Failed to fetch GitVersion");
             }
 
+            GitVersionInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<GitVersionInfo>(processResult.CombinedOutput);
 
             var specFlowAssembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "TechTalk.SpecFlow").SingleOrDefault();
             if (specFlowAssembly != null)
@@ -37,12 +37,9 @@ namespace SpecFlow.TestProjectGenerator
             }
         }
 
-        public string SpecFlowVersionDash { get; private set; }
+        public GitVersionInfo GitVersionInfo { get; }
 
-        public string Major { get; private set; }
-        public string Minor { get; private set; }
-        public string Patch { get; private set; }
-        public string NuGetVersion { get; set; }
+        public string SpecFlowVersionDash { get; private set; }
 
         public string SpecFlowVersion { get; private set; }
         public int SpecFlowMajor { get; set; }

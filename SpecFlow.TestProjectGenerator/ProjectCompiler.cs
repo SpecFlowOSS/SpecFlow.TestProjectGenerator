@@ -188,7 +188,7 @@ namespace SpecFlow.TestProjectGenerator
             
             _projectCompilerHelper.SaveFileFromResourceTemplate(inputProjectDriver.ProjectFolder, "packages.config", "packages.config", new Dictionary<string, string>()
             {
-                {"NuGetVersion", _currentVersionDriver.NuGetVersion},
+                {"NuGetVersion", _currentVersionDriver.GitVersionInfo.NuGetVersion},
                 {"TestingFrameworkPackage", inputProjectDriver.TestingFrameworkPackage}
             });
 
