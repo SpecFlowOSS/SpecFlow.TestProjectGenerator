@@ -82,9 +82,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
                     throw new ArgumentOutOfRangeException();
             }
 
-            
-            _project.AddFile(_appConfigGenerator.Generate(_configuration));
-            
             _solutionDriver.AddProject(_project);
         }
 
@@ -129,6 +126,12 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             
             var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
             _project.AddFile(bindingsGenerator.GenerateStepDefinition(bindingCode));
+        }
+
+        public void LastStuffBeforeWritingToDisk()
+        {
+            _project.AddFile(_appConfigGenerator.Generate(_configuration));
+
         }
     }
 
