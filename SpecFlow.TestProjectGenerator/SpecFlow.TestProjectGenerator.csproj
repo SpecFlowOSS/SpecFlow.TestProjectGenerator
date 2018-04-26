@@ -2,9 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>../specflow.snk</AssemblyOriginatorKeyFile>
     <DebugType>full</DebugType>
