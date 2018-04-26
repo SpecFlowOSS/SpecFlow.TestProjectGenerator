@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using SpecFlow.TestProjectGenerator.NewApi.Driver;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 
@@ -16,14 +17,16 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void FileNameIsAppConfig()
         {
-            var projectFile = _appConfigGenerator.Generate("SpecRun");
+            var configuration = new Configuration {UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun};
+            var projectFile = _appConfigGenerator.Generate(configuration);
             projectFile.Path.Should().Be("app.config");
         }
 
         [Fact]
         public void BuildActionIsNone()
         {
-            var projectFile = _appConfigGenerator.Generate("SpecRun");
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var projectFile = _appConfigGenerator.Generate(configuration);
             projectFile.BuildAction.Should().Be("None");
         }
 
@@ -31,7 +34,9 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void UnitTestProvider()
         {
-            var projectFile = _appConfigGenerator.Generate("SpecRun");
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var projectFile = _appConfigGenerator.Generate(configuration);
+
 
             projectFile.Content.Should().Contain("<unitTestProvider name=\"SpecRun\" />");
         }
@@ -40,7 +45,9 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void SinglePlugin()
         {
-            var projectFile = _appConfigGenerator.Generate("SpecRun", plugins: new[] { new SpecFlowPlugin("SpecRun") });
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            configuration.Plugins.Add(new SpecFlowPlugin("SpecRun") );
+            var projectFile = _appConfigGenerator.Generate(configuration);
 
             projectFile.Content.Should().Contain("<plugins>");
             projectFile.Content.Should().Contain("<add name=\"SpecRun\" />");
@@ -50,7 +57,10 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void MultiplePlugins()
         {
-            var projectFile = _appConfigGenerator.Generate("SpecRun", plugins: new[] { new SpecFlowPlugin("SpecRun"), new SpecFlowPlugin("SpecFlow+Excel") });
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
+            configuration.Plugins.Add(new SpecFlowPlugin("SpecFlow+Excel"));
+            var projectFile = _appConfigGenerator.Generate(configuration);
 
             projectFile.Content.Should().Contain("<plugins>");
             projectFile.Content.Should().Contain("<add name=\"SpecRun\" />");
@@ -61,7 +71,10 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void PluginWithPath()
         {
-            var projectFile = _appConfigGenerator.Generate("SpecRun", plugins: new[] { new SpecFlowPlugin("SpecRun", "pathToPluginFolder") });
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            configuration.Plugins.Add(new SpecFlowPlugin("SpecRun", "pathToPluginFolder"));
+            var projectFile = _appConfigGenerator.Generate(configuration);
+            
 
             projectFile.Content.Should().Contain("<plugins>");
             projectFile.Content.Should().Contain("<add name=\"SpecRun\" path=\"pathToPluginFolder\" />");
@@ -71,7 +84,10 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void SingleAdditionalStepAssembly()
         {
-            var projectFile = _appConfigGenerator.Generate("SpecRun", stepAssemblies: new[] { new StepAssembly("AdditionalStepAssembly") });
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            configuration.StepAssemblies.Add(new StepAssembly("AdditionalStepAssembly"));
+
+            var projectFile = _appConfigGenerator.Generate(configuration);
 
             projectFile.Content.Should().Contain("<stepAssemblies>");
             projectFile.Content.Should().Contain("<stepAssembly assembly=\"AdditionalStepAssembly\" />");

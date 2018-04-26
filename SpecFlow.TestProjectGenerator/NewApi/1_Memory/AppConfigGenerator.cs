@@ -1,7 +1,9 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
+using SpecFlow.TestProjectGenerator.NewApi.Driver;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
@@ -10,20 +12,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
     {
         private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
 
-        public ProjectFile Generate(string unitTestProvider, AppConfigSection[] appConfigSections = null, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
+        public ProjectFile Generate(Configuration configuration)
         {
-            featureLanguage = featureLanguage ?? CultureInfo.GetCultureInfo("en-US");
-            appConfigSections = appConfigSections ?? new[] { new AppConfigSection(name: "specFlow", type: "TechTalk.SpecFlow.Configuration.ConfigurationSectionHandler, TechTalk.SpecFlow") };
-
             using (var ms = new MemoryStream())
             {
                 using (var writer = GenerateDefaultXmlWriter(ms))
                 {
                     writer.WriteStartElement("configuration");
 
-                    WriteConfigSections(writer, appConfigSections);
+                    WriteConfigSections(writer, configuration.AppConfigSection);
 
-                    WriteSpecFlow(writer, unitTestProvider, stepAssemblies, plugins, featureLanguage);
+                    WriteSpecFlow(writer, configuration.GetUnitTestProviderName(), configuration.StepAssemblies, configuration.Plugins, configuration.FeatureLanguage, configuration.BindingCulture);
 
                     writer.WriteEndElement();
                     writer.Flush();
@@ -33,19 +32,33 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
         }
 
-        private void WriteSpecFlow(XmlWriter writer, string unitTestProvider, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
+        private void WriteSpecFlow(XmlWriter writer, string unitTestProvider, IEnumerable<StepAssembly> stepAssemblies, IEnumerable<SpecFlowPlugin> plugins, CultureInfo featureLanguage, CultureInfo bindingCulture)
         {
             writer.WriteStartElement("specFlow");
 
             WriteUnitTestProvider(writer, unitTestProvider);
-            WriteLanguage(writer, featureLanguage);
+            if (bindingCulture != null)
+            {
+                WriteBindingCulture(writer, bindingCulture);
+            }
+            if (featureLanguage != null)
+            {
+                WriteLanguage(writer, featureLanguage);
+            }
             WriteStepAssemblies(writer, stepAssemblies);
             WritePlugins(writer, plugins);
 
             writer.WriteEndElement();
         }
 
-        private void WriteConfigSections(XmlWriter writer, AppConfigSection[] appConfigSections)
+        private void WriteBindingCulture(XmlWriter writer, CultureInfo bindingCulture)
+        {
+            writer.WriteStartElement("bindingCulture");
+            writer.WriteAttributeString("name", bindingCulture.Name);
+            writer.WriteEndElement();
+        }
+
+        private void WriteConfigSections(XmlWriter writer, IEnumerable<AppConfigSection> appConfigSections)
         {
             writer.WriteStartElement("configSections");
 
@@ -79,7 +92,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             writer.WriteEndElement();
         }
 
-        private void WriteStepAssemblies(XmlWriter writer, StepAssembly[] stepAssemblies)
+        private void WriteStepAssemblies(XmlWriter writer, IEnumerable<StepAssembly> stepAssemblies)
         {
             if (stepAssemblies is null) return;
             writer.WriteStartElement("stepAssemblies");
@@ -98,7 +111,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             writer.WriteEndElement();
         }
 
-        private void WritePlugins(XmlWriter writer, SpecFlowPlugin[] plugins)
+        private void WritePlugins(XmlWriter writer, IEnumerable<SpecFlowPlugin> plugins)
         {
             if (plugins is null) return;
             writer.WriteStartElement("plugins");
