@@ -56,7 +56,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         private string GetProjectCompilePath(Project project)
         {
-            // TODO: hardcoded values should be replaced
+            // TODO: hardcoded "Debug" value should be replaced by a configuration parameter
             if (project.ProjectFormat == ProjectFormat.New)
             {
                 return Path.Combine("bin", "Debug", project.TargetFrameworks.ToTargetFrameworkMoniker().Split(';')[0]);
