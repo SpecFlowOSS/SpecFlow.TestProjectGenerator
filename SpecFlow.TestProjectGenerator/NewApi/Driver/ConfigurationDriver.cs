@@ -80,6 +80,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             SetBindingCulture(_projectsDriver.DefaultProject, bindingCulture);
         }
 
+        public void SetConfigurationFormat(ConfigurationFormat configurationFormat)
+        {
+            SetConfigurationFormat(_projectsDriver.DefaultProject, configurationFormat);
+        }
+
+        public void SetConfigurationFormat(string projectName, ConfigurationFormat configurationFormat)
+        {
+            var project = _projectsDriver.Projects[projectName];
+            SetConfigurationFormat(project, configurationFormat);
+        }
+
         private void SetBindingCulture(ProjectBuilder project, CultureInfo bindingCulture)
         {
             project.Configuration.BindingCulture = bindingCulture;
@@ -93,6 +104,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         private void AddStepAssembly(ProjectBuilder project, StepAssembly stepAssembly)
         {
             project.Configuration.StepAssemblies.Add(stepAssembly);
+        }
+
+        private void SetConfigurationFormat(ProjectBuilder project, ConfigurationFormat configurationFormat)
+        {
+            project.ConfigurationFormat = configurationFormat;
         }
 
         private void AddFromXmlSpecFlowSection(ProjectBuilder project, string specFlowSection)

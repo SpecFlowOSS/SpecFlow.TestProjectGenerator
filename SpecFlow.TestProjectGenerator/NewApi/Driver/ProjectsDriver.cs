@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using SpecFlow.TestProjectGenerator.Helpers;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi.Driver
@@ -12,26 +14,19 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
-        private readonly AppConfigGenerator _appConfigGenerator;
+        private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         private readonly CurrentVersionDriver _currentVersionDriver;
         private readonly Dictionary<string, ProjectBuilder> _projects;
 
-        public ProjectsDriver(FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, AppConfigGenerator appConfigGenerator, CurrentVersionDriver currentVersionDriver)
+        public ProjectsDriver(FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, CurrentVersionDriver currentVersionDriver)
         {
             _featureFileGenerator = featureFileGenerator;
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
-            _appConfigGenerator = appConfigGenerator;
+            _configurationGeneratorFactory = configurationGeneratorFactory;
             _currentVersionDriver = currentVersionDriver;
 
-            DefaultProject = new ProjectBuilder(_featureFileGenerator, _bindingsGeneratorFactory, _appConfigGenerator, new Configuration(), _currentVersionDriver)
-            {
-                ProjectName = DefaultProjectName
-            };
-
-            Projects = _projects = new Dictionary<string, ProjectBuilder>
-            {
-                [DefaultProjectName] = DefaultProject
-            };
+            Projects = _projects = new Dictionary<string, ProjectBuilder>();
+            DefaultProject = CreateProject(DefaultProjectName, ProgrammingLanguage.CSharp);
         }
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects { get; }
@@ -39,23 +34,12 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public string CreateProject(string language)
         {
-            var project = new ProjectBuilder(_featureFileGenerator, _bindingsGeneratorFactory, _appConfigGenerator, new Configuration(), _currentVersionDriver)
-            {
-                Language = ParseProgrammingLanguage(language)
-            };
-
-            _projects.Add(project.ProjectName, project);
-            return project.ProjectName;
+            return CreateProject(null, ParseProgrammingLanguage(language)).ProjectName;
         }
 
         public void CreateProject(string projectName, string language)
         {
-            var project = new ProjectBuilder(_featureFileGenerator, _bindingsGeneratorFactory, _appConfigGenerator, new Configuration(), _currentVersionDriver)
-            {
-                ProjectName = projectName,
-                Language = ParseProgrammingLanguage(language)
-            };
-            _projects.Add(projectName, project);
+            CreateProject(projectName, ParseProgrammingLanguage(language));
         }
 
         public void AddFeatureFile(string projectName, string featureFileContent)
@@ -98,6 +82,22 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         public void AddProjectReference(string projectNameToReference)
         {
             AddProjectReference(DefaultProject, projectNameToReference);
+        }
+
+        private ProjectBuilder CreateProject(string projectName, ProgrammingLanguage language)
+        {
+            var project = new ProjectBuilder(_featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, new Configuration(), _currentVersionDriver)
+            {
+                Language = language
+            };
+
+            if (projectName.IsNotNullOrWhiteSpace())
+            {
+                project.ProjectName = projectName;
+            }
+
+            _projects.Add(project.ProjectName, project);
+            return project;
         }
 
         private void AddBindingCode(ProjectBuilder targetProject, string bindingCode)

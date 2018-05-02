@@ -1,6 +1,7 @@
 ﻿using System;
 using SpecFlow.TestProjectGenerator.NewApi.Driver;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
@@ -8,17 +9,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
     {
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
-        private readonly AppConfigGenerator _appConfigGenerator;
+        private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
 
         private readonly CurrentVersionDriver _currentVersionDriver;
 
         private Project _project;
 
-        public ProjectBuilder(FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, AppConfigGenerator appConfigGenerator, Configuration configuration, CurrentVersionDriver currentVersionDriver)
+        public ProjectBuilder(FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, Configuration configuration, CurrentVersionDriver currentVersionDriver)
         {
             _featureFileGenerator = featureFileGenerator;
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
-            _appConfigGenerator = appConfigGenerator;
+            _configurationGeneratorFactory = configurationGeneratorFactory;
             Configuration = configuration;
             _currentVersionDriver = currentVersionDriver;
             ProjectName = $"TestProject_{ProjectGuid:N}";
@@ -36,6 +37,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
         public TargetFramework TargetFrameworks { get; set; } = TargetFramework.Net452;
         public ProjectFormat Format { get; set; } = ProjectFormat.Old;
+        public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Config;
+
         public bool IsSpecFlowFeatureProject { get; set; } = true;
 
         public void AddFile(ProjectFile projectFile)
@@ -73,11 +76,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _project.AddFile(bindingsGenerator.GenerateStepDefinition(bindingCode));
         }
 
-        public void GenerateAppConfig()
+        public void GenerateConfigurationFile()
         {
             EnsureProjectExists();
-
-            _project.AddFile(_appConfigGenerator.Generate(Configuration));
+            var generator = _configurationGeneratorFactory.FromConfigurationFormat(ConfigurationFormat);
+            _project.AddFile(generator.Generate(Configuration));
         }
 
         public Project Build()
