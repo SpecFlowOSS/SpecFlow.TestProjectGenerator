@@ -35,6 +35,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 WriteNuGetPackagePropsImports(xw, project);
 
                 WriteProjectProperties(xw, project);
+                WriteReferences(xw, project);
                 WriteProjectReferences(xw, project);
                 WriteProjectNuGetPackages(xw, project);
                 WriteProjectFiles(xw, project, path);
@@ -94,6 +95,27 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         }
 
         private void WriteProjectReferences(XmlWriter xw, Project project)
+        {
+            if (project.References.Count <= 0) return;
+
+            // item group for project references
+            xw.WriteStartElement("ItemGroup");
+            
+            foreach (var reference in project.ProjectReferences)
+            {
+                xw.WriteStartElement("ProjectReference");
+                xw.WriteAttributeString("Include", reference.Path);
+
+                xw.WriteElementString("Project", reference.Project.ProjectGuid.ToString("B"));
+                xw.WriteElementString("Name", reference.Project.ProjectName);
+
+                xw.WriteEndElement();
+            }
+            
+            xw.WriteEndElement();
+        }
+
+        private void WriteReferences(XmlWriter xw, Project project)
         {
             if (project.References.Count <= 0) return;
 
