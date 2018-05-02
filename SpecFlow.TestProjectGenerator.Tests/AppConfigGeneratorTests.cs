@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using SpecFlow.TestProjectGenerator.NewApi.Driver;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
 using Xunit;
 
 namespace SpecFlow.TestProjectGenerator.Tests
@@ -40,7 +40,6 @@ namespace SpecFlow.TestProjectGenerator.Tests
 
             projectFile.Content.Should().Contain("<unitTestProvider name=\"SpecRun\" />");
         }
-
 
         [Fact]
         public void SinglePlugin()
@@ -94,6 +93,4 @@ namespace SpecFlow.TestProjectGenerator.Tests
             projectFile.Content.Should().Contain("</stepAssemblies>");
         }
     }
-
-
 }

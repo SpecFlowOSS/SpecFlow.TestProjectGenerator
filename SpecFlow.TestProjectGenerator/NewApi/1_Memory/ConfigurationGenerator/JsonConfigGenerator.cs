@@ -1,13 +1,14 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Newtonsoft.Json;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
 {
-    public class JsonConfigGenerator
+    public class JsonConfigGenerator : IConfigurationGenerator
     {
-        public ProjectFile Generate(string unitTestProvider = null, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
+        public ProjectFile Generate(Configuration configuration)
         {
             using (var stringWriter = new StringWriter())
             {
@@ -16,7 +17,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     // open root object
                     jsonWriter.WriteStartObject();
 
-                    WriteSpecFlow(jsonWriter, unitTestProvider, stepAssemblies, plugins, featureLanguage);
+                    WriteSpecFlow(jsonWriter, configuration);
 
                     // close root object
                     jsonWriter.WriteEndObject();
@@ -25,6 +26,38 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     return new ProjectFile("specflow.json", "None", stringWriter.ToString());
                 }
             }
+        }
+
+        private void WriteSpecFlow(JsonWriter jsonWriter, Configuration configuration)
+        {
+            configuration.FeatureLanguage = configuration.FeatureLanguage ?? CultureInfo.GetCultureInfo("en-US");
+
+            // open specflow object
+            jsonWriter.WritePropertyName("specFlow");
+            jsonWriter.WriteStartObject();
+
+            WriteUnitTestProvider(jsonWriter, configuration.UnitTestProvider.ToName());
+
+            if (configuration.FeatureLanguage != null)
+            {
+                WriteLanguage(jsonWriter, configuration.FeatureLanguage);
+            }
+
+            if (configuration.BindingCulture != null)
+            {
+                WriteBindingCulture(jsonWriter, configuration.BindingCulture);
+            }
+
+            if (configuration.Generator != null)
+            {
+                WriteGenerator(jsonWriter, configuration.Generator);
+            }
+
+            WriteStepAssemblies(jsonWriter, configuration.StepAssemblies);
+            WritePlugins(jsonWriter, configuration.Plugins);
+
+            // close specflow object
+            jsonWriter.WriteEndObject();
         }
 
         private void WriteUnitTestProvider(JsonWriter jsonWriter, string unitTestProvider)
@@ -53,7 +86,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             jsonWriter.WriteEndObject();
         }
 
-        private void WriteStepAssemblies(JsonWriter jsonWriter, StepAssembly[] stepAssemblies)
+        private void WriteBindingCulture(JsonWriter jsonWriter, CultureInfo bindingCulture)
+        {
+            jsonWriter.WritePropertyName("bindingCulture");
+            jsonWriter.WriteStartObject();
+
+            jsonWriter.WritePropertyName("name");
+            jsonWriter.WriteValue(bindingCulture.Name);
+            jsonWriter.WriteEndObject();
+        }
+
+        private void WriteStepAssemblies(JsonWriter jsonWriter, IEnumerable<StepAssembly> stepAssemblies)
         {
             if (!(stepAssemblies is null))
             {
@@ -83,7 +126,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             jsonWriter.WriteEndObject();
         }
 
-        private void WritePlugins(JsonWriter jsonWriter, SpecFlowPlugin[] plugins)
+        private void WritePlugins(JsonWriter jsonWriter, IEnumerable<SpecFlowPlugin> plugins)
         {
             if (plugins is null) return;
 
@@ -123,24 +166,23 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             jsonWriter.WriteEndObject();
         }
 
-        private void WriteSpecFlow(JsonWriter jsonWriter, string unitTestProvider = null, StepAssembly[] stepAssemblies = null, SpecFlowPlugin[] plugins = null, CultureInfo featureLanguage = null)
+        private void WriteGenerator(JsonWriter jsonWriter, Generator generator)
         {
-            featureLanguage = featureLanguage ?? CultureInfo.GetCultureInfo("en-US");
-            unitTestProvider = unitTestProvider ?? "MsTest";
-
-            // open specflow object
-            jsonWriter.WritePropertyName("specFlow");
+            jsonWriter.WritePropertyName("generator");
             jsonWriter.WriteStartObject();
 
-            WriteUnitTestProvider(jsonWriter, unitTestProvider);
+            jsonWriter.WritePropertyName("allowDebugGeneratedFiles");
+            jsonWriter.WriteValue(generator.AllowDebugGeneratedFiles);
 
-            WriteLanguage(jsonWriter, featureLanguage);
+            jsonWriter.WritePropertyName("allowRowTests");
+            jsonWriter.WriteValue(generator.AllowRowTests);
 
-            WriteStepAssemblies(jsonWriter, stepAssemblies);
+            jsonWriter.WritePropertyName("generateAsyncTests");
+            jsonWriter.WriteValue(generator.GenerateAsyncTests);
 
-            WritePlugins(jsonWriter, plugins);
+            jsonWriter.WritePropertyName("path");
+            jsonWriter.WriteValue(generator.Path);
 
-            // close specflow object
             jsonWriter.WriteEndObject();
         }
     }

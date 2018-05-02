@@ -5,9 +5,9 @@ using System.Text;
 using System.Xml;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
 {
-    public class AppConfigGenerator : XmlFileGeneratorBase
+    public class AppConfigGenerator : XmlFileGeneratorBase, IConfigurationGenerator
     {
         private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
 
@@ -20,7 +20,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     writer.WriteStartElement("configuration");
 
                     WriteConfigSections(writer, configuration.AppConfigSection);
-                    WriteSpecFlow(writer, configuration.UnitTestProvider.ToName(), configuration.StepAssemblies, configuration.Plugins, configuration.FeatureLanguage, configuration.BindingCulture);
+                    WriteSpecFlow(writer, configuration);
 
                     writer.WriteEndElement();
                     writer.Flush();
@@ -30,21 +30,28 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
         }
 
-        private void WriteSpecFlow(XmlWriter writer, string unitTestProvider, IEnumerable<StepAssembly> stepAssemblies, IEnumerable<SpecFlowPlugin> plugins, CultureInfo featureLanguage, CultureInfo bindingCulture)
+        private void WriteSpecFlow(XmlWriter writer, Configuration configuration)
         {
             writer.WriteStartElement("specFlow");
 
-            WriteUnitTestProvider(writer, unitTestProvider);
-            if (bindingCulture != null)
+            WriteUnitTestProvider(writer, configuration.UnitTestProvider.ToName());
+            if (configuration.BindingCulture != null)
             {
-                WriteBindingCulture(writer, bindingCulture);
+                WriteBindingCulture(writer, configuration.BindingCulture);
             }
-            if (featureLanguage != null)
+
+            if (configuration.FeatureLanguage != null)
             {
-                WriteLanguage(writer, featureLanguage);
+                WriteLanguage(writer, configuration.FeatureLanguage);
             }
-            WriteStepAssemblies(writer, stepAssemblies);
-            WritePlugins(writer, plugins);
+
+            if (configuration.Generator != null)
+            {
+                WriteGenerator(writer, configuration.Generator);
+            }
+
+            WriteStepAssemblies(writer, configuration.StepAssemblies);
+            WritePlugins(writer, configuration.Plugins);
 
             writer.WriteEndElement();
         }
@@ -131,6 +138,18 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             if (plugin.Type != (SpecFlowPluginType.Generator | SpecFlowPluginType.Runtime))
                 writer.WriteAttributeString("type", plugin.Type.ToPluginTypeString());
+
+            writer.WriteEndElement();
+        }
+
+        private void WriteGenerator(XmlWriter writer, Generator generator)
+        {
+            writer.WriteStartElement("generator");
+
+            writer.WriteAttributeString("allowDebugGeneratedFiles", generator.AllowDebugGeneratedFiles ? "true" : "false");
+            writer.WriteAttributeString("allowRowTests", generator.AllowRowTests ? "true" : "false");
+            writer.WriteAttributeString("generateAsyncTests", generator.GenerateAsyncTests? "true" : "false");
+            writer.WriteAttributeString("path", generator.Path);
 
             writer.WriteEndElement();
         }

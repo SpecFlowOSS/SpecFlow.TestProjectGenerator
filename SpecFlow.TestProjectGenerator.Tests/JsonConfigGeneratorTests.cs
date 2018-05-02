@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
 using Xunit;
 
 namespace SpecFlow.TestProjectGenerator.Tests
@@ -14,27 +15,50 @@ namespace SpecFlow.TestProjectGenerator.Tests
         }
 
         [Fact]
+        public void FileNameIsAppConfig()
+        {
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var projectFile = _jsonConfigGenerator.Generate(configuration);
+            projectFile.Path.Should().Be("specflow.json");
+        }
+
+        [Fact]
+        public void BuildActionIsNone()
+        {
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var projectFile = _jsonConfigGenerator.Generate(configuration);
+            projectFile.BuildAction.Should().Be("None");
+        }
+
+        [Fact]
         public void UnitTestProvider()
         {
-            var projectFile = _jsonConfigGenerator.Generate("SpecRun");
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var projectFile = _jsonConfigGenerator.Generate(configuration);
 
             projectFile.Content.Should().Contain("\"unitTestProvider\":{\"name\":\"SpecRun\"}");
         }
 
-
         [Fact]
         public void SinglePlugin()
         {
-            var projectFile = _jsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun") });
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
+            var projectFile = _jsonConfigGenerator.Generate(configuration);
 
+            projectFile.Content.Should().Contain(@"""plugins"":");
             projectFile.Content.Should().Contain(@"{""name"":""SpecRun""}");
         }
 
         [Fact]
         public void MultiplePlugins()
         {
-            var projectFile = _jsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun"), new SpecFlowPlugin("SpecFlow+Excel") });
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
+            configuration.Plugins.Add(new SpecFlowPlugin("SpecFlow+Excel"));
+            var projectFile = _jsonConfigGenerator.Generate(configuration);
 
+            projectFile.Content.Should().Contain(@"""plugins"":");
             projectFile.Content.Should().Contain(@"{""name"":""SpecRun""}");
             projectFile.Content.Should().Contain(@"{""name"":""SpecFlow+Excel""}");
         }
@@ -42,16 +66,23 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void PluginWithPath()
         {
-            var projectFile = _jsonConfigGenerator.Generate("SpecRun", plugins: new SpecFlowPlugin[] { new SpecFlowPlugin("SpecRun", "pathToPluginFolder") });
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            configuration.Plugins.Add(new SpecFlowPlugin("SpecRun", "pathToPluginFolder"));
+            var projectFile = _jsonConfigGenerator.Generate(configuration);
 
+            projectFile.Content.Should().Contain(@"""plugins"":");
             projectFile.Content.Should().Contain(@"{""name"":""SpecRun"",""path"":""pathToPluginFolder""}");
         }
 
         [Fact]
         public void SingleAdditionalStepAssembly()
         {
-            var projectFile = _jsonConfigGenerator.Generate("SpecRun", stepAssemblies: new StepAssembly[] { new StepAssembly("AdditionalStepAssembly") });
+            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            configuration.StepAssemblies.Add(new StepAssembly("AdditionalStepAssembly"));
 
+            var projectFile = _jsonConfigGenerator.Generate(configuration);
+
+            projectFile.Content.Should().Contain(@"""stepAssemblies"":");
             projectFile.Content.Should().Contain(@"[{""assembly"":""AdditionalStepAssembly""}]");
         }
     }
