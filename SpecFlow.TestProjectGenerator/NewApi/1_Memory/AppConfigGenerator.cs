@@ -3,7 +3,6 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
-using SpecFlow.TestProjectGenerator.NewApi.Driver;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
@@ -21,8 +20,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     writer.WriteStartElement("configuration");
 
                     WriteConfigSections(writer, configuration.AppConfigSection);
-
-                    WriteSpecFlow(writer, configuration.GetUnitTestProviderName(), configuration.StepAssemblies, configuration.Plugins, configuration.FeatureLanguage, configuration.BindingCulture);
+                    WriteSpecFlow(writer, configuration.UnitTestProvider.ToName(), configuration.StepAssemblies, configuration.Plugins, configuration.FeatureLanguage, configuration.BindingCulture);
 
                     writer.WriteEndElement();
                     writer.Flush();

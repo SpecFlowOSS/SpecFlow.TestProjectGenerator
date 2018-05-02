@@ -22,7 +22,7 @@ type {0} =
         {
 
             string randomClassName = $"BindingsClass_{Guid.NewGuid():N}";
-            return new ProjectFile($"{randomClassName}.cs", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
+            return new ProjectFile($"{randomClassName}.fs", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
         }
 
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)
