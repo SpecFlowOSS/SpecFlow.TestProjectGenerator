@@ -13,13 +13,15 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         private readonly NuGetConfigGenerator _nuGetConfigGenerator;
         private readonly Folders _folders;
         private readonly TestProjectFolders _testProjectFolders;
+        private readonly ProjectsDriver _projectsDriver;
         private readonly Solution _solution;
         
-        public SolutionDriver(NuGetConfigGenerator nuGetConfigGenerator, Folders folders, TestProjectFolders testProjectFolders)
+        public SolutionDriver(NuGetConfigGenerator nuGetConfigGenerator, Folders folders, TestProjectFolders testProjectFolders, ProjectsDriver projectsDriver)
         {
             _nuGetConfigGenerator = nuGetConfigGenerator;
             _folders = folders;
             _testProjectFolders = testProjectFolders;
+            _projectsDriver = projectsDriver;
             NuGetSources = new List<NuGetSource> { new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder), new NuGetSource("LocalExternalPackages", _folders.ExternalNuGetFolder) };
             _solution = new Solution(SolutionName);
         }
@@ -30,21 +32,21 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public string SolutionName => $"TestSolution_{SolutionGuid:N}";
 
-        public void AddProject(Project project)
-        {
-            _solution.AddProject(project);
-        }
-
         public void WriteToDisk()
         {
+            foreach (var project in _projectsDriver.Projects.Values)
+            {
+                _solution.AddProject(project.Build());
+            }
+
             _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
 
             var solutionWriter = new SolutionWriter();
             string solutionDirectoryPath = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName);
             _testProjectFolders.PathToSolutionFile =  solutionWriter.WriteToFileSystem(_solution, solutionDirectoryPath);
 
-            // TODO: find better solution
-            var proj = _solution.Projects.Last();
+            // TODO: search all projects for unit tests
+            var proj = _solution.Projects.First();
 
             _testProjectFolders.ProjectFolder = Path.Combine(_testProjectFolders.PathToSolutionDirectory, proj.Name);
             _testProjectFolders.ProjectBinOutputPath = Path.Combine(_testProjectFolders.ProjectFolder, GetProjectCompilePath(proj));

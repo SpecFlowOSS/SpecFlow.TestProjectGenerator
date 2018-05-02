@@ -22,12 +22,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             Name = name;
             ProjectGuid = projectGuid;
             TargetFrameworks = targetFrameworks;
-
+            
             if (projectFormat == ProjectFormat.Old)
             {
                 AddReference("System");
                 AddReference("System.Configuration");
                 AddReference("System.Core");
+                AddReference("System.Data");
+                AddReference("Microsoft.CSharp");
             }
         }
         
@@ -59,9 +61,9 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _files.Add(projectFile ?? throw new ArgumentNullException(nameof(projectFile)));
         }
 
-        public void AddProjectReference(string fullPath)
+        public void AddProjectReference(string fullPath, ProjectBuilder projectToReference)
         {
-            _projectReferences.Add(new ProjectReference(fullPath));
+            _projectReferences.Add(new ProjectReference(fullPath, projectToReference));
         }
     }
 }
