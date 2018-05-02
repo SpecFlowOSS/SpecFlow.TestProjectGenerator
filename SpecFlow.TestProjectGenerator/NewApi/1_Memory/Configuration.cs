@@ -11,5 +11,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public List<StepAssembly> StepAssemblies { get;  } = new List<StepAssembly>();
         public CultureInfo FeatureLanguage { get; set; } = CultureInfo.GetCultureInfo("en-US");
         public CultureInfo BindingCulture { get; set; }
+        public Generator Generator { get; set; }
     }
 }
