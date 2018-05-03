@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
 using Xunit;
 
 namespace SpecFlow.TestProjectGenerator.Tests

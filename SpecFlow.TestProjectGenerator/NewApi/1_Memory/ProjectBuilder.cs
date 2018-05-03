@@ -2,6 +2,7 @@
 using SpecFlow.TestProjectGenerator.NewApi.Driver;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {

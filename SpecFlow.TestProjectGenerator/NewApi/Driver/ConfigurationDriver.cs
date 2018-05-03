@@ -89,6 +89,33 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             SetIsRowTestsAllowed(_projectsDriver.DefaultProject, isAllowed);
         }
 
+        public void AddGeneratorRegisterDependency(string type, string @as) => AddGeneratorRegisterDependency(_projectsDriver.DefaultProject, type, @as);
+        public void AddGeneratorRegisterDependency(string type, string @as, string name) => AddGeneratorRegisterDependency(_projectsDriver.DefaultProject, type, @as, name);
+        public void AddGeneratorRegisterDependency(string projectName, string type, string @as, string name) => AddGeneratorRegisterDependency(_projectsDriver.Projects[projectName], type, @as, name);
+
+        public void AddRuntimeRegisterDependency(string type, string @as) => AddRuntimeRegisterDependency(_projectsDriver.DefaultProject, type, @as);
+        public void AddRuntimeRegisterDependency(string type, string @as, string name) => AddRuntimeRegisterDependency(_projectsDriver.DefaultProject, type, @as, name);
+        public void AddRuntimeRegisterDependency(string projectName, string type, string @as, string name) => AddRuntimeRegisterDependency(_projectsDriver.Projects[projectName], type, @as, name);
+
+        public void AddGeneratorRegisterDependency(ProjectBuilder project, string type, string @as)
+        {
+            project.Configuration.Generator.Value.AddRegisterDependency(type, @as);
+        }
+        public void AddGeneratorRegisterDependency(ProjectBuilder project, string type, string @as, string name)
+        {
+            project.Configuration.Generator.Value.AddRegisterDependency(type, @as, name);
+        }
+
+        public void AddRuntimeRegisterDependency(ProjectBuilder project, string type, string @as, string name)
+        {
+            project.Configuration.Runtime.Value.AddRegisterDependency(type, @as, name);
+        }
+
+        public void AddRuntimeRegisterDependency(ProjectBuilder project, string type, string @as)
+        {
+            project.Configuration.Runtime.Value.AddRegisterDependency(type, @as);
+        }
+
         public void SetBindingCulture(ProjectBuilder project, CultureInfo bindingCulture)
         {
             project.Configuration.BindingCulture = bindingCulture;
@@ -111,7 +138,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public void SetIsRowTestsAllowed(ProjectBuilder project, bool isAllowed)
         {
-            project.Configuration.Generator.AllowRowTests = isAllowed;
+            project.Configuration.Generator.Value.AllowRowTests = isAllowed;
         }
 
         private UnitTestProvider GetUnitTestProvider(string providerName)

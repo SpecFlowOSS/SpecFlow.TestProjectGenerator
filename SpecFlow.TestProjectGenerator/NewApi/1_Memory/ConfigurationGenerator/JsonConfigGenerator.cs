@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Newtonsoft.Json;
+using SpecFlow.TestProjectGenerator.Helpers;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel.Dependencies;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
@@ -48,9 +52,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
                 WriteBindingCulture(jsonWriter, configuration.BindingCulture);
             }
 
-            if (configuration.Generator != null)
+            if (configuration.Generator.IsValueCreated)
             {
-                WriteGenerator(jsonWriter, configuration.Generator);
+                WriteGenerator(jsonWriter, configuration.Generator.Value);
+            }
+
+            if (configuration.Runtime.IsValueCreated)
+            {
+                WriteRuntime(jsonWriter, configuration.Runtime.Value);
             }
 
             WriteStepAssemblies(jsonWriter, configuration.StepAssemblies);
@@ -182,6 +191,70 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
 
             jsonWriter.WritePropertyName("path");
             jsonWriter.WriteValue(generator.Path);
+
+            if (generator.Dependencies.Count > 0)
+            {
+                jsonWriter.WritePropertyName("dependencies");
+                WriteDependencies(jsonWriter, generator.Dependencies);
+            }
+
+            jsonWriter.WriteEndObject();
+        }
+
+        private void WriteRuntime(JsonWriter jsonWriter, Runtime runtime)
+        {
+            jsonWriter.WritePropertyName("runtime");
+            jsonWriter.WriteStartObject();
+
+            jsonWriter.WritePropertyName("missingOrPendingStepsOutcome");
+            jsonWriter.WriteValue(runtime.MissingOrPendingStepsOutcome.ToString());
+
+            jsonWriter.WritePropertyName("stopAtFirstError");
+            jsonWriter.WriteValue(runtime.StopAtFirstError);
+
+            if (runtime.Dependencies.Count > 0)
+            {
+                jsonWriter.WritePropertyName("dependencies");
+                WriteDependencies(jsonWriter, runtime.Dependencies);
+            }
+
+            jsonWriter.WriteEndObject();
+        }
+
+        private void WriteDependencies(JsonWriter jsonWriter, IEnumerable<IDependency> dependencies)
+        {
+            jsonWriter.WriteStartArray();
+
+            foreach (var dependency in dependencies)
+            {
+                switch (dependency)
+                {
+                    case RegisterDependency registerDependency:
+                        WriteRegisterDependency(jsonWriter, registerDependency);
+                        break;
+                    case null: throw new InvalidOperationException("null is not supported as dependency.");
+                    default: throw new NotSupportedException($"Dependency type {dependency.GetType()} is not supported.");
+                }
+            }
+
+            jsonWriter.WriteEndArray();
+        }
+
+        private void WriteRegisterDependency(JsonWriter jsonWriter, RegisterDependency dependency)
+        {
+            jsonWriter.WriteStartObject();
+
+            jsonWriter.WritePropertyName("type");
+            jsonWriter.WriteValue(dependency.Type);
+
+            jsonWriter.WritePropertyName("as");
+            jsonWriter.WriteValue(dependency.As);
+
+            if (dependency.Name.IsNotNullOrWhiteSpace())
+            {
+                jsonWriter.WritePropertyName("name");
+                jsonWriter.WriteValue(dependency.Name);
+            }
 
             jsonWriter.WriteEndObject();
         }

@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel
 {
     public class Configuration
     {
@@ -11,6 +12,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public List<StepAssembly> StepAssemblies { get;  } = new List<StepAssembly>();
         public CultureInfo FeatureLanguage { get; set; } = CultureInfo.GetCultureInfo("en-US");
         public CultureInfo BindingCulture { get; set; }
-        public Generator Generator { get; set; }
+        public Lazy<Generator> Generator { get; } = new Lazy<Generator>(() => new Generator());
+        public Lazy<Runtime> Runtime { get; } = new Lazy<Runtime>(() => new Runtime());
     }
 }

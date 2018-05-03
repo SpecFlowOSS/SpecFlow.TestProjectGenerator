@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
+using SpecFlow.TestProjectGenerator.Helpers;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel.Dependencies;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
@@ -45,9 +49,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
                 WriteLanguage(writer, configuration.FeatureLanguage);
             }
 
-            if (configuration.Generator != null)
+            if (configuration.Generator.IsValueCreated)
             {
-                WriteGenerator(writer, configuration.Generator);
+                WriteGenerator(writer, configuration.Generator.Value);
+            }
+
+            if (configuration.Runtime.IsValueCreated)
+            {
+                WriteRuntime(writer, configuration.Runtime.Value);
             }
 
             WriteStepAssemblies(writer, configuration.StepAssemblies);
@@ -146,12 +155,68 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
         {
             writer.WriteStartElement("generator");
 
-            writer.WriteAttributeString("allowDebugGeneratedFiles", generator.AllowDebugGeneratedFiles ? "true" : "false");
-            writer.WriteAttributeString("allowRowTests", generator.AllowRowTests ? "true" : "false");
-            writer.WriteAttributeString("generateAsyncTests", generator.GenerateAsyncTests? "true" : "false");
+            writer.WriteAttributeString("allowDebugGeneratedFiles", ToXmlString(generator.AllowDebugGeneratedFiles));
+            writer.WriteAttributeString("allowRowTests", ToXmlString(generator.AllowRowTests));
+            writer.WriteAttributeString("generateAsyncTests", ToXmlString(generator.GenerateAsyncTests));
             writer.WriteAttributeString("path", generator.Path);
+
+            if (generator.Dependencies.Count > 0)
+            {
+                writer.WriteStartElement("dependencies");
+                WriteDependencies(writer, generator.Dependencies);
+                writer.WriteEndElement();
+            }
 
             writer.WriteEndElement();
         }
+
+        private void WriteRuntime(XmlWriter writer, Runtime runtime)
+        {
+            writer.WriteStartElement("runtime");
+
+            writer.WriteAttributeString("stopAtFirstError", ToXmlString(runtime.StopAtFirstError));
+            writer.WriteAttributeString("missingOrPendingStepsOutcome", runtime.MissingOrPendingStepsOutcome.ToString());
+
+            if (runtime.Dependencies.Count > 0)
+            {
+                writer.WriteStartElement("dependencies");
+                WriteDependencies(writer, runtime.Dependencies);
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+        }
+
+        private void WriteDependencies(XmlWriter writer, IEnumerable<IDependency> dependencies)
+        {
+            foreach (var dependency in dependencies)
+            {
+                switch (dependency)
+                {
+                    case RegisterDependency registerDependency:
+                        WriteRegisterDependency(writer, registerDependency);
+                        break;
+                    case null: throw new InvalidOperationException("null is not supported as dependency.");
+                    default: throw new NotSupportedException($"Dependency type {dependency.GetType()} is not supported.");
+                }
+            }
+        }
+
+        private void WriteRegisterDependency(XmlWriter writer, RegisterDependency dependency)
+        {
+            writer.WriteStartElement("register");
+
+            writer.WriteAttributeString("type", dependency.Type);
+            writer.WriteAttributeString("as", dependency.As);
+
+            if (dependency.Name.IsNotNullOrWhiteSpace())
+            {
+                writer.WriteAttributeString("name", dependency.Name);
+            }
+
+            writer.WriteEndElement();
+        }
+
+        private string ToXmlString(bool value) => value ? "true" : "false";
     }
 }

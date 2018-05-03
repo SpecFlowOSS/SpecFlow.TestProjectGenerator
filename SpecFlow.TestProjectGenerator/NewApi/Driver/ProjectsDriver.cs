@@ -4,6 +4,7 @@ using SpecFlow.TestProjectGenerator.Helpers;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi.Driver
