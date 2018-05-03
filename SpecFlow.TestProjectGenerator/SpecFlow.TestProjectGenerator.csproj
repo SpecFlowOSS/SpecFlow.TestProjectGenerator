@@ -34,8 +34,4 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\TechTalk.SpecFlow\TechTalk.SpecFlow.csproj" />
-  </ItemGroup>
-
 </Project>

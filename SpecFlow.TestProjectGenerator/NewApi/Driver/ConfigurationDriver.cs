@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using TechTalk.SpecFlow.Configuration;
-using TechTalk.SpecFlow.Configuration.AppConfig;
 
 namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 {
@@ -13,17 +11,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         public ConfigurationDriver(ProjectsDriver projectsDriver)
         {
             _projectsDriver = projectsDriver;
-        }
-
-        public void AddFromXmlSpecFlowSection(string projectName, string specFlowSection)
-        {
-            var project = _projectsDriver.Projects[projectName];
-            AddFromXmlSpecFlowSection(project, specFlowSection);
-        }
-
-        public void AddFromXmlSpecFlowSection(string specFlowSection)
-        {
-            AddFromXmlSpecFlowSection(_projectsDriver.DefaultProject, specFlowSection);
         }
 
         public void AddPlugin(string projectName, SpecFlowPlugin specFlowPlugin)
@@ -91,40 +78,40 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             SetConfigurationFormat(project, configurationFormat);
         }
 
-        private void SetBindingCulture(ProjectBuilder project, CultureInfo bindingCulture)
+        public void SetIsRowTestsAllowed(string projectName, bool isAllowed)
+        {
+            var project = _projectsDriver.Projects[projectName];
+            SetIsRowTestsAllowed(project, isAllowed);
+        }
+
+        public void SetIsRowTestsAllowed(bool isAllowed)
+        {
+            SetIsRowTestsAllowed(_projectsDriver.DefaultProject, isAllowed);
+        }
+
+        public void SetBindingCulture(ProjectBuilder project, CultureInfo bindingCulture)
         {
             project.Configuration.BindingCulture = bindingCulture;
         }
 
-        private void SetUnitTestProvider(ProjectBuilder project, string unitTestProviderName)
+        public void SetUnitTestProvider(ProjectBuilder project, string unitTestProviderName)
         {
             project.Configuration.UnitTestProvider = GetUnitTestProvider(unitTestProviderName);
         }
 
-        private void AddStepAssembly(ProjectBuilder project, StepAssembly stepAssembly)
+        public void AddStepAssembly(ProjectBuilder project, StepAssembly stepAssembly)
         {
             project.Configuration.StepAssemblies.Add(stepAssembly);
         }
 
-        private void SetConfigurationFormat(ProjectBuilder project, ConfigurationFormat configurationFormat)
+        public void SetConfigurationFormat(ProjectBuilder project, ConfigurationFormat configurationFormat)
         {
             project.ConfigurationFormat = configurationFormat;
         }
 
-        private void AddFromXmlSpecFlowSection(ProjectBuilder project, string specFlowSection)
+        public void SetIsRowTestsAllowed(ProjectBuilder project, bool isAllowed)
         {
-            var configSection = ConfigurationSectionHandler.CreateFromXml(specFlowSection);
-            var appConfigConfigurationLoader = new AppConfigConfigurationLoader();
-
-            var specFlowConfiguration = appConfigConfigurationLoader.LoadAppConfig(ConfigurationLoader.GetDefault(), configSection);
-
-            foreach (string stepAssemblyName in specFlowConfiguration.AdditionalStepAssemblies)
-            {
-                AddStepAssembly(project, new StepAssembly(stepAssemblyName));
-            }
-
-            SetUnitTestProvider(project, specFlowConfiguration.UnitTestProvider);
-            SetBindingCulture(project, specFlowConfiguration.BindingCulture);
+            project.Configuration.Generator.AllowRowTests = isAllowed;
         }
 
         private UnitTestProvider GetUnitTestProvider(string providerName)
