@@ -29,6 +29,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 AddReference("System.Configuration");
                 AddReference("System.Core");
                 AddReference("System.Data");
+                AddReference("System.Xml");
+                AddReference("System.Xml.Linq");
                 AddReference("Microsoft.CSharp");
             }
         }
