@@ -50,7 +50,7 @@ namespace SpecFlow.TestProjectGenerator
 
         public virtual string NuGetFolder
         {
-            get => !_nugetFolder.IsNullOrWhiteSpace() ? _nugetFolder : Path.GetFullPath(Path.Combine(SourceRoot, "Installer", "NuGetPackages", "bin", "Debug", "net45", "Debug", "NuGetPackages"));
+            get => !_nugetFolder.IsNullOrWhiteSpace() ? _nugetFolder : Path.GetFullPath(Path.Combine(SourceRoot, "Installer", "NuGetPackages", "bin", "Debug", "net471", "Debug", "NuGetPackages"));
             set => _nugetFolder = value;
         }
 
