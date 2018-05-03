@@ -40,7 +40,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 WriteProjectNuGetPackages(xw, project);
                 WriteProjectFiles(xw, project, path);
 
-                WriteMSBuildImport(xw, "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
+                WriteLanguageTargets(xw, project);
 
                 WriteNuGetPackageTargetImports(xw, project);
 
@@ -50,6 +50,32 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
 
             return projFilePath;
+        }
+
+        private void WriteLanguageTargets(XmlWriter xw, Project project)
+        {
+            switch (project.ProgrammingLanguage)
+            {
+                case ProgrammingLanguage.CSharp:
+                    WriteMSBuildImport(xw, "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
+                    break;
+                case ProgrammingLanguage.FSharp:
+                    ////xw.WriteStartElement("PropertyGroup");
+                    ////xw.WriteAttributeString("Condition", @"'$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets')");
+
+                    ////xw.WriteElementString("FSharpTargetsPath", @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets");
+
+                    ////xw.WriteEndElement();
+                    ////WriteMSBuildImport(xw, @"<Import Project=""$(FSharpTargetsPath)"" />");
+
+                    // uses FSharp.Compiler.Tools package
+                    break;
+                case ProgrammingLanguage.VB:
+                    WriteMSBuildImport(xw, "$(MSBuildToolsPath)\\Microsoft.VisualBasic.targets");
+                    break;
+
+                default: throw new NotSupportedException($"The programming language {project.ProgrammingLanguage} is not supported.");
+            }
         }
 
         private void WriteProjectProperties(XmlWriter xw, Project project)
@@ -65,7 +91,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
 
             string outputType = project.ProjectType == ProjectType.Exe ? "WinExe" : "Library";
-            
+
             xw.WriteStartElement("PropertyGroup");
 
             xw.WriteElementString("Configuration", "Debug");
@@ -100,7 +126,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             // item group for project references
             xw.WriteStartElement("ItemGroup");
-            
+
             foreach (var reference in project.ProjectReferences)
             {
                 xw.WriteStartElement("ProjectReference");
@@ -111,7 +137,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
                 xw.WriteEndElement();
             }
-            
+
             xw.WriteEndElement();
         }
 
@@ -137,7 +163,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         private void WriteProjectNuGetPackages(XmlWriter xw, Project project)
         {
             if (project.NuGetPackages.Count <= 0) return;
-            
+
             xw.WriteStartElement("ItemGroup");
 
             foreach (var package in project.NuGetPackages)
@@ -158,7 +184,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 xw.WriteStartElement("Reference");
                 xw.WriteAttributeString("Include", assembly.PublicAssemblyName);
 
-                xw.WriteElementString("HintPath", Path.Combine("..","packages",$"{package.Name}.{package.Version}","lib",assembly.RelativeHintPath));
+                xw.WriteElementString("HintPath", Path.Combine("..", "packages", $"{package.Name}.{package.Version}", "lib", assembly.RelativeHintPath));
 
                 xw.WriteEndElement();
             }

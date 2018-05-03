@@ -72,7 +72,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public void AddBindingCode(string bindingCode)
         {
             EnsureProjectExists();
-            
+
             var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
             _project.AddFile(bindingsGenerator.GenerateStepDefinition(bindingCode));
         }
@@ -103,6 +103,32 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
         }
 
+        private void AddInitialFSharpReferences()
+        {
+            switch (_project.ProjectFormat)
+            {
+                case ProjectFormat.Old:
+                    AddInitialOldFormatFSharpReferences();
+                    break;
+                case ProjectFormat.New:
+                    AddInitialNewFormatFSharpReferences();
+                    break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void AddInitialOldFormatFSharpReferences()
+        {
+            _project.AddNuGetPackage("FSharp.Compiler.Tools", "10.0.2");
+            _project.AddReference("FSharp.Core");
+            _project.AddReference("System.Numerics");
+        }
+
+        private void AddInitialNewFormatFSharpReferences()
+        {
+            _project.AddNuGetPackage("FSharp.Core", "4.3.4");
+        }
+
         private void EnsureProjectExists()
         {
             if (_project != null)
@@ -117,6 +143,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 #else
             _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
 #endif
+            
+            if (_project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
+            {
+                AddInitialFSharpReferences();
+            }
 
             if (IsSpecFlowFeatureProject)
             {
