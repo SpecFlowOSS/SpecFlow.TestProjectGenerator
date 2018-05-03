@@ -10,7 +10,7 @@ namespace Bindings
 open TechTalk.SpecFlow
 
 [<Binding>]
-type {0} =
+type {0}() =
     {1}";
 
         public override ProjectFile GenerateBindingClassFile(string name, string content)

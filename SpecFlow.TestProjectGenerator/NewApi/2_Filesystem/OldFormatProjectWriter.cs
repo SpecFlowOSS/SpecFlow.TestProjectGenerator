@@ -60,15 +60,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                     WriteMSBuildImport(xw, "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
                     break;
                 case ProgrammingLanguage.FSharp:
-                    ////xw.WriteStartElement("PropertyGroup");
-                    ////xw.WriteAttributeString("Condition", @"'$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets')");
-
-                    ////xw.WriteElementString("FSharpTargetsPath", @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets");
-
-                    ////xw.WriteEndElement();
-                    ////WriteMSBuildImport(xw, @"<Import Project=""$(FSharpTargetsPath)"" />");
-
-                    // uses FSharp.Compiler.Tools package
+                    WriteMSBuildImport(xw, "$(FSharpTargetsPath)");
                     break;
                 case ProgrammingLanguage.VB:
                     WriteMSBuildImport(xw, "$(MSBuildToolsPath)\\Microsoft.VisualBasic.targets");
