@@ -13,7 +13,7 @@ namespace SpecFlow.TestProjectGenerator
         public CurrentVersionDriver(Folders folders)
         {
             _folders = folders;
-            string pathToGitVersionDir = Path.Combine(_folders.GlobalPackages, "gitversion.commandline", "3.6.5", "tools");
+            string pathToGitVersionDir = Path.Combine(_folders.GlobalPackages, "gitversion.commandline", "4.0.0-beta0012", "tools");
             string pathToGitVersionExe = Path.Combine(pathToGitVersionDir, "GitVersion.exe");
             var processResult = new ProcessHelper().RunProcess(_folders.SourceRoot, pathToGitVersionExe, "");
 
