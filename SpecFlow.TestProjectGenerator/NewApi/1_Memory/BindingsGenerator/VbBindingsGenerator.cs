@@ -14,15 +14,15 @@ Public Class {0}
     {1}
 End Class";
 
-        public override ProjectFile GenerateBindingClassFile(string name, string content)
+        public override ProjectFile GenerateBindingClassFile(string content)
         {
-            return new ProjectFile(name, "Compile", content);
+            return new ProjectFile($"BindingsClass_{Guid.NewGuid():N}.vb", "Compile", content);
         }
 
         public override ProjectFile GenerateStepDefinition(string method)
         {
             string randomClassName = $"BindingsClass_{Guid.NewGuid():N}";
-            return new ProjectFile($"{randomClassName}.cs", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
+            return new ProjectFile($"{randomClassName}.vb", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
         }
 
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)

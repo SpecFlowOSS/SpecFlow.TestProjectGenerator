@@ -63,16 +63,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             DefaultProject.AddStepBinding(scenarioBlock, regex, csharpcode, vbnetcode);
         }
 
-        public void AddBindingCode(string projectName, string bindingCode)
-        {
-            var targetProject = Projects[projectName];
-            AddBindingCode(targetProject, bindingCode);
-        }
-
-        public void AddBindingCode(string bindingCode)
-        {
-            AddBindingCode(DefaultProject, bindingCode);
-        }
+        public void AddStepBinding(string projectName, string bindingCode) => AddStepBinding(Projects[projectName], bindingCode);
+        public void AddStepBinding(string bindingCode) => AddStepBinding(DefaultProject, bindingCode);
 
         public void AddProjectReference(string projectName, string projectNameToReference)
         {
@@ -84,6 +76,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         {
             AddProjectReference(DefaultProject, projectNameToReference);
         }
+
+        public void AddBindingClass(string rawBindingClass) => AddBindingClass(DefaultProject, rawBindingClass);
+
+        public void AddBindingClass(string projectName, string rawBindingClass) => AddBindingClass(Projects[projectName], rawBindingClass);
 
         private ProjectBuilder CreateProject(string projectName, ProgrammingLanguage language)
         {
@@ -101,15 +97,20 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             return project;
         }
 
-        private void AddBindingCode(ProjectBuilder targetProject, string bindingCode)
+        private void AddStepBinding(ProjectBuilder targetProject, string bindingCode)
         {
-            targetProject.AddBindingCode(bindingCode);
+            targetProject.AddStepBinding(bindingCode);
         }
 
         private void AddProjectReference(ProjectBuilder targetProject, string projectNameToReference)
         {
             var projectToReference = Projects[projectNameToReference];
             targetProject.AddProjectReference(Path.Combine(@"..\", projectNameToReference, $"{projectNameToReference}.{projectToReference.Language.ToProjectFileExtension()}"), projectToReference);
+        }
+
+        private void AddBindingClass(ProjectBuilder project, string rawBindingClass)
+        {
+            project.AddBindingClass(rawBindingClass);
         }
 
         public ProgrammingLanguage ParseProgrammingLanguage(string input)

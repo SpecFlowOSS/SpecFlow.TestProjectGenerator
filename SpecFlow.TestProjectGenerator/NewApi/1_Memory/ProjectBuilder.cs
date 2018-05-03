@@ -69,12 +69,20 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, scenarioBlock, regex, ParameterType.DocString, "docStringArg"));
         }
 
-        public void AddBindingCode(string bindingCode)
+        public void AddStepBinding(string bindingCode)
         {
             EnsureProjectExists();
 
             var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
             _project.AddFile(bindingsGenerator.GenerateStepDefinition(bindingCode));
+        }
+
+        public void AddBindingClass(string fullBindingClass)
+        {
+            EnsureProjectExists();
+
+            var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
+            _project.AddFile(bindingsGenerator.GenerateBindingClassFile(fullBindingClass));
         }
 
         public void GenerateConfigurationFile()
@@ -188,6 +196,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            _project.AddNuGetPackage("FluentAssertions", "5.3.0", new NuGetPackageAssembly("FluentAssertions, Version=5.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a", @"net45\FluentAssertions.dll"));
         }
     }
 }

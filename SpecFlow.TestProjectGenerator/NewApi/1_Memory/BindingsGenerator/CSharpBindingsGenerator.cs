@@ -16,9 +16,9 @@ public class {0}
     {1}
 }}";
 
-        public override ProjectFile GenerateBindingClassFile(string name, string content)
+        public override ProjectFile GenerateBindingClassFile(string content)
         {
-            return new ProjectFile(name, "Compile", content);
+            return new ProjectFile($"BindingsClass_{Guid.NewGuid():N}.cs", "Compile", content);
         }
 
         public override ProjectFile GenerateStepDefinition(string method)
