@@ -8,6 +8,10 @@
             private string _packageName;
             private string _packageVersion;
 
+            public AddPackageCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)
+            {
+            }
+
 
             public AddPackageCommandBuilder ToProject(string projectFilePath)
             {

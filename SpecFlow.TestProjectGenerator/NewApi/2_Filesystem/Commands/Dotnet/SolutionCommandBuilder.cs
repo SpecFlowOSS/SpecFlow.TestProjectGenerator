@@ -3,8 +3,15 @@
     public partial class SolutionCommandBuilder
 
     {
-        public static SolutionCommandBuilder Create() => new SolutionCommandBuilder();
+        private readonly IOutputWriter _outputWriter;
 
-        public AddProjectSolutionCommandBuilder AddProject() => new AddProjectSolutionCommandBuilder(this);
+        public SolutionCommandBuilder(IOutputWriter outputWriter)
+        {
+            _outputWriter = outputWriter;
+        }
+
+        public static SolutionCommandBuilder Create(IOutputWriter outputWriter) => new SolutionCommandBuilder(outputWriter);
+
+        public AddProjectSolutionCommandBuilder AddProject() => new AddProjectSolutionCommandBuilder(_outputWriter);
     }
 }

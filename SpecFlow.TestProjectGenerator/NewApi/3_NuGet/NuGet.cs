@@ -7,11 +7,13 @@ namespace SpecFlow.TestProjectGenerator.NewApi._3_NuGet
     {
         private readonly Folders _folders;
         private readonly TestProjectFolders _testProjectFolders;
+        private readonly IOutputWriter _outputWriter;
 
-        public NuGet(Folders folders, TestProjectFolders testProjectFolders)
+        public NuGet(Folders folders, TestProjectFolders testProjectFolders, IOutputWriter outputWriter)
         {
             _folders = folders;
             _testProjectFolders = testProjectFolders;
+            _outputWriter = outputWriter;
         }
 
         public void Restore()
@@ -27,7 +29,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._3_NuGet
 
 
             var nugetRestore = new ProcessHelper();
-            var processResult = nugetRestore.RunProcess(_testProjectFolders.PathToSolutionDirectory, processPath, commandLineArgs);
+            var processResult = nugetRestore.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, processPath, commandLineArgs);
 
             if (processResult.ExitCode > 0)
             {

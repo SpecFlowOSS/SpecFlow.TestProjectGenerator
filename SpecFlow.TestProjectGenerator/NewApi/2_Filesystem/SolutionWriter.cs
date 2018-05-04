@@ -7,11 +7,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class SolutionWriter
     {
-        private readonly ProjectWriterFactory _projectWriterFactory = new ProjectWriterFactory();
+        private readonly IOutputWriter _outputWriter;
+        private readonly ProjectWriterFactory _projectWriterFactory;
         private readonly ProjectFileWriter _projectFileWriter;
 
-        public SolutionWriter()
+        public SolutionWriter(IOutputWriter outputWriter)
         {
+            _outputWriter = outputWriter;
+            _projectWriterFactory = new ProjectWriterFactory(outputWriter);
             _projectFileWriter = new ProjectFileWriter();
         }
 
@@ -22,7 +25,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 throw new ArgumentNullException(nameof(solution));
             }
 
-            var createSolutionCommand = DotNet.New().Solution().InFolder(outputPath).WithName(solution.Name).Build();
+            var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
             createSolutionCommand.Execute(new ProjectCreationNotPossibleException("Could not create solution."));
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
 
@@ -49,7 +52,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         {
             string projPath = formatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
 
-            var addProjCommand = DotNet.Sln().AddProject().Project(projPath).ToSolution(solutionFilePath).Build().Execute();
+            var addProjCommand = DotNet.Sln(_outputWriter).AddProject().Project(projPath).ToSolution(solutionFilePath).Build().Execute();
             if (addProjCommand.ExitCode != 0)
             {
                 throw new ProjectCreationNotPossibleException("Could not add project to solution.");

@@ -7,15 +7,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
     {
         public class NewProjectCommandBuilder : BaseCommandBuilder
         {
-            private readonly NewCommandBuilder _newCommandBuilder;
             private string _templateName = "classlib";
             private string _name = "ClassLib";
             private string _folder;
             private ProgrammingLanguage _language = ProgrammingLanguage.CSharp;
 
-            public NewProjectCommandBuilder(NewCommandBuilder newCommandBuilder)
+
+            public NewProjectCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)
             {
-                _newCommandBuilder = newCommandBuilder;
             }
 
             public NewProjectCommandBuilder UsingTemplate(string templateName)

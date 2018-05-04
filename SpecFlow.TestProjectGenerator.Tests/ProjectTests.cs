@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using FluentAssertions;
+using Moq;
+using SpecFlow.TestProjectGenerator.NewApi;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
@@ -34,7 +36,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -52,7 +54,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -74,7 +76,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
                 "2.3.2-preview20180328");
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -94,7 +96,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             project.AddReference("System.Configuration");
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -112,7 +114,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             project.AddReference("System.Configuration");
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -132,7 +134,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             project.AddFile(projectFile);
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
             var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "File.cs");
@@ -155,7 +157,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             project.AddFile(projectFile);
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
             var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "File.cs");
@@ -178,7 +180,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             project.AddFile(projectFile);
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
             var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "Folder", "File.cs");
@@ -201,7 +203,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
             project.AddFile(projectFile);
 
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
             var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "Folder", "File.cs");
@@ -231,7 +233,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -244,7 +246,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp, TargetFramework.Net45);
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -257,7 +259,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB, TargetFramework.Net45);
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -273,7 +275,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
                 ProgrammingLanguage.CSharp,
                 TargetFramework.Net45 | TargetFramework.NetStandard20);
 
-            new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -288,7 +290,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
                 ProgrammingLanguage.CSharp,
                 TargetFramework.Net45 | TargetFramework.NetStandard20);
 
-            Action createSolution = () => new SolutionWriter().WriteToFileSystem(solution, solutionFolder);
+            Action createSolution = () => new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             createSolution.ShouldThrow<ProjectCreationNotPossibleException>().WithMessage("Multiple target frameworks don't work with the old csproj format");
 

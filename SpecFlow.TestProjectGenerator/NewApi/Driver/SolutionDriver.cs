@@ -14,14 +14,16 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         private readonly Folders _folders;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly ProjectsDriver _projectsDriver;
+        private readonly IOutputWriter _outputWriter;
         private readonly Solution _solution;
         
-        public SolutionDriver(NuGetConfigGenerator nuGetConfigGenerator, Folders folders, TestProjectFolders testProjectFolders, ProjectsDriver projectsDriver)
+        public SolutionDriver(NuGetConfigGenerator nuGetConfigGenerator, Folders folders, TestProjectFolders testProjectFolders, ProjectsDriver projectsDriver, IOutputWriter outputWriter)
         {
             _nuGetConfigGenerator = nuGetConfigGenerator;
             _folders = folders;
             _testProjectFolders = testProjectFolders;
             _projectsDriver = projectsDriver;
+            _outputWriter = outputWriter;
             NuGetSources = new List<NuGetSource> { new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder), new NuGetSource("LocalExternalPackages", _folders.ExternalNuGetFolder) };
             _solution = new Solution(SolutionName);
         }
@@ -41,7 +43,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
             _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
 
-            var solutionWriter = new SolutionWriter();
+            var solutionWriter = new SolutionWriter(_outputWriter);
             string solutionDirectoryPath = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName);
             _testProjectFolders.PathToSolutionFile =  solutionWriter.WriteToFileSystem(_solution, solutionDirectoryPath);
 

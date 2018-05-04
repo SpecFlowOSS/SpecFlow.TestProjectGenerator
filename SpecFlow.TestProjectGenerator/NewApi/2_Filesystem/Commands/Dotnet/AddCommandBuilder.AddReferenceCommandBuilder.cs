@@ -26,6 +26,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
             {
                 return $"add {_projectFilePath} reference {string.Join(" ", _referencedProjects)}";
             }
+
+            public AddReferenceCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)
+            {
+            }
         }
     }
 }

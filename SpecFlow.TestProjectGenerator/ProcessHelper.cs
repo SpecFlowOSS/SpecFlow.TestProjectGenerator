@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using SpecFlow.TestProjectGenerator.NewApi;
 
 namespace SpecFlow.TestProjectGenerator
 {
@@ -27,11 +28,11 @@ namespace SpecFlow.TestProjectGenerator
         private static TimeSpan _timeout = TimeSpan.FromMinutes(10);
         private static readonly int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
 
-        public ProcessResult RunProcess(string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
+        public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
         {
             var parameters = string.Format(argumentsFormat, arguments);
 
-            Console.WriteLine("Starting external program: \"{0}\" {1}", executablePath, parameters);
+            outputWriter.WriteLine("Starting external program: \"{0}\" {1}", executablePath, parameters);
             var psi = CreateProcessStartInfo(workingDirectory, executablePath, parameters);
 
 

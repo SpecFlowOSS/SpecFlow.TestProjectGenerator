@@ -2,10 +2,17 @@
 {
     public partial class AddCommandBuilder
     {
-        internal static AddCommandBuilder Create() => new AddCommandBuilder();
+        private readonly IOutputWriter _outputWriter;
 
-        public AddPackageCommandBuilder Package() => new AddPackageCommandBuilder();
+        public AddCommandBuilder(IOutputWriter outputWriter)
+        {
+            _outputWriter = outputWriter;
+        }
 
-        public AddReferenceCommandBuilder Reference() => new AddReferenceCommandBuilder();
+        internal static AddCommandBuilder Create(IOutputWriter outputWriter) => new AddCommandBuilder(outputWriter);
+
+        public AddPackageCommandBuilder Package() => new AddPackageCommandBuilder(_outputWriter);
+
+        public AddReferenceCommandBuilder Reference() => new AddReferenceCommandBuilder(_outputWriter);
     }
 }

@@ -6,15 +6,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
     {
         public class AddProjectSolutionCommandBuilder : BaseCommandBuilder
         {
-            private SolutionCommandBuilder _solutionCommandBuilder;
             private string _solutionPath;
             private string _projectPath;
 
-            public AddProjectSolutionCommandBuilder(SolutionCommandBuilder solutionCommandBuilder)
-            {
-                _solutionCommandBuilder = solutionCommandBuilder;
-            }
-
+         
             public AddProjectSolutionCommandBuilder ToSolution(string solutionPath)
             {
                 _solutionPath = solutionPath;
@@ -35,6 +30,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
                 var arguments = $"sln \"{_solutionPath}\" add \"{_projectPath}\"";
 
                 return arguments;
+            }
+
+            public AddProjectSolutionCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)
+            {
             }
         }
     }

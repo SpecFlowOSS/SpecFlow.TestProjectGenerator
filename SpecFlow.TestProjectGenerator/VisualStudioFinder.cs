@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using SpecFlow.TestProjectGenerator.NewApi;
 
 namespace SpecFlow.TestProjectGenerator
 {
@@ -8,10 +9,12 @@ namespace SpecFlow.TestProjectGenerator
     {
         private const string VsWhereParameter = @"-latest -products * -requires Microsoft.VisualStudio.PackageGroup.TestTools.Core -property installationPath";
         private readonly Folders _folders;
+        private readonly IOutputWriter _outputWriter;
 
-        public VisualStudioFinder(Folders folders)
+        public VisualStudioFinder(Folders folders, IOutputWriter outputWriter)
         {
             _folders = folders;
+            _outputWriter = outputWriter;
         }
 
         public string Find()
@@ -24,7 +27,7 @@ namespace SpecFlow.TestProjectGenerator
             }
 
             var ph = new ProcessHelper();
-            var processResult = ph.RunProcess(".", vsWherePath, VsWhereParameter);
+            var processResult = ph.RunProcess(_outputWriter, ".", vsWherePath, VsWhereParameter);
 
 
             var lines = processResult.CombinedOutput.Split(new string[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);

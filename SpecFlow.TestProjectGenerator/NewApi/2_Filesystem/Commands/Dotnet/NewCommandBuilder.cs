@@ -2,10 +2,17 @@
 {
     public partial class NewCommandBuilder
     {
-        internal static NewCommandBuilder Create() => new NewCommandBuilder();
+        private readonly IOutputWriter _outputWriter;
 
-        public NewSolutionCommandBuilder Solution() => new NewSolutionCommandBuilder(this);
+        public NewCommandBuilder(IOutputWriter outputWriter)
+        {
+            _outputWriter = outputWriter;
+        }
 
-        public NewProjectCommandBuilder Project() => new NewProjectCommandBuilder(this);
+        internal static NewCommandBuilder Create(IOutputWriter outputWriter) => new NewCommandBuilder(outputWriter);
+
+        public NewSolutionCommandBuilder Solution() => new NewSolutionCommandBuilder(_outputWriter);
+
+        public NewProjectCommandBuilder Project() => new NewProjectCommandBuilder(_outputWriter);
     }
 }

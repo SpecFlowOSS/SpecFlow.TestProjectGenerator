@@ -4,7 +4,6 @@
     {
         public class NewSolutionCommandBuilder : BaseCommandBuilder
         {
-            private NewCommandBuilder _newCommandBuilder;
             private string _name;
             private string _rootPath;
 
@@ -29,9 +28,9 @@
                 return arguments;
             }
 
-            public NewSolutionCommandBuilder(NewCommandBuilder newCommandBuilder)
+
+            public NewSolutionCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)
             {
-                _newCommandBuilder = newCommandBuilder;
             }
         }
     }

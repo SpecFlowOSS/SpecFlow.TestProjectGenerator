@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using FluentAssertions;
+using Moq;
+using SpecFlow.TestProjectGenerator.NewApi;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
 using Xunit;
@@ -16,7 +18,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
 
             var solution = new Solution("SolutionName");
 
-            var solutionWriter = new SolutionWriter();
+            var solutionWriter = new SolutionWriter(new Mock<IOutputWriter>().Object);
 
             solutionWriter.WriteToFileSystem(solution, folder);
 
@@ -38,7 +40,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
 
             solution.AddProject(project);
 
-            var solutionWriter = new SolutionWriter();
+            var solutionWriter = new SolutionWriter(new Mock<IOutputWriter>().Object);
 
             solutionWriter.WriteToFileSystem(solution, folder);
 

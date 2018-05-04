@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.Build.Evaluation;
 using SpecFlow.TestProjectGenerator.Helpers;
 using SpecFlow.TestProjectGenerator.Inputs;
+using SpecFlow.TestProjectGenerator.NewApi;
 using SpecFlow.TestProjectGenerator.ProgramLanguageDrivers;
 
 namespace SpecFlow.TestProjectGenerator
@@ -16,15 +17,17 @@ namespace SpecFlow.TestProjectGenerator
         protected readonly Folders _folders;
         protected readonly ProjectCompilerHelper _projectCompilerHelper;
         private readonly CurrentVersionDriver _currentVersionDriver;
+        private readonly IOutputWriter _outputWriter;
         protected readonly VisualStudioFinder _visualStudioFinder;
         protected IProgramLanguageProjectCompiler _programLanguageProjectCompiler;
 
-        public ProjectCompiler(Folders folders, VisualStudioFinder visualStudioFinder, ProjectCompilerHelper projectCompilerHelper, CurrentVersionDriver currentVersionDriver)
+        public ProjectCompiler(Folders folders, VisualStudioFinder visualStudioFinder, ProjectCompilerHelper projectCompilerHelper, CurrentVersionDriver currentVersionDriver, IOutputWriter outputWriter)
         {
             _folders = folders;
             _visualStudioFinder = visualStudioFinder;
             _projectCompilerHelper = projectCompilerHelper;
             _currentVersionDriver = currentVersionDriver;
+            _outputWriter = outputWriter;
         }
 
         public void Compile(InputProjectDriver inputProjectDriver)
@@ -156,7 +159,7 @@ namespace SpecFlow.TestProjectGenerator
 
 
             var nugetRestore = new ProcessHelper();
-            var processResult = nugetRestore.RunProcess(inputProjectDriver.SolutionFolder, processPath, commandLineArgs);
+            var processResult = nugetRestore.RunProcess(_outputWriter, inputProjectDriver.SolutionFolder, processPath, commandLineArgs);
 
             if (processResult.ExitCode > 0)
             {
@@ -210,7 +213,7 @@ namespace SpecFlow.TestProjectGenerator
 
 
             var processHelper = new ProcessHelper();
-            var msBuildExitCode = processHelper.RunProcess(inputProjectDriver.SolutionFolder, msBuildPath, $"/bl /nologo /v:m \"{inputProjectDriver.SolutionPath}\"");
+            var msBuildExitCode = processHelper.RunProcess(_outputWriter, inputProjectDriver.SolutionFolder, msBuildPath, $"/bl /nologo /v:m \"{inputProjectDriver.SolutionPath}\"");
 
             
             if (msBuildExitCode.ExitCode > 0)

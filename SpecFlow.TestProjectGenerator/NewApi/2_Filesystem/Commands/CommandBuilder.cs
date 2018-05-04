@@ -4,8 +4,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands
 {
     public class CommandBuilder
     {
-        public CommandBuilder(string executablePath, string argumentsFormat)
+        private readonly IOutputWriter _outputWriter;
+
+        public CommandBuilder(IOutputWriter outputWriter, string executablePath, string argumentsFormat)
         {
+            _outputWriter = outputWriter;
             ExecutablePath = executablePath;
             ArgumentsFormat = argumentsFormat;
         }
@@ -17,7 +20,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands
         {
             var solutionCreateProcessHelper = new ProcessHelper();
 
-            var processResult = solutionCreateProcessHelper.RunProcess(".", ExecutablePath, ArgumentsFormat);
+            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, ".", ExecutablePath, ArgumentsFormat);
             if (processResult.ExitCode > 0)
             {
                 var innerException = new Exception(processResult.CombinedOutput);
@@ -31,7 +34,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands
         {
             var solutionCreateProcessHelper = new ProcessHelper();
 
-            var processResult = solutionCreateProcessHelper.RunProcess(".", ExecutablePath, ArgumentsFormat);
+            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, ".", ExecutablePath, ArgumentsFormat);
             if (processResult.ExitCode != 0)
             {
                 var innerException = new Exception(processResult.CombinedOutput);

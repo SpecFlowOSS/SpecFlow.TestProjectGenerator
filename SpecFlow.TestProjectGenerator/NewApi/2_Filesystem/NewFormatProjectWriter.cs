@@ -9,6 +9,13 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class NewFormatProjectWriter : IProjectWriter
     {
+        private readonly IOutputWriter _outputWriter;
+
+        public NewFormatProjectWriter(IOutputWriter outputWriter)
+        {
+            _outputWriter = outputWriter;
+        }
+
         public virtual string WriteProject(Project project, string projRootPath)
         {
             if (project is null)
@@ -43,7 +50,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         {
             foreach (var nugetPackage in project.NuGetPackages)
             {
-                var addPackageCommand = DotNet.Add()
+                var addPackageCommand = DotNet.Add(_outputWriter)
                                               .Package()
                                               .WithPackageName(nugetPackage.Name)
                                               .WithPackageVersion(nugetPackage.Version)
@@ -58,7 +65,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         {
             foreach (var projReference in project.ProjectReferences)
             {
-                DotNet.Add()
+                DotNet.Add(_outputWriter)
                       .Reference()
                       .ReferencingProject(projReference.Path)
                       .ToProject(projFilePath)
@@ -116,7 +123,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         {
             string template = project.ProjectType == ProjectType.Exe ? "console" : "classlib";
 
-            var newProjCommand = DotNet.New()
+            var newProjCommand = DotNet.New(_outputWriter)
                                        .Project()
                                        .InFolder(projRootPath)
                                        .WithName(project.Name)

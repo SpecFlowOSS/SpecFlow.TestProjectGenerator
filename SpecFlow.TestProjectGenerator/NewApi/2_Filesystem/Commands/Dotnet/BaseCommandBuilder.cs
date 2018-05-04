@@ -2,11 +2,17 @@
 {
     public abstract class BaseCommandBuilder
     {
+        protected readonly IOutputWriter _outputWriter;
         private const string ExecutablePath = "dotnet";
+
+        protected BaseCommandBuilder(IOutputWriter outputWriter)
+        {
+            _outputWriter = outputWriter;
+        }
 
         public CommandBuilder Build()
         {
-            return new CommandBuilder(ExecutablePath, BuildArguments());
+            return new CommandBuilder(_outputWriter, ExecutablePath, BuildArguments());
         }
 
         protected abstract string BuildArguments();

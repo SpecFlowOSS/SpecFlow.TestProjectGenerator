@@ -8,7 +8,13 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class OldFormatProjectWriter : XmlFileGeneratorBase, IProjectWriter
     {
+        private readonly IOutputWriter _outputWriter;
         private readonly ProjectFileWriter _fileWriter = new ProjectFileWriter();
+
+        public OldFormatProjectWriter(IOutputWriter outputWriter)
+        {
+            _outputWriter = outputWriter;
+        }
 
         public virtual string WriteProject(Project project, string path)
         {

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using SpecFlow.TestProjectGenerator.NewApi;
 
 namespace SpecFlow.TestProjectGenerator
 {
@@ -10,12 +11,12 @@ namespace SpecFlow.TestProjectGenerator
     {
         private readonly Folders _folders;
 
-        public CurrentVersionDriver(Folders folders)
+        public CurrentVersionDriver(Folders folders, IOutputWriter outputWriter)
         {
             _folders = folders;
             string pathToGitVersionDir = Path.Combine(_folders.GlobalPackages, "gitversion.commandline", "4.0.0-beta0012", "tools");
             string pathToGitVersionExe = Path.Combine(pathToGitVersionDir, "GitVersion.exe");
-            var processResult = new ProcessHelper().RunProcess(_folders.SourceRoot, pathToGitVersionExe, "");
+            var processResult = new ProcessHelper().RunProcess(outputWriter, folders.SourceRoot, pathToGitVersionExe, "");
 
             if (processResult.ExitCode != 0)
             {

@@ -15,16 +15,18 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         private readonly AppConfigDriver _appConfigDriver;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly Folders _folders;
+        private readonly IOutputWriter _outputWriter;
 
         private const string BeginnOfTrxFileLine = "Results File: ";
         private const string BeginnOfLogFileLine = "Log file: ";
 
-        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, Folders folders)
+        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, Folders folders, IOutputWriter outputWriter)
         {
             _visualStudioFinder = visualStudioFinder;
             _appConfigDriver = appConfigDriver;
             _testProjectFolders = testProjectFolders;
             _folders = folders;
+            _outputWriter = outputWriter;
         }
 
         public TestExecutionResult LastTestExecutionResult { get; private set; }
@@ -41,7 +43,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             ProcessResult processResult;
             try
             {
-                processResult = processHelper.RunProcess(_testProjectFolders.ProjectFolder, vsTestConsoleExePath, arguments);
+                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, vsTestConsoleExePath, arguments);
             }
             catch (Exception)
             {
