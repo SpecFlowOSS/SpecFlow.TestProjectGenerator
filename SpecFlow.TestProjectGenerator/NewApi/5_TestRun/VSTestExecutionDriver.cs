@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using FluentAssertions;
 using SpecFlow.TestProjectGenerator.Helpers;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
@@ -31,7 +33,22 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
         public TestExecutionResult LastTestExecutionResult { get; private set; }
 
-        public void ExecuteTests()
+        public void CheckIsBindingMethodExecuted(string methodName, int timesExecuted)
+        {
+            LastTestExecutionResult.Should().NotBeNull();
+            var regex = new Regex($@"-> done: \S+\.{methodName}");
+
+            regex.Match(LastTestExecutionResult.Output).Success.Should().BeTrue($"method {methodName} was not executed.");
+            regex.Matches(LastTestExecutionResult.Output).Count.Should().Be(timesExecuted);
+        }
+
+        public void CheckOutputContainsText(string text)
+        {
+            LastTestExecutionResult.Output.Should().NotBeNull()
+                                   .And.Subject.Should().Contain(text);
+        }
+
+        public void ExecuteTests(string tag = null)
         {
             string vsFolder = _visualStudioFinder.Find();
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
@@ -39,7 +56,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             var vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetTestAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
 
             var processHelper = new ProcessHelper();
-            string arguments = GenereateVsTestsArguments(null);
+            string arguments = GenereateVsTestsArguments(tag != null ? $"Category={tag}" : null);
             ProcessResult processResult;
             try
             {
@@ -50,19 +67,19 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 Console.WriteLine($"running vstest.console.exe failed - {_testProjectFolders.CompiledAssemblyPath} {vsTestConsoleExePath} {arguments}");
                 throw;
             }
-            
+
             var output = processResult.CombinedOutput;
 
             var lines = output.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             var trxFiles = FindFilePath(lines, ".trx", BeginnOfTrxFileLine);
 
             if (trxFiles.Count() != 1)
-                throw new Exception("No or to many trx files in output found!" + Environment.NewLine + String.Join(Environment.NewLine, trxFiles));
+                throw new Exception("No or to many trx files in output found!" + Environment.NewLine + string.Join(Environment.NewLine, trxFiles));
 
 
             var trxFile = trxFiles.Single().Substring(BeginnOfTrxFileLine.Length);
             var testResult = XDocument.Load(trxFile);
-            
+
             TestExecutionResult executionResult = new TestExecutionResult();
 
             XmlNameTable nameTable = new NameTable();
@@ -79,17 +96,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Ignored = 0; // mstest does not support ignored in the report
                 executionResult.Output = output;
             }
-            
+
             LastTestExecutionResult = executionResult;
         }
 
         private IEnumerable<string> FindFilePath(string[] lines, string ending, string starting)
         {
             return from l in lines
-                let trimmed = l.Trim()
-                where trimmed.StartsWith(starting)
-                where trimmed.EndsWith(ending)
-                select trimmed;
+                   let trimmed = l.Trim()
+                   where trimmed.StartsWith(starting)
+                   where trimmed.EndsWith(ending)
+                   select trimmed;
         }
 
         private string GenereateVsTestsArguments(string filter)
