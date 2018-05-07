@@ -31,6 +31,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         }
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects { get; }
+
         public ProjectBuilder DefaultProject { get; }
 
         public string CreateProject(string language)
@@ -104,6 +105,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             }
 
             _projects.Add(project.ProjectName, project);
+
             return project;
         }
 

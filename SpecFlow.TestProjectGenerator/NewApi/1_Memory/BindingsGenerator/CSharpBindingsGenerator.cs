@@ -8,6 +8,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
     {
         private const string BindingsClassTemplate = @"
 using System;
+using System.IO;
+using System.Xml;
 using TechTalk.SpecFlow;
 
 [Binding]

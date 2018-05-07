@@ -1,14 +1,19 @@
-﻿namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
+﻿using System;
+using System.Text.RegularExpressions;
+
+namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
 {
     public class CompileResult
     {
-        public CompileResult(bool successful, string output)
+        public CompileResult(int exitCode, string output)
         {
-            Successful = successful;
+            ExitCode = exitCode;
+            IsSuccessful = exitCode == 0;
             Output = output;
         }
 
-        public bool Successful { get; }
+        public int ExitCode { get; }
+        public bool IsSuccessful { get; }
         public string Output { get; }
     }
 }

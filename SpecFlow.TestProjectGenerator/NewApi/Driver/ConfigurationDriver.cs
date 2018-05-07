@@ -76,22 +76,31 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         public void AddRuntimeRegisterDependency(string type, string @as, string name) => AddRuntimeRegisterDependency(_projectsDriver.DefaultProject, type, @as, name);
         public void AddRuntimeRegisterDependency(string projectName, string type, string @as, string name) => AddRuntimeRegisterDependency(_projectsDriver.Projects[projectName], type, @as, name);
 
+        private (string type, string @as) GetFullTypeAs(ProjectBuilder project, string type, string @as)
+        {
+            return ($"{type}, {project.ProjectName}", $"{@as}, TechTalk.SpecFlow");
+        }
+
         public void AddGeneratorRegisterDependency(ProjectBuilder project, string type, string @as)
         {
+            (type, @as) = GetFullTypeAs(project, type, @as);
             project.Configuration.Generator.Value.AddRegisterDependency(type, @as);
         }
         public void AddGeneratorRegisterDependency(ProjectBuilder project, string type, string @as, string name)
         {
+            (type, @as) = GetFullTypeAs(project, type, @as);
             project.Configuration.Generator.Value.AddRegisterDependency(type, @as, name);
         }
 
         public void AddRuntimeRegisterDependency(ProjectBuilder project, string type, string @as, string name)
         {
+            (type, @as) = GetFullTypeAs(project, type, @as);
             project.Configuration.Runtime.Value.AddRegisterDependency(type, @as, name);
         }
 
         public void AddRuntimeRegisterDependency(ProjectBuilder project, string type, string @as)
         {
+            (type, @as) = GetFullTypeAs(project, type, @as);
             project.Configuration.Runtime.Value.AddRegisterDependency(type, @as);
         }
 

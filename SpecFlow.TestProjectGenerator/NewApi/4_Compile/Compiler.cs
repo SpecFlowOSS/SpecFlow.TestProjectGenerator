@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
 {
@@ -29,13 +30,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
                 _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
             }
 
-            return new CompileResult(successful: msBuildProcess.ExitCode == 0, output: msBuildProcess.CombinedOutput);
-
-            //if (msBuildProcess.ExitCode > 0)
-            //{
-            //    var firstErrorLine = msBuildProcess.CombinedOutput.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(l => l.Contains("): error "));
-            //    throw new Exception($"Build failed: {firstErrorLine}");
-            //}
+            return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);
         }
     }
 }

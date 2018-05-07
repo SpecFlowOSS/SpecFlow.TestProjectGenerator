@@ -151,7 +151,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 #else
             _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
 #endif
-            
+
             if (_project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
             {
                 AddInitialFSharpReferences();
@@ -177,7 +177,16 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     throw new NotImplementedException();
                     break;
                 case UnitTestProvider.MSTest:
-                    throw new NotImplementedException();
+                    _project.AddNuGetPackage("MSTest.TestAdapter", "1.2.0");
+                    _project.AddNuGetPackage(
+                        "MSTest.TestFramework",
+                        "1.2.0",
+                        new NuGetPackageAssembly(
+                            "Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL",
+                            "net45\\Microsoft.VisualStudio.TestPlatform.TestFramework.dll"),
+                        new NuGetPackageAssembly(
+                            "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL",
+                            "net45\\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll"));
                     break;
                 case UnitTestProvider.XUnit:
                     _project.AddNuGetPackage("xunit.core", "2.3.1");
@@ -188,7 +197,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     _project.AddNuGetPackage("xunit.runner.visualstudio", "2.3.1");
                     break;
                 case UnitTestProvider.NUnit3:
-                    throw new NotImplementedException();
+                    _project.AddNuGetPackage("NUnit", "3.8.1", new NuGetPackageAssembly("nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL", "net45\\nunit.framework.dll"));
+                    _project.AddNuGetPackage("NUnit3TestAdapter", "3.8.0");
                     break;
                 case UnitTestProvider.NUnit2:
                     throw new NotImplementedException();
@@ -197,6 +207,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     throw new ArgumentOutOfRangeException();
             }
 
+            _project.AddNuGetPackage("Newtonsoft.Json", "10.0.3", new NuGetPackageAssembly("Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll"));
             _project.AddNuGetPackage("FluentAssertions", "5.3.0", new NuGetPackageAssembly("FluentAssertions, Version=5.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a", @"net45\FluentAssertions.dll"));
         }
     }

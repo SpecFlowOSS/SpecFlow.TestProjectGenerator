@@ -54,6 +54,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _nuGet.Restore();
 
             _compileResult = _compiler.Run();
+            if (!_compileResult.IsSuccessful)
+            {
+                throw new InvalidOperationException($"Failed compiling. {_compileResult.Output}");
+            }
         }
 
         public void WriteToDisk()
@@ -87,7 +91,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         public void CheckSolutionShouldHaveCompiled()
         {
             _compileResult.Should().NotBeNull("the project should have compiled");
-            _compileResult.Successful.Should().BeTrue("the project should have compiled successfully.\r\n\r\n------ Build output ------\r\n{0}", _compileResult.Output);
+            _compileResult.IsSuccessful.Should().BeTrue("the project should have compiled successfully.\r\n\r\n------ Build output ------\r\n{0}", _compileResult.Output);
         }
 
         private string GetProjectCompilePath(Project project)
