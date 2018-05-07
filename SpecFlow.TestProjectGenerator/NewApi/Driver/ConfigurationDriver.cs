@@ -13,14 +13,19 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _projectsDriver = projectsDriver;
         }
 
+        public void AddPlugin(SpecFlowPlugin specFlowPlugin)
+        {
+            _projectsDriver.DefaultProject.Configuration.Plugins.Add(specFlowPlugin);
+        }
+
         public void AddPlugin(string projectName, SpecFlowPlugin specFlowPlugin)
         {
             _projectsDriver.Projects[projectName].Configuration.Plugins.Add(specFlowPlugin);
         }
 
-        public void AddPlugin(SpecFlowPlugin specFlowPlugin)
+        public void AddStepAssembly(StepAssembly stepAssembly)
         {
-            _projectsDriver.DefaultProject.Configuration.Plugins.Add(specFlowPlugin);
+            AddStepAssembly(_projectsDriver.DefaultProject, stepAssembly);
         }
 
         public void AddStepAssembly(string projectName, StepAssembly stepAssembly)
@@ -29,25 +34,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             AddStepAssembly(project, stepAssembly);
         }
 
-        public void AddStepAssembly(StepAssembly stepAssembly)
-        {
-            AddStepAssembly(_projectsDriver.DefaultProject, stepAssembly);
-        }
-
-        public void AddConfigSection(string projectName, AppConfigSection appConfigSection)
-        {
-            _projectsDriver.Projects[projectName].Configuration.AppConfigSection.Add(appConfigSection);
-        }
-
         public void AddConfigSection(AppConfigSection appConfigSection)
         {
             _projectsDriver.DefaultProject.Configuration.AppConfigSection.Add(appConfigSection);
         }
 
-        public void SetUnitTestProvider(string projectName, string unitTestProviderName)
+        public void AddConfigSection(string projectName, AppConfigSection appConfigSection)
         {
-            var project = _projectsDriver.Projects[projectName];
-            SetUnitTestProvider(project, unitTestProviderName);
+            _projectsDriver.Projects[projectName].Configuration.AppConfigSection.Add(appConfigSection);
         }
 
         public void SetUnitTestProvider(string unitTestProviderName)
@@ -56,38 +50,23 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _projectsDriver.DefaultProject.Configuration.UnitTestProvider = GetUnitTestProvider(unitTestProviderName);
         }
 
-        public void SetBindingCulture(string projectName, CultureInfo bindingCulture)
+        public void SetUnitTestProvider(string projectName, string unitTestProviderName)
         {
             var project = _projectsDriver.Projects[projectName];
-            SetBindingCulture(project, bindingCulture);
+            SetUnitTestProvider(project, unitTestProviderName);
         }
 
-        public void SetBindingCulture(CultureInfo bindingCulture)
-        {
-            SetBindingCulture(_projectsDriver.DefaultProject, bindingCulture);
-        }
+        public void SetBindingCulture(CultureInfo bindingCulture) => SetBindingCulture(_projectsDriver.DefaultProject, bindingCulture);
+        public void SetBindingCulture(string projectName, CultureInfo bindingCulture) => SetBindingCulture(_projectsDriver.Projects[projectName], bindingCulture);
 
-        public void SetConfigurationFormat(ConfigurationFormat configurationFormat)
-        {
-            SetConfigurationFormat(_projectsDriver.DefaultProject, configurationFormat);
-        }
+        public void SetFeatureLanguage(CultureInfo featureLanguage) => SetFeatureLanguage(_projectsDriver.DefaultProject, featureLanguage);
+        public void SetFeatureLanguage(string projectName, CultureInfo featureLanguage) => SetFeatureLanguage(_projectsDriver.Projects[projectName], featureLanguage);
 
-        public void SetConfigurationFormat(string projectName, ConfigurationFormat configurationFormat)
-        {
-            var project = _projectsDriver.Projects[projectName];
-            SetConfigurationFormat(project, configurationFormat);
-        }
+        public void SetConfigurationFormat(ConfigurationFormat configurationFormat) => SetConfigurationFormat(_projectsDriver.DefaultProject, configurationFormat);
+        public void SetConfigurationFormat(string projectName, ConfigurationFormat configurationFormat) => SetConfigurationFormat(_projectsDriver.Projects[projectName], configurationFormat);
 
-        public void SetIsRowTestsAllowed(string projectName, bool isAllowed)
-        {
-            var project = _projectsDriver.Projects[projectName];
-            SetIsRowTestsAllowed(project, isAllowed);
-        }
-
-        public void SetIsRowTestsAllowed(bool isAllowed)
-        {
-            SetIsRowTestsAllowed(_projectsDriver.DefaultProject, isAllowed);
-        }
+        public void SetIsRowTestsAllowed(string projectName, bool isAllowed) => SetIsRowTestsAllowed(_projectsDriver.Projects[projectName], isAllowed);
+        public void SetIsRowTestsAllowed(bool isAllowed) => SetIsRowTestsAllowed(_projectsDriver.DefaultProject, isAllowed);
 
         public void AddGeneratorRegisterDependency(string type, string @as) => AddGeneratorRegisterDependency(_projectsDriver.DefaultProject, type, @as);
         public void AddGeneratorRegisterDependency(string type, string @as, string name) => AddGeneratorRegisterDependency(_projectsDriver.DefaultProject, type, @as, name);
@@ -119,6 +98,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         public void SetBindingCulture(ProjectBuilder project, CultureInfo bindingCulture)
         {
             project.Configuration.BindingCulture = bindingCulture;
+        }
+
+        public void SetFeatureLanguage(ProjectBuilder project, CultureInfo featureLanguage)
+        {
+            project.Configuration.FeatureLanguage = featureLanguage;
         }
 
         public void SetUnitTestProvider(ProjectBuilder project, string unitTestProviderName)
