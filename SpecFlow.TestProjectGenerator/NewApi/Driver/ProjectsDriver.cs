@@ -13,14 +13,16 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
     {
         public const string DefaultProjectName = "DefaultTestProject";
 
+        private readonly HooksDriver _hooksDriver;
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         private readonly CurrentVersionDriver _currentVersionDriver;
         private readonly Dictionary<string, ProjectBuilder> _projects;
 
-        public ProjectsDriver(FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, CurrentVersionDriver currentVersionDriver)
+        public ProjectsDriver(HooksDriver hooksDriver, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, CurrentVersionDriver currentVersionDriver)
         {
+            _hooksDriver = hooksDriver;
             _featureFileGenerator = featureFileGenerator;
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
             _configurationGeneratorFactory = configurationGeneratorFactory;
@@ -54,6 +56,31 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             CreateProjectInternal(projectName, language);
         }
 
+        public void AddHookBinding(string eventType, string name, string code = "", int? order = null)
+        {
+            AddHookBinding(DefaultProject, eventType, name, code, order);
+        }
+
+        public void AddHookBinding(string projectName, string eventType, string name, string code = "", int? order = null)
+        {
+            AddHookBinding(Projects[projectName], eventType, name, code, order);
+        }
+
+        public void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null)
+        {
+            bool isStatic = IsStaticEvent(eventType);
+
+            if (code.IsNullOrWhiteSpace()) code = _hooksDriver.GetHookLogStatement(name);
+
+            project.AddStepBinding($@"
+            [{eventType}{(order is null ? "" : $"(Order = {order})")}]
+            public {(isStatic ? "static" : string.Empty)} void {name}()
+            {{
+                Console.WriteLine(""-> hook: {name}"");
+                {code}
+            }}");
+        }
+
         public void AddFeatureFile(string projectName, string featureFileContent)
         {
             Projects[projectName].AddFeatureFile(featureFileContent);
@@ -75,6 +102,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         }
 
         public void AddStepBinding(string projectName, string bindingCode) => AddStepBinding(Projects[projectName], bindingCode);
+
         public void AddStepBinding(string bindingCode) => AddStepBinding(DefaultProject, bindingCode);
 
         public void AddProjectReference(string projectName, string projectNameToReference)
@@ -138,6 +166,15 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
                 case "F#": return ProgrammingLanguage.FSharp;
                 default: return ProgrammingLanguage.Other;
             }
+        }
+
+        private bool IsStaticEvent(string eventType)
+        {
+            return
+                eventType == "BeforeFeature" ||
+                eventType == "AfterFeature" ||
+                eventType == "BeforeTestRun" ||
+                eventType == "AfterTestRun";
         }
     }
 }

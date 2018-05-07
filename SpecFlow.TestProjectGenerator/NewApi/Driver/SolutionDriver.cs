@@ -35,6 +35,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _outputWriter = outputWriter;
             NuGetSources = new List<NuGetSource> { new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder), new NuGetSource("LocalExternalPackages", _folders.ExternalNuGetFolder) };
             _solution = new Solution(SolutionName);
+            testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
 
         public Guid SolutionGuid { get; } = Guid.NewGuid();
@@ -72,9 +73,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
 
             var solutionWriter = new SolutionWriter(_outputWriter);
-            string solutionDirectoryPath = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName);
-            _testProjectFolders.PathToSolutionFile =  solutionWriter.WriteToFileSystem(_solution, solutionDirectoryPath);
-
+            solutionWriter.WriteToFileSystem(_solution, _testProjectFolders.PathToSolutionDirectory);
             // TODO: search all projects for unit tests
             var proj = _solution.Projects.First();
 

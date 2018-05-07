@@ -37,7 +37,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
             configuration.FeatureLanguage = configuration.FeatureLanguage ?? CultureInfo.GetCultureInfo("en-US");
 
             // open specflow object
-            jsonWriter.WritePropertyName("specFlow");
+            jsonWriter.WritePropertyName("specflow");
             jsonWriter.WriteStartObject();
 
             WriteUnitTestProvider(jsonWriter, configuration.UnitTestProvider.ToName());
