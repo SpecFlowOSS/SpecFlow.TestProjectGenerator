@@ -27,7 +27,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _currentVersionDriver = currentVersionDriver;
 
             Projects = _projects = new Dictionary<string, ProjectBuilder>();
-            DefaultProject = CreateProject(DefaultProjectName, ProgrammingLanguage.CSharp);
+            DefaultProject = CreateProjectInternal(DefaultProjectName, ProgrammingLanguage.CSharp);
         }
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects { get; }
@@ -35,12 +35,22 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public string CreateProject(string language)
         {
-            return CreateProject(null, ParseProgrammingLanguage(language)).ProjectName;
+            return CreateProjectInternal(null, ParseProgrammingLanguage(language)).ProjectName;
+        }
+
+        public string CreateProject(ProgrammingLanguage language)
+        {
+            return CreateProjectInternal(null, language).ProjectName;
         }
 
         public void CreateProject(string projectName, string language)
         {
-            CreateProject(projectName, ParseProgrammingLanguage(language));
+            CreateProjectInternal(projectName, ParseProgrammingLanguage(language));
+        }
+
+        public void CreateProject(string projectName, ProgrammingLanguage language)
+        {
+            CreateProjectInternal(projectName, language);
         }
 
         public void AddFeatureFile(string projectName, string featureFileContent)
@@ -81,7 +91,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public void AddBindingClass(string projectName, string rawBindingClass) => AddBindingClass(Projects[projectName], rawBindingClass);
 
-        private ProjectBuilder CreateProject(string projectName, ProgrammingLanguage language)
+        private ProjectBuilder CreateProjectInternal(string projectName, ProgrammingLanguage language)
         {
             var project = new ProjectBuilder(_featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, new Configuration(), _currentVersionDriver)
             {
@@ -120,6 +130,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
                 case "CSHARP":
                 case "C#": return ProgrammingLanguage.CSharp;
                 case "VB":
+                case "VB.NET":
                 case "VBNET": return ProgrammingLanguage.VB;
                 case "FSHARP":
                 case "F#": return ProgrammingLanguage.FSharp;
