@@ -228,11 +228,30 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             {
                 xw.WriteStartElement(file.BuildAction);
                 xw.WriteAttributeString("Include", file.Path);
+
+                if (file.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy)
+                {
+                    xw.WriteElementString("CopyToOutputDirectory", GetCopyToOutputDirectoryString(file.CopyToOutputDirectory));
+                }
+
                 xw.WriteEndElement();
                 _fileWriter.Write(file, projectRootPath);
             }
 
             xw.WriteEndElement();
+        }
+
+        private string GetCopyToOutputDirectoryString(CopyToOutputDirectory fileCopyToOutputDirectory)
+        {
+            switch (fileCopyToOutputDirectory)
+            {
+                case CopyToOutputDirectory.CopyIfNewer:
+                    return "PreserveNewest";
+                case CopyToOutputDirectory.CopyAlways:
+                    return "Always";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(fileCopyToOutputDirectory), fileCopyToOutputDirectory, null);
+            }
         }
     }
 }

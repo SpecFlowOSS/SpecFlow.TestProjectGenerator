@@ -91,6 +91,8 @@ namespace SpecFlow.TestProjectGenerator
                 }
             }
 
+            outputWriter.WriteLine(combinedOutput.ToString());
+
             return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), combinedOutput.ToString());
         }
 

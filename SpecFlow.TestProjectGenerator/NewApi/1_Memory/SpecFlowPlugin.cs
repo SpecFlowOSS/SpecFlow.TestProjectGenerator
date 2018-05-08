@@ -13,6 +13,12 @@
             Path = path;
         }
 
+        public SpecFlowPlugin(string name, SpecFlowPluginType type)
+        {
+            Name = name;
+            Type = type;
+        }
+
         public SpecFlowPlugin(string name, string path, SpecFlowPluginType type)
         {
             Name = name;

@@ -27,7 +27,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
                     jsonWriter.WriteEndObject();
                     jsonWriter.Flush();
 
-                    return new ProjectFile("specflow.json", "None", stringWriter.ToString());
+                    return new ProjectFile("specflow.json", "None", stringWriter.ToString(), CopyToOutputDirectory.CopyIfNewer);
                 }
             }
         }

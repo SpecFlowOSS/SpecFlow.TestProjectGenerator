@@ -144,11 +144,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             _project = new Project(ProjectName, ProjectGuid, Language, TargetFrameworks, Format);
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha1", new NuGetPackageAssembly("BoDi, Version=1.4.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
-#if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
-            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly($"TechTalk.SpecFlow, Version={_currentVersionDriver.GitVersionInfo.MajorMinorPatch}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
-#else
-            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
-#endif
+            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
 
             if (_project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
             {
@@ -164,16 +160,12 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             {
                 case UnitTestProvider.SpecRun:
                     throw new NotImplementedException();
-                    break;
                 case UnitTestProvider.SpecRunWithNUnit:
                     throw new NotImplementedException();
-                    break;
                 case UnitTestProvider.SpecRunWithNUnit2:
                     throw new NotImplementedException();
-                    break;
                 case UnitTestProvider.SpecRunWithMsTest:
                     throw new NotImplementedException();
-                    break;
                 case UnitTestProvider.MSTest:
                     _project.AddNuGetPackage("MSTest.TestAdapter", "1.2.0");
                     _project.AddNuGetPackage(
@@ -193,6 +185,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     _project.AddNuGetPackage("xunit.assert", "2.3.1", new NuGetPackageAssembly("xunit.assert, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
                     _project.AddNuGetPackage("xunit.abstractions", "2.0.1", new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
                     _project.AddNuGetPackage("xunit.runner.visualstudio", "2.3.1");
+                    _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
+                    Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.xUnit", SpecFlowPluginType.Runtime));
                     break;
                 case UnitTestProvider.NUnit3:
                     _project.AddNuGetPackage("NUnit", "3.8.1", new NuGetPackageAssembly("nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL", "net45\\nunit.framework.dll"));
@@ -200,13 +194,21 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     break;
                 case UnitTestProvider.NUnit2:
                     throw new NotImplementedException();
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            _project.AddNuGetPackage("Newtonsoft.Json", "10.0.3", new NuGetPackageAssembly("Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll"));
+            _project.AddNuGetPackage("Newtonsoft.Json", "11.0.2", new NuGetPackageAssembly("Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll"));
             _project.AddNuGetPackage("FluentAssertions", "5.3.0", new NuGetPackageAssembly("FluentAssertions, Version=5.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a", @"net45\FluentAssertions.dll"));
+        }
+
+        private string GetSpecFlowPublicAssemblyName(string assemblyName)
+        {
+#if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
+            return $"{assemblyName}, Version={_currentVersionDriver.GitVersionInfo.MajorMinorPatch}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL"
+#else
+            return assemblyName;
+#endif
         }
     }
 }
