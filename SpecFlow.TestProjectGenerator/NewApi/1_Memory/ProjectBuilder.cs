@@ -155,10 +155,22 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha1", new NuGetPackageAssembly("BoDi, Version=1.4.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
             _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
 
-            if (_project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
+
+
+            switch (_project.ProgrammingLanguage)
             {
-                AddInitialFSharpReferences();
+                case ProgrammingLanguage.FSharp:
+                    AddInitialFSharpReferences();
+                    break;
+                case ProgrammingLanguage.CSharp:
+                    if (Configuration.UnitTestProvider == UnitTestProvider.XUnit)
+                    {
+                        _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]"));
+                    }
+                    break;
             }
+
+
 
             if (IsSpecFlowFeatureProject)
             {

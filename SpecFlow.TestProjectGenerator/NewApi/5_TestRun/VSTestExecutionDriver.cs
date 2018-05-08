@@ -90,10 +90,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             if (summaryElement != null)
             {
                 executionResult.Total = int.Parse(summaryElement.Attribute("total").Value);
+                executionResult.Executed = int.Parse(summaryElement.Attribute("executed").Value);
                 executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
                 executionResult.Failed = int.Parse(summaryElement.Attribute("failed").Value);
                 executionResult.Pending = int.Parse(summaryElement.Attribute("inconclusive").Value);
-                executionResult.Ignored = 0; // mstest does not support ignored in the report
+                executionResult.Ignored = executionResult.Total - executionResult.Executed;
                 executionResult.Output = output;
             }
 
