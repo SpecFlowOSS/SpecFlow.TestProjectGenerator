@@ -70,8 +70,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         {
             bool isStatic = IsStaticEvent(eventType);
 
-            if (code.IsNullOrWhiteSpace()) code = _hooksDriver.GetHookLogStatement(name);
-
             project.AddStepBinding($@"
             [{eventType}{(order is null ? "" : $"(Order = {order})")}]
             public {(isStatic ? "static" : string.Empty)} void {name}()

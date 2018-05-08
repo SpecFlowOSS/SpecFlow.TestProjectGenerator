@@ -2,29 +2,23 @@
 using System.IO;
 using System.Linq;
 using FluentAssertions;
+using SpecFlow.TestProjectGenerator.NewApi._5_TestRun;
 
 namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 {
     public class HooksDriver
     {
-        private readonly TestProjectFolders _testProjectFolders;
+        private readonly VSTestExecutionDriver _vsTestExecutionDriver;
 
-        public HooksDriver(TestProjectFolders testProjectFolders)
+        public HooksDriver(VSTestExecutionDriver vsTestExecutionDriver)
         {
-            _testProjectFolders = testProjectFolders;
-        }
-
-        public string GetHookLogStatement(string methodName)
-        {
-            string pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "hooks.log");
-            return $@"System.IO.File.AppendAllText(@""{pathToLogFile}"", ""-> hook: {methodName}"");";
+            _vsTestExecutionDriver = vsTestExecutionDriver;
         }
 
         public void CheckIsHookExecuted(string methodName, int times)
         {
-            string pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "hooks.log");
-            var lines = File.ReadAllLines(pathToLogFile);
-
+            _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
+            var lines = GetLines(_vsTestExecutionDriver.LastTestExecutionResult.Output);
             lines.Where(l => l == $"-> hook: {methodName}")
                  .Should()
                  .HaveCount(times);
@@ -32,11 +26,25 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public void CheckIsHookExecutedInOrder(IEnumerable<string> methodNames)
         {
-            string pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "hooks.log");
-            var lines = File.ReadAllLines(pathToLogFile);
+            _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
+            var lines = GetLines(_vsTestExecutionDriver.LastTestExecutionResult.Output);
             var methodNameLines = methodNames.Select(m => $"-> hook: {m}");
-
             lines.Should().ContainInOrder(methodNameLines);
+        }
+
+        private IEnumerable<string> GetLines(string value)
+        {
+            var lines = new List<string>();
+            using (var sr = new StringReader(value))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    lines.Add(line);
+                }
+            }
+
+            return lines;
         }
     }
 }
