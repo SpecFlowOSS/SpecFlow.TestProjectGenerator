@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SpecFlow.TestProjectGenerator.Helpers;
 using SpecFlow.TestProjectGenerator.NewApi.Driver;
 
@@ -13,6 +15,27 @@ Imports TechTalk.SpecFlow
 Public Class {0}
     {1}
 End Class";
+
+        private const string HookBindingsClassTemplate = @"
+Imports System;
+Imports System.Collections;
+Imports System.IO;
+Imports System.Linq;
+Imports System.Xml;
+Imports System.Xml.Linq;
+Imports TechTalk.SpecFlow;
+
+<Binding> _
+{0}
+Public Class {1}
+    <{2}({3})>_
+    {4}
+    Public {5} Sub {6}()
+        Console.WriteLine(""-> hook: {6}"");
+        {7}
+    End Sub
+End Class
+";
 
         public override ProjectFile GenerateBindingClassFile(string content)
         {
@@ -51,6 +74,34 @@ End Class";
                                 
                                     {methodImplementation}
                                 End Sub";
+        }
+
+        protected override string GetHookBindingClass(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        {
+            bool isStatic = IsStaticEvent(eventType);
+
+            var tagsArray = tags as string[] ?? tags?.ToArray() ?? new string[0];
+            string eventTypeTags = string.Join(", ", tagsArray.Select(t => $@"""{t}"""));
+
+            var eventTypeParams = new[]
+            {
+                useScopeTagsOnHookMethods ? null : $"tags:= New String() {{{eventTypeTags}}}",
+                order is null ? null : $"Order:= {order}"
+            }.Where(p => p.IsNotNullOrWhiteSpace());
+
+            string eventTypeParamsString = string.Join(", ", eventTypeParams);
+            string scopeTags = $"[{string.Join(", ", tagsArray.Select(t => $@"Scope(Tag:=""{t}"")"))}]";
+
+            return string.Format(
+                HookBindingsClassTemplate,
+                useScopeTagsOnClass ? scopeTags : "",
+                Guid.NewGuid(),
+                eventType,
+                eventTypeParamsString,
+                useScopeTagsOnHookMethods ? scopeTags : "",
+                isStatic ? "Static" : string.Empty,
+                name,
+                code);
         }
     }
 }

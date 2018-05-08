@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SpecFlow.TestProjectGenerator.NewApi.Driver;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
@@ -25,6 +26,11 @@ type {0}() =
         }
 
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override string GetHookBindingClass(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
         {
             throw new NotImplementedException();
         }

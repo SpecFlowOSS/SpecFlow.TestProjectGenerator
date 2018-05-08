@@ -1,4 +1,5 @@
-﻿using SpecFlow.TestProjectGenerator.NewApi.Driver;
+﻿using System.Collections.Generic;
+using SpecFlow.TestProjectGenerator.NewApi.Driver;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
 {
@@ -15,11 +16,23 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
             return GenerateStepDefinition(method);
         }
 
+        public ProjectFile GenerateHookBinding(string eventType, string name, string code = null, int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        {
+            string hookClass = GetHookBindingClass(eventType, name, code, order, tags, useScopeTagsOnHookMethods && EventSupportsTagsParameter(eventType), useScopeTagsOnClass);
+            return GenerateBindingClassFile(hookClass);
+        }
+
         protected abstract string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName);
+        protected abstract string GetHookBindingClass(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false);
 
         protected bool IsStaticEvent(string eventType)
         {
             return eventType == "BeforeFeature" || eventType == "AfterFeature" || eventType == "BeforeTestRun" || eventType == "AfterTestRun";
+        }
+
+        protected bool EventSupportsTagsParameter(string eventType)
+        {
+            return eventType != "AfterTestRun" && eventType != "BeforeTestRun";
         }
     }
 }

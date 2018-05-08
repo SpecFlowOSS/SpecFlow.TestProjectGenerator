@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SpecFlow.TestProjectGenerator.NewApi.Driver;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
@@ -65,6 +66,14 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, scenarioBlock, regex));
             _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, scenarioBlock, regex, ParameterType.Table, "tableArg"));
             _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, scenarioBlock, regex, ParameterType.DocString, "docStringArg"));
+        }
+
+        public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        {
+            EnsureProjectExists();
+
+            var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
+            _project.AddFile(bindingsGenerator.GenerateHookBinding(eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass));
         }
 
         public void AddStepBinding(string bindingCode)

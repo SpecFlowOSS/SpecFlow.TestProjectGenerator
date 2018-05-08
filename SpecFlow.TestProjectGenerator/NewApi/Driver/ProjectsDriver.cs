@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using SpecFlow.TestProjectGenerator.Helpers;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
@@ -56,27 +59,26 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             CreateProjectInternal(projectName, language);
         }
 
-        public void AddHookBinding(string eventType, string name, string code = "", int? order = null)
+        public void AddHookBinding(string eventType, string name, string tags, string code = "", int? order = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
         {
-            AddHookBinding(DefaultProject, eventType, name, code, order);
+            IEnumerable<string> ToTagsList(string input) => input.Split(',');
+
+            AddHookBinding(DefaultProject, eventType, name, code, order, ToTagsList(tags), useScopeTagsOnHookMethods, useScopeTagsOnClass);
         }
 
-        public void AddHookBinding(string projectName, string eventType, string name, string code = "", int? order = null)
+        public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
         {
-            AddHookBinding(Projects[projectName], eventType, name, code, order);
+            AddHookBinding(DefaultProject, eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass);
         }
 
-        public void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null)
+        public void AddHookBinding(string projectName, string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
         {
-            bool isStatic = IsStaticEvent(eventType);
+            AddHookBinding(Projects[projectName], eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass);
+        }
 
-            project.AddStepBinding($@"
-            [{eventType}{(order is null ? "" : $"(Order = {order})")}]
-            public {(isStatic ? "static" : string.Empty)} void {name}()
-            {{
-                Console.WriteLine(""-> hook: {name}"");
-                {code}
-            }}");
+        public void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        {
+            project.AddHookBinding(eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass);
         }
 
         public void AddFeatureFile(string projectName, string featureFileContent)
