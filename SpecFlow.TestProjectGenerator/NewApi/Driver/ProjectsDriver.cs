@@ -32,31 +32,43 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _currentVersionDriver = currentVersionDriver;
 
             Projects = _projects = new Dictionary<string, ProjectBuilder>();
-            DefaultProject = CreateProjectInternal(DefaultProjectName, ProgrammingLanguage.CSharp);
         }
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects { get; }
 
-        public ProjectBuilder DefaultProject { get; }
+        private ProjectBuilder _defaultProject;
+        public ProjectBuilder DefaultProject
+        {
+            get
+            {
+                if (_defaultProject == null)
+                {
+                    _defaultProject = CreateProjectInternal(DefaultProjectName, ProgrammingLanguage.CSharp);
+                }
+                return _defaultProject;
+            }
+
+        }
 
         public string CreateProject(string language)
         {
-            return CreateProjectInternal(null, ParseProgrammingLanguage(language)).ProjectName;
-        }
+            var projectBuilder = CreateProjectInternal(null, ParseProgrammingLanguage(language));
 
-        public string CreateProject(ProgrammingLanguage language)
-        {
-            return CreateProjectInternal(null, language).ProjectName;
+            if (_defaultProject == null)
+            {
+                _defaultProject = projectBuilder;
+            }
+
+            return projectBuilder.ProjectName;
         }
 
         public void CreateProject(string projectName, string language)
         {
-            CreateProjectInternal(projectName, ParseProgrammingLanguage(language));
-        }
-
-        public void CreateProject(string projectName, ProgrammingLanguage language)
-        {
-            CreateProjectInternal(projectName, language);
+            var projectBuilder = CreateProjectInternal(projectName, ParseProgrammingLanguage(language));
+            if (_defaultProject == null)
+            {
+                _defaultProject = projectBuilder;
+            }
         }
 
         public void AddHookBinding(string eventType, string name, string tags, string code = "", int? order = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
@@ -76,7 +88,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             AddHookBinding(Projects[projectName], eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass);
         }
 
-        public void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        private void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
         {
             project.AddHookBinding(eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass);
         }
@@ -175,6 +187,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
                 eventType == "AfterFeature" ||
                 eventType == "BeforeTestRun" ||
                 eventType == "AfterTestRun";
+        }
+
+        public void AddFile(string fileName, string fileContent)
+        {
+            DefaultProject.AddFile(new ProjectFile(fileName, "None", fileContent, CopyToOutputDirectory.CopyAlways));
         }
     }
 }

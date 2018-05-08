@@ -52,7 +52,7 @@ End Class
         {
             string parameter = "";
 
-            if (argumentName.IsNullOrWhiteSpace())
+            if (argumentName.IsNotNullOrWhiteSpace())
             {
                 switch (parameterType)
                 {
@@ -70,7 +70,7 @@ End Class
                 }
             }
 
-            return $@"<{attributeName}(@""{regex}"")> Public Sub {methodName}({parameter}) 
+            return $@"<[{attributeName}](""{regex}"")> Public Sub {methodName}({parameter}) 
                                 
                                     {methodImplementation}
                                 End Sub";

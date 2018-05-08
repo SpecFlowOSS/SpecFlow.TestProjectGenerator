@@ -94,12 +94,30 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             xw.WriteElementString("Configuration", "Debug");
             xw.WriteElementString("Platform", "AnyCPU");
-            xw.WriteElementString("ProductVersion", null);
-            xw.WriteElementString("SchemaVersion", "2.0");
+            
+            
             xw.WriteElementString("ProjectGuid", project.ProjectGuid.ToString("B"));
-            xw.WriteElementString("AppDesignerFolder", "Properties");
-            xw.WriteElementString("ProjectTypeGuids", "{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
-            xw.WriteElementString("ShowTrace", "true");
+            
+            if (project.ProgrammingLanguage != ProgrammingLanguage.VB)
+            {
+                xw.WriteElementString("AppDesignerFolder", "Properties");
+
+                xw.WriteElementString("SchemaVersion", "2.0");
+                xw.WriteElementString("ProductVersion", null);
+                xw.WriteElementString("ProjectTypeGuids", "{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
+                xw.WriteElementString("ShowTrace", "true");
+                xw.WriteElementString("ErrorReport", "prompt");
+                xw.WriteElementString("WarningLevel", "4");
+            }
+            else
+            {
+                xw.WriteElementString("MyType", "Windows");
+                xw.WriteElementString("OptionExplicit", "On");
+                xw.WriteElementString("OptionCompare", "Binary");
+                xw.WriteElementString("OptionStrict", "Off");
+                xw.WriteElementString("OptionInfer", "On");
+            }
+
             xw.WriteElementString("OutputType", outputType);
             xw.WriteElementString("RootNamespace", project.Name);
             xw.WriteElementString("AssemblyName", project.Name);
@@ -111,9 +129,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             xw.WriteElementString("DebugType", "full");
             xw.WriteElementString("Optimize", "false");
             xw.WriteElementString("OutputPath", "bin\\Debug");
-            xw.WriteElementString("DefineConstants", "DEBUG;TRACE");
-            xw.WriteElementString("ErrorReport", "prompt");
-            xw.WriteElementString("WarningLevel", "4");
+
+            if (project.ProgrammingLanguage == ProgrammingLanguage.VB)
+            {
+                xw.WriteElementString("DefineDebug", "true");
+                xw.WriteElementString("DefineTrace", "true");
+            }
+            else
+            {
+                xw.WriteElementString("DefineConstants", "DEBUG;TRACE");
+            }
+
 
             xw.WriteEndElement();
         }
