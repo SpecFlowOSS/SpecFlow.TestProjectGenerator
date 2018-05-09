@@ -55,10 +55,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             _nuGet.Restore();
 
             _compileResult = _compiler.Run();
-            if (!_compileResult.IsSuccessful)
-            {
-                throw new InvalidOperationException($"Failed compiling. {_compileResult.Output}");
-            }
         }
 
         public void WriteToDisk()

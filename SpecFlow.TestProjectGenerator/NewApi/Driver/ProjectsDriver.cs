@@ -191,9 +191,9 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             }
         }
 
-        public void AddFile(string fileName, string fileContent)
+        public void AddFile(string fileName, string fileContent, string compileAction = "None")
         {
-            DefaultProject.AddFile(new ProjectFile(fileName, "None", fileContent, CopyToOutputDirectory.CopyAlways));
+            DefaultProject.AddFile(new ProjectFile(fileName, compileAction, fileContent, CopyToOutputDirectory.CopyAlways));
         }
 
         public void EnableTestParallelExecution()
