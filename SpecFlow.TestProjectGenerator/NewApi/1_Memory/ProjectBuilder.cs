@@ -14,6 +14,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         private readonly CurrentVersionDriver _currentVersionDriver;
         private Project _project;
+        private bool _parallelTestExecution = false;
 
         public ProjectBuilder(FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, Configuration configuration, CurrentVersionDriver currentVersionDriver)
         {
@@ -163,9 +164,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     AddInitialFSharpReferences();
                     break;
                 case ProgrammingLanguage.CSharp:
-                    if (Configuration.UnitTestProvider == UnitTestProvider.XUnit)
+                    switch (Configuration.UnitTestProvider)
                     {
-                        _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]"));
+                        case UnitTestProvider.XUnit when !_parallelTestExecution:
+                            _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]"));
+                            break;
+                        case UnitTestProvider.XUnit:
+                            _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
+                            break;
+                        case UnitTestProvider.NUnit3 when _parallelTestExecution:
+                            _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.Fixtures)]"));
+                            break;
                     }
                     break;
             }
@@ -230,6 +239,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 #else
             return assemblyName;
 #endif
+        }
+
+        public void EnableParallelTestExecution()
+        {
+            _parallelTestExecution = true;
         }
     }
 }

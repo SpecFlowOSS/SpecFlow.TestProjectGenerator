@@ -50,6 +50,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
         }
 
+        
+
         public string CreateProject(string language)
         {
             var projectBuilder = CreateProjectInternal(null, ParseProgrammingLanguage(language));
@@ -192,6 +194,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         public void AddFile(string fileName, string fileContent)
         {
             DefaultProject.AddFile(new ProjectFile(fileName, "None", fileContent, CopyToOutputDirectory.CopyAlways));
+        }
+
+        public void EnableTestParallelExecution()
+        {
+            DefaultProject.EnableParallelTestExecution();
         }
     }
 }
