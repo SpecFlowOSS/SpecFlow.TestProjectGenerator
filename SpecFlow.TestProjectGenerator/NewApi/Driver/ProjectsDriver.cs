@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using SpecFlow.TestProjectGenerator.Helpers;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
@@ -16,16 +14,16 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
     {
         public const string DefaultProjectName = "DefaultTestProject";
 
-        private readonly HooksDriver _hooksDriver;
+        private readonly TestProjectFolders _testProjectFolders;
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         private readonly CurrentVersionDriver _currentVersionDriver;
         private readonly Dictionary<string, ProjectBuilder> _projects;
 
-        public ProjectsDriver(HooksDriver hooksDriver, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, CurrentVersionDriver currentVersionDriver)
+        public ProjectsDriver(TestProjectFolders testProjectFolders, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, CurrentVersionDriver currentVersionDriver)
         {
-            _hooksDriver = hooksDriver;
+            _testProjectFolders = testProjectFolders;
             _featureFileGenerator = featureFileGenerator;
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
             _configurationGeneratorFactory = configurationGeneratorFactory;
@@ -73,26 +71,33 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             }
         }
 
-        public void AddHookBinding(string eventType, string name, string tags, string code = "", int? order = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        public void AddHookBinding(string eventType, string name, string hookTypeAttributeTagsString, string methodScopeAttributeTagsString = null, string classScopeAttributeTagsString = null, string code = "", int? order = null)
         {
-            IEnumerable<string> ToTagsList(string input) => input.Split(',');
+            var hookTypeAttributeTags = hookTypeAttributeTagsString?.Split(',').Select(t => t.Trim()).ToArray();
+            var methodScopeAttributeTags = methodScopeAttributeTagsString?.Split(',').Select(t => t.Trim()).ToArray();
+            var classScopeAttributeTags = classScopeAttributeTagsString?.Split(',').Select(t => t.Trim()).ToArray();
 
-            AddHookBinding(DefaultProject, eventType, name, code, order, ToTagsList(tags), useScopeTagsOnHookMethods, useScopeTagsOnClass);
+            AddHookBinding(DefaultProject, eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
-        public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
         {
-            AddHookBinding(DefaultProject, eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass);
+            AddHookBinding(DefaultProject, eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
-        public void AddHookBinding(string projectName, string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        public void AddHookBinding(string projectName, string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
         {
-            AddHookBinding(Projects[projectName], eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass);
+            AddHookBinding(Projects[projectName], eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
-        private void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        private void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,  IList<string> classScopeAttributeTags = null)
         {
-            project.AddHookBinding(eventType, name, code, order, tags, useScopeTagsOnHookMethods, useScopeTagsOnClass);
+            if (code is null)
+            {
+                code = $"System.IO.File.AppendAllText(System.IO.Path.Combine({_testProjectFolders.PathToSolutionDirectory}, \"hooks.log\"), \"-> hook: {name}\");";
+            }
+
+            project.AddHookBinding(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
         public void AddFeatureFile(string projectName, string featureFileContent)
@@ -180,15 +185,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
                 case "F#": return ProgrammingLanguage.FSharp;
                 default: return ProgrammingLanguage.Other;
             }
-        }
-
-        private bool IsStaticEvent(string eventType)
-        {
-            return
-                eventType == "BeforeFeature" ||
-                eventType == "AfterFeature" ||
-                eventType == "BeforeTestRun" ||
-                eventType == "AfterTestRun";
         }
 
         public void AddFile(string fileName, string fileContent)

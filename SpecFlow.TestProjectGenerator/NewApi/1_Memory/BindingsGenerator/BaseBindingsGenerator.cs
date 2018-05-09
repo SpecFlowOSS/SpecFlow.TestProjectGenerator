@@ -16,14 +16,21 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
             return GenerateStepDefinition(method);
         }
 
-        public ProjectFile GenerateHookBinding(string eventType, string name, string code = null, int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        public ProjectFile GenerateHookBinding(string eventType, string name, string code = null, int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
         {
-            string hookClass = GetHookBindingClass(eventType, name, code, order, tags, useScopeTagsOnHookMethods && EventSupportsTagsParameter(eventType), useScopeTagsOnClass);
+            string hookClass = GetHookBindingClass(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
             return GenerateBindingClassFile(hookClass);
         }
 
         protected abstract string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName);
-        protected abstract string GetHookBindingClass(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false);
+        protected abstract string GetHookBindingClass(
+            string hookType,
+            string name,
+            string code = "",
+            int? order = null,
+            IList<string> hookTypeAttributeTags = null,
+            IList<string> methodScopeAttributeTags = null,
+            IList<string> classScopeAttributeTags = null);
 
         protected bool IsStaticEvent(string eventType)
         {

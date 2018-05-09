@@ -30,7 +30,14 @@ type {0}() =
             throw new NotImplementedException();
         }
 
-        protected override string GetHookBindingClass(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        protected override string GetHookBindingClass(
+            string hookType,
+            string name,
+            string code = "",
+            int? order = null,
+            IList<string> hookTypeAttributeTags = null,
+            IList<string> methodScopeAttributeTags = null,
+            IList<string> classScopeAttributeTags = null)
         {
             throw new NotImplementedException();
         }

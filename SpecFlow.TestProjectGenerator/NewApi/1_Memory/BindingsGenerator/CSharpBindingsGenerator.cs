@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SpecFlow.TestProjectGenerator.Helpers;
 using SpecFlow.TestProjectGenerator.NewApi.Driver;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
 {
@@ -19,29 +20,6 @@ public class {0}
 {{
     {1}
 }}";
-
-        private const string HookBindingsClassTemplate = @"
-using System;
-using System.Collections;
-using System.IO;
-using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
-using TechTalk.SpecFlow;
-
-[Binding]
-{0}
-public class {1}
-{{
-    [{2}({3})]
-    {4}
-    public {5} void {6}()
-    {{
-        Console.WriteLine(""-> hook: {6}"");
-        {7}
-    }}   
-}}
-";
 
         public override ProjectFile GenerateBindingClassFile(string content)
         {
@@ -83,32 +61,55 @@ public class {1}
                                 }}";
         }
 
-        protected override string GetHookBindingClass(string eventType, string name, string code = "", int? order = null, IEnumerable<string> tags = null, bool useScopeTagsOnHookMethods = false, bool useScopeTagsOnClass = false)
+        protected override string GetHookBindingClass(
+            string hookType,
+            string name,
+            string code = "",
+            int? order = null,
+            IList<string> hookTypeAttributeTags = null,
+            IList<string> methodScopeAttributeTags = null,
+            IList<string> classScopeAttributeTags = null)
         {
-            bool isStatic = IsStaticEvent(eventType);
+            string ToScopeTags(IList<string> scopeTags) => scopeTags is null || !scopeTags.Any() ? null : $"[{string.Join(", ", scopeTags.Select(t => $@"Scope(Tag=""{t}"")"))}]";
 
-            var tagsArray = tags as string[] ?? tags?.ToArray() ?? new string[0];
-            string eventTypeTags = string.Join(", ", tagsArray.Select(t => $@"""{t}"""));
+            bool isStatic = IsStaticEvent(hookType);
 
-            var eventTypeParams = new[]
+            string hookTags = hookTypeAttributeTags?.Select(t => $@"""{t}""").JoinToString(", ");
+
+            var hookAttributeConstructorProperties = new[]
             {
-                eventTypeTags.Any() ? $"tags: new string[] {{{eventTypeTags}}}" : null,
+                hookTypeAttributeTags is null || !hookTypeAttributeTags.Any() ? null : $"tags: new string[] {{{hookTags}}}",
                 order is null ? null : $"Order = {order}"
             }.Where(p => p.IsNotNullOrWhiteSpace());
 
-            string eventTypeParamsString = string.Join(", ", eventTypeParams);
-            string scopeTags = $"[{string.Join(", ", tagsArray.Select(t => $@"Scope(Tag=""{t}"")"))}]";
+            string hookTypeAttributeTagsString = string.Join(", ", hookAttributeConstructorProperties);
 
-            return string.Format(
-                HookBindingsClassTemplate,
-                useScopeTagsOnClass ? scopeTags : "",
-                $"HooksClass_{Guid.NewGuid():N}",
-                eventType,
-                eventTypeParamsString,
-                useScopeTagsOnHookMethods ? scopeTags : "",
-                isStatic ? "static" : string.Empty,
-                name,
-                code);
+            string scopeClassAttributes = ToScopeTags(classScopeAttributeTags);
+            string scopeMethodAttributes = ToScopeTags(methodScopeAttributeTags);
+            string staticKeyword = isStatic ? "static" : string.Empty;
+
+            return $@"
+using System;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
+using TechTalk.SpecFlow;
+
+[Binding]
+{scopeClassAttributes}
+public class {$"HooksClass_{Guid.NewGuid():N}"}
+{{
+    [{hookType}({hookTypeAttributeTagsString})]
+    {scopeMethodAttributes}
+    public {staticKeyword} void {name}()
+    {{
+        Console.WriteLine(""-> hook: {name}"");
+        {code}
+    }}   
+}}
+";
         }
     }
 }
