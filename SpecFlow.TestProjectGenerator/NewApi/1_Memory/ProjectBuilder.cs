@@ -24,6 +24,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
             Configuration = configuration;
             _currentVersionDriver = currentVersionDriver;
             ProjectName = $"TestProject_{ProjectGuid:N}";
+
+
         }
 
         public void AddProjectReference(string projectPath, ProjectBuilder projectToReference)

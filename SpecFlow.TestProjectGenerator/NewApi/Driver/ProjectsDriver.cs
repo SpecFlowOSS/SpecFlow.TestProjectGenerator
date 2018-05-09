@@ -19,15 +19,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         private readonly CurrentVersionDriver _currentVersionDriver;
+        private readonly TestRunConfiguration _testRunConfiguration;
         private readonly Dictionary<string, ProjectBuilder> _projects;
 
-        public ProjectsDriver(TestProjectFolders testProjectFolders, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, CurrentVersionDriver currentVersionDriver)
+        public ProjectsDriver(TestProjectFolders testProjectFolders, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, CurrentVersionDriver currentVersionDriver, TestRunConfiguration testRunConfiguration)
         {
             _testProjectFolders = testProjectFolders;
             _featureFileGenerator = featureFileGenerator;
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
             _configurationGeneratorFactory = configurationGeneratorFactory;
             _currentVersionDriver = currentVersionDriver;
+            _testRunConfiguration = testRunConfiguration;
 
             Projects = _projects = new Dictionary<string, ProjectBuilder>();
         }
@@ -41,7 +43,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
             {
                 if (_defaultProject == null)
                 {
-                    _defaultProject = CreateProjectInternal(DefaultProjectName, ProgrammingLanguage.CSharp);
+                    _defaultProject = CreateProjectInternal(DefaultProjectName, _testRunConfiguration.ProgrammingLanguage);
                 }
                 return _defaultProject;
             }
@@ -143,7 +145,9 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
         {
             var project = new ProjectBuilder(_featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, new Configuration(), _currentVersionDriver)
             {
-                Language = language
+                Language = language,
+                Format = _testRunConfiguration.ProjectFormat,
+                TargetFrameworks = _testRunConfiguration.TargetFramework
             };
 
             if (projectName.IsNotNullOrWhiteSpace())
