@@ -55,6 +55,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                                               .WithPackageName(nugetPackage.Name)
                                               .WithPackageVersion(nugetPackage.Version)
                                               .ToProject(projFilePath)
+                                              .WithNoRestore()
                                               .Build();
 
                 addPackageCommand.Execute(new ProjectCreationNotPossibleException($"Adding nuGet Package '{nugetPackage.Name}', {nugetPackage.Version} failed."));

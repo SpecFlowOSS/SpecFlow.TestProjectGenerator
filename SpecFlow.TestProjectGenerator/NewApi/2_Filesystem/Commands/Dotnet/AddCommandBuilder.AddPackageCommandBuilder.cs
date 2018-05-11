@@ -7,6 +7,7 @@
             private string _projectFilePath;
             private string _packageName;
             private string _packageVersion;
+            private bool _noRestore = false;
 
             public AddPackageCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)
             {
@@ -36,7 +37,18 @@
                 string arguments = $"add {_projectFilePath} package {_packageName}";
                 arguments = AddArgument(arguments, "-v", _packageVersion);
 
+                if (_noRestore)
+                {
+                    arguments += " -n ";
+                }
+
                 return arguments;
+            }
+
+            public AddPackageCommandBuilder WithNoRestore()
+            {
+                _noRestore = true;
+                return this;
             }
         }
     }
