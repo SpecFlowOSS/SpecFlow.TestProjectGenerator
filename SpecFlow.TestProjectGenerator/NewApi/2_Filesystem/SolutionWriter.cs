@@ -36,6 +36,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 _projectFileWriter.Write(solution.NugetConfig, outputPath);
             }
 
+            _projectFileWriter.Write(new ProjectFile("global.json", "None", "{ \"sdk\": { \"version\": \"2.1.105\" }}"), outputPath);
+
             return solutionFilePath;
         }
 
