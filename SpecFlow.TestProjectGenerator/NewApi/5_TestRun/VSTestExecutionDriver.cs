@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
 using SpecFlow.TestProjectGenerator.Helpers;
+using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 {
@@ -16,19 +17,19 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         private readonly VisualStudioFinder _visualStudioFinder;
         private readonly AppConfigDriver _appConfigDriver;
         private readonly TestProjectFolders _testProjectFolders;
-        private readonly Folders _folders;
         private readonly IOutputWriter _outputWriter;
+        private readonly TestRunConfiguration _testRunConfiguration;
 
         private const string BeginnOfTrxFileLine = "Results File: ";
         private const string BeginnOfLogFileLine = "Log file: ";
 
-        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, Folders folders, IOutputWriter outputWriter)
+        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, IOutputWriter outputWriter, TestRunConfiguration testRunConfiguration)
         {
             _visualStudioFinder = visualStudioFinder;
             _appConfigDriver = appConfigDriver;
             _testProjectFolders = testProjectFolders;
-            _folders = folders;
             _outputWriter = outputWriter;
+            _testRunConfiguration = testRunConfiguration;
         }
 
         public TestExecutionResult LastTestExecutionResult { get; private set; }
@@ -112,7 +113,12 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
         private string GenereateVsTestsArguments(string filter)
         {
-            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
+            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx";
+
+            if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
+            {
+                arguments += $" /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
+            }
 
             if (filter.IsNotNullOrEmpty())
             {
