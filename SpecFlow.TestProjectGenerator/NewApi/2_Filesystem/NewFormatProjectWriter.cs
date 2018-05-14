@@ -94,18 +94,17 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         private void SetTargetFramework(Project project, XmlDocument doc, XmlNode projRootNode)
         {
-            var targetFrameworkNode =
-                projRootNode.SelectSingleNode("//PropertyGroup/TargetFramework")
-                ?? throw new ProjectCreationNotPossibleException();
-
+            var targetFrameworkNode = projRootNode.SelectSingleNode("//PropertyGroup/TargetFramework") ?? throw new ProjectCreationNotPossibleException();
             string newTargetFrameworks = project.TargetFrameworks.ToTargetFrameworkMoniker();
-            var targetFrameworkParentGroup =
-                targetFrameworkNode.ParentNode ?? throw new ProjectCreationNotPossibleException();
-            var multipleTargetFrameworksNode = doc.CreateElement("TargetFrameworks");
-            multipleTargetFrameworksNode.InnerText = newTargetFrameworks;
 
-            targetFrameworkParentGroup.RemoveChild(targetFrameworkNode);
-            targetFrameworkParentGroup.AppendChild(multipleTargetFrameworksNode);
+            targetFrameworkNode.InnerText = newTargetFrameworks;
+
+            //var targetFrameworkParentGroup = targetFrameworkNode.ParentNode ?? throw new ProjectCreationNotPossibleException();
+            //var multipleTargetFrameworksNode = doc.CreateElement("TargetFrameworks");
+            //multipleTargetFrameworksNode.InnerText = newTargetFrameworks;
+
+            //targetFrameworkParentGroup.RemoveChild(targetFrameworkNode);
+            //targetFrameworkParentGroup.AppendChild(multipleTargetFrameworksNode);
         }
 
         private void WriteReferences(Project project, XmlDocument doc, XmlNode projRootNode)
