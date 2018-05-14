@@ -144,7 +144,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
         private void AddInitialNewFormatFSharpReferences()
         {
-            _project.AddNuGetPackage("FSharp.Core", "4.3.4");
         }
 
         private void EnsureProjectExists()

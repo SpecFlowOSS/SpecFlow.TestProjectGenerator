@@ -63,6 +63,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
 
             foreach (var project in _projectsDriver.Projects.Values)
             {
+                project.Build();
+            }
+
+            foreach (var project in _projectsDriver.Projects.Values)
+            {
                 _solution.AddProject(project.Build());
             }
 

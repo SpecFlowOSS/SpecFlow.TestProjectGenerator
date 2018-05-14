@@ -58,6 +58,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             return projFilePath;
         }
 
+        public void WriteReferences(Project project, string projectFilePath)
+        {
+            
+        }
+
         private void WriteLanguageTargets(XmlWriter xw, Project project)
         {
             switch (project.ProgrammingLanguage)

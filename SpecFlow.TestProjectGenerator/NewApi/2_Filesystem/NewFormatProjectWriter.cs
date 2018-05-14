@@ -28,9 +28,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             string projFileName = $"{project.Name}.{project.ProgrammingLanguage.ToProjectFileExtension()}";
 
             string projFilePath = Path.Combine(projRootPath, projFileName);
-            
-            WriteNuGetPackages(project, projFilePath);
-            WriteProjectReferences(project, projFilePath);
 
             var doc = new XmlDocument();
             doc.Load(projFilePath);
@@ -41,9 +38,16 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             doc.Save(projFilePath);
             
+            WriteNuGetPackages(project, projFilePath);
+            
             WriteProjectFiles(project, projRootPath);
 
             return projFilePath;
+        }
+
+        public void WriteReferences(Project project, string projectFilePath)
+        {
+            WriteProjectReferences(project, projectFilePath);
         }
 
         private void WriteNuGetPackages(Project project, string projFilePath)

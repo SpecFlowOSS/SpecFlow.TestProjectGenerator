@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
 {
@@ -24,7 +26,9 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
 
             protected override string BuildArguments()
             {
-                return $"add {_projectFilePath} reference {string.Join(" ", _referencedProjects)}";
+                var projectDirectoryPath = Path.GetDirectoryName(_projectFilePath);
+                var absoluteReferenceProject = _referencedProjects.Select(p => Path.Combine(projectDirectoryPath, p));
+                return $"add {_projectFilePath} reference {string.Join(" ", absoluteReferenceProject)}";
             }
 
             public AddReferenceCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)

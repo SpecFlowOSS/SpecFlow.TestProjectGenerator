@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
@@ -43,14 +44,22 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         private void WriteProjects(Solution solution, string outputPath, string solutionFilePath)
         {
+            var projectPathMappings = new Dictionary<Project, string>();
             foreach (var project in solution.Projects)
             {
                 var formatProjectWriter = _projectWriterFactory.FromProjectFormat(project.ProjectFormat);
-                WriteProject(project, outputPath, formatProjectWriter, solutionFilePath);
+                var pathToProjectFile = WriteProject(project, outputPath, formatProjectWriter, solutionFilePath);
+                projectPathMappings.Add(project, pathToProjectFile);
+            }
+
+            foreach (var project in solution.Projects)
+            {
+                var formatProjectWriter = _projectWriterFactory.FromProjectFormat(project.ProjectFormat);
+                formatProjectWriter.WriteReferences(project, projectPathMappings[project]);
             }
         }
 
-        private void WriteProject(Project project, string outputPath, IProjectWriter formatProjectWriter, string solutionFilePath)
+        private string WriteProject(Project project, string outputPath, IProjectWriter formatProjectWriter, string solutionFilePath)
         {
             string projPath = formatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
 
@@ -59,6 +68,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             {
                 throw new ProjectCreationNotPossibleException("Could not add project to solution.");
             }
+
+            return projPath;
         }
     }
 }
