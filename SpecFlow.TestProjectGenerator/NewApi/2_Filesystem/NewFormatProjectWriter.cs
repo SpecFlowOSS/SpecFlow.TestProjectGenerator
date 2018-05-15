@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
@@ -36,6 +37,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             WriteReferences(project, doc, projRootNode);
             SetTargetFramework(project, doc, projRootNode);
 
+            if (project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
+            {
+                WriteFileReferences(project, projRootNode, doc);
+            }
+
             doc.Save(projFilePath);
             
             WriteNuGetPackages(project, projFilePath);
@@ -43,6 +49,20 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             WriteProjectFiles(project, projRootPath);
 
             return projFilePath;
+        }
+
+        private void WriteFileReferences(Project project, XmlNode projectNode, XmlDocument projectFileXmlDoc)
+        {
+            var itemGroup = projectFileXmlDoc.CreateElement("ItemGroup");
+            foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "COMPILE"))
+            {
+                var fileElement = projectFileXmlDoc.CreateElement("Compile");
+                fileElement.SetAttribute("Include", file.Path);
+                
+                itemGroup.AppendChild(fileElement);
+            }
+
+            projectNode.AppendChild(itemGroup);
         }
 
         public void WriteReferences(Project project, string projectFilePath)
