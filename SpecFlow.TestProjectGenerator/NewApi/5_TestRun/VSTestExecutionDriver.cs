@@ -69,7 +69,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 throw;
             }
 
-            var output = processResult.CombinedOutput;
+            string output = processResult.CombinedOutput;
 
             var lines = output.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             var trxFiles = FindFilePath(lines, ".trx", BeginnOfTrxFileLine);
@@ -87,6 +87,8 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(nameTable);
             namespaceManager.AddNamespace("mstest", "http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
 
+            bool isXUnit = output.Contains("xUnit.net");
+
             var summaryElement = testResult.XPathSelectElement("//mstest:ResultSummary/mstest:Counters", namespaceManager);
             if (summaryElement != null)
             {
@@ -94,7 +96,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Executed = int.Parse(summaryElement.Attribute("executed").Value);
                 executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
                 executionResult.Failed = int.Parse(summaryElement.Attribute("failed").Value);
-                executionResult.Pending = int.Parse(summaryElement.Attribute("inconclusive").Value);
+                executionResult.Pending = isXUnit ? Regex.Matches(output, "XUnitPendingStepException").Count / 2 : int.Parse(summaryElement.Attribute("inconclusive").Value);
                 executionResult.Ignored = executionResult.Total - executionResult.Executed;
                 executionResult.Output = output;
             }
