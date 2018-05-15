@@ -262,7 +262,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
                 if (file.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy)
                 {
-                    xw.WriteElementString("CopyToOutputDirectory", GetCopyToOutputDirectoryString(file.CopyToOutputDirectory));
+                    xw.WriteElementString("CopyToOutputDirectory", file.CopyToOutputDirectory.GetCopyToOutputDirectoryString());
                 }
 
                 xw.WriteEndElement();
@@ -270,19 +270,6 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
 
             xw.WriteEndElement();
-        }
-
-        private string GetCopyToOutputDirectoryString(CopyToOutputDirectory fileCopyToOutputDirectory)
-        {
-            switch (fileCopyToOutputDirectory)
-            {
-                case CopyToOutputDirectory.CopyIfNewer:
-                    return "PreserveNewest";
-                case CopyToOutputDirectory.CopyAlways:
-                    return "Always";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(fileCopyToOutputDirectory), fileCopyToOutputDirectory, null);
-            }
         }
     }
 }

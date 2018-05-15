@@ -23,7 +23,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             {
                 throw new ArgumentNullException(nameof(project));
             }
-            
+
             CreateProjectFile(project, projRootPath);
 
             string projFileName = $"{project.Name}.{project.ProgrammingLanguage.ToProjectFileExtension()}";
@@ -33,19 +33,16 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             var doc = new XmlDocument();
             doc.Load(projFilePath);
             var projRootNode = doc.SelectSingleNode("//Project") ?? throw new ProjectCreationNotPossibleException("Project root node could not be found in project file.");
-            
+
             WriteReferences(project, doc, projRootNode);
             SetTargetFramework(project, doc, projRootNode);
 
-            if (project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
-            {
-                WriteFileReferences(project, projRootNode, doc);
-            }
+            WriteFileReferences(project, projRootNode, doc);
 
             doc.Save(projFilePath);
-            
+
             WriteNuGetPackages(project, projFilePath);
-            
+
             WriteProjectFiles(project, projRootPath);
 
             return projFilePath;
@@ -54,11 +51,27 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
         private void WriteFileReferences(Project project, XmlNode projectNode, XmlDocument projectFileXmlDoc)
         {
             var itemGroup = projectFileXmlDoc.CreateElement("ItemGroup");
-            foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "COMPILE"))
+
+            if (project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
             {
-                var fileElement = projectFileXmlDoc.CreateElement("Compile");
+                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "COMPILE"))
+                {
+                    var fileElement = projectFileXmlDoc.CreateElement("Compile");
+                    fileElement.SetAttribute("Include", file.Path);
+
+                    itemGroup.AppendChild(fileElement);
+                }
+            }
+            
+            foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || f.BuildAction.ToUpper() == "NONE" && f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy))
+            {
+                var fileElement = projectFileXmlDoc.CreateElement(file.BuildAction);
                 fileElement.SetAttribute("Include", file.Path);
-                
+
+                var copyToOutputDirElement = projectFileXmlDoc.CreateElement("CopyToOutputDirectory");
+                copyToOutputDirElement.InnerText = file.CopyToOutputDirectory.GetCopyToOutputDirectoryString();
+
+                fileElement.AppendChild(copyToOutputDirElement);
                 itemGroup.AppendChild(fileElement);
             }
 
@@ -158,7 +171,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                                        .UsingTemplate(template)
                                        .WithLanguage(project.ProgrammingLanguage)
                                        .Build();
-            
+
             newProjCommand.Execute(new ProjectCreationNotPossibleException("Execution of dotnet new failed."));
         }
     }
