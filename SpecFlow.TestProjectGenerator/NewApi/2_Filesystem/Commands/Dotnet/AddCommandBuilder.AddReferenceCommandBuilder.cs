@@ -28,7 +28,7 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
             {
                 var projectDirectoryPath = Path.GetDirectoryName(_projectFilePath);
                 var absoluteReferenceProject = _referencedProjects.Select(p => Path.Combine(projectDirectoryPath, p));
-                return $"add {_projectFilePath} reference {string.Join(" ", absoluteReferenceProject)}";
+                return $"add {_projectFilePath} reference {string.Join(" ", absoluteReferenceProject.Select(p => $@"""{p}"""))}";
             }
 
             public AddReferenceCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)

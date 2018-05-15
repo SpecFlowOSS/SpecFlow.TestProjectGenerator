@@ -68,14 +68,18 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         private void WriteProjectReferences(Project project, string projFilePath)
         {
-            foreach (var projReference in project.ProjectReferences)
+            if (project.ProjectReferences.Count > 0)
             {
-                DotNet.Add(_outputWriter)
-                      .Reference()
-                      .ReferencingProject(projReference.Path)
-                      .ToProject(projFilePath)
-                      .Build()
-                      .Execute(new ProjectCreationNotPossibleException($"Adding refence to '{projReference.Path}' failed."));
+                var reference = DotNet.Add(_outputWriter)
+                                      .Reference();
+                foreach (var projReference in project.ProjectReferences)
+                {
+                    reference.ReferencingProject(projReference.Path);
+                }
+
+                reference.ToProject(projFilePath)
+                         .Build()
+                         .Execute(new ProjectCreationNotPossibleException($"Writing ProjectRefences failed."));
             }
         }
 
