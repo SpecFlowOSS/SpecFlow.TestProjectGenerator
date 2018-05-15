@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
+using SpecFlow.TestProjectGenerator.Helpers;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
@@ -28,54 +30,56 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             string projFileName = $"{project.Name}.{project.ProgrammingLanguage.ToProjectFileExtension()}";
 
-            string projFilePath = Path.Combine(projRootPath, projFileName);
+            string projectFilePath = Path.Combine(projRootPath, projFileName);
 
-            var doc = new XmlDocument();
-            doc.Load(projFilePath);
-            var projRootNode = doc.SelectSingleNode("//Project") ?? throw new ProjectCreationNotPossibleException("Project root node could not be found in project file.");
+            var xd = XDocument.Load(projectFilePath);
+            var projectElement = xd.Element(XName.Get("Project")) ?? throw new ProjectCreationNotPossibleException($"No 'Project' tag could be found in project file '{projectFilePath}'");
 
-            WriteReferences(project, doc, projRootNode);
-            SetTargetFramework(project, doc, projRootNode);
+            SetTargetFramework(project, projectElement);
+            WriteAssemblyReferences(project, projectElement);
+            WriteNuGetPackages(project, projectElement);
+            WriteFileReferences(project, projectElement);
 
-            WriteFileReferences(project, projRootNode, doc);
-
-            doc.Save(projFilePath);
-
-            WriteNuGetPackages(project, projFilePath);
+            xd.Save(projectFilePath);
 
             WriteProjectFiles(project, projRootPath);
 
-            return projFilePath;
+            return projectFilePath;
         }
 
-        private void WriteFileReferences(Project project, XmlNode projectNode, XmlDocument projectFileXmlDoc)
+        private void WriteFileReferences(Project project, XElement projectElement)
         {
-            var itemGroup = projectFileXmlDoc.CreateElement("ItemGroup");
-
-            if (project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
+            var itemGroup = new XElement("ItemGroup");
+            using (var xw = itemGroup.CreateWriter())
             {
-                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "COMPILE"))
+                if (project.ProgrammingLanguage == ProgrammingLanguage.FSharp)
                 {
-                    var fileElement = projectFileXmlDoc.CreateElement("Compile");
-                    fileElement.SetAttribute("Include", file.Path);
+                    foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "COMPILE"))
+                    {
+                        WriteFileReference(xw, file);
+                    }
+                }
 
-                    itemGroup.AppendChild(fileElement);
+                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || f.BuildAction.ToUpper() == "NONE" && f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy))
+                {
+                    WriteFileReference(xw, file);
                 }
             }
-            
-            foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || f.BuildAction.ToUpper() == "NONE" && f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy))
+
+            projectElement.Add(itemGroup);
+        }
+
+        private void WriteFileReference(XmlWriter xw, ProjectFile projectFile)
+        {
+            xw.WriteStartElement(projectFile.BuildAction);
+            xw.WriteAttributeString("Include", projectFile.Path);
+
+            if (projectFile.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy)
             {
-                var fileElement = projectFileXmlDoc.CreateElement(file.BuildAction);
-                fileElement.SetAttribute("Include", file.Path);
-
-                var copyToOutputDirElement = projectFileXmlDoc.CreateElement("CopyToOutputDirectory");
-                copyToOutputDirElement.InnerText = file.CopyToOutputDirectory.GetCopyToOutputDirectoryString();
-
-                fileElement.AppendChild(copyToOutputDirElement);
-                itemGroup.AppendChild(fileElement);
+                xw.WriteElementString("CopyToOutputDirectory", projectFile.CopyToOutputDirectory.GetCopyToOutputDirectoryString());
             }
-
-            projectNode.AppendChild(itemGroup);
+            
+            xw.WriteEndElement();
         }
 
         public void WriteReferences(Project project, string projectFilePath)
@@ -83,20 +87,32 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             WriteProjectReferences(project, projectFilePath);
         }
 
-        private void WriteNuGetPackages(Project project, string projFilePath)
+        private void WriteNuGetPackages(Project project, XElement projectElement)
         {
-            foreach (var nugetPackage in project.NuGetPackages)
-            {
-                var addPackageCommand = DotNet.Add(_outputWriter)
-                                              .Package()
-                                              .WithPackageName(nugetPackage.Name)
-                                              .WithPackageVersion(nugetPackage.Version)
-                                              .ToProject(projFilePath)
-                                              .WithNoRestore()
-                                              .Build();
+            var newNode = new XElement("ItemGroup");
 
-                addPackageCommand.Execute(new ProjectCreationNotPossibleException($"Adding nuGet Package '{nugetPackage.Name}', {nugetPackage.Version} failed."));
+            using (var xw = newNode.CreateWriter())
+            {
+                foreach (var nugetPackage in project.NuGetPackages)
+                {
+                    WritePackageReference(xw, nugetPackage);
+                }
             }
+
+            projectElement.Add(newNode);
+        }
+
+        private void WritePackageReference(XmlWriter xw, NuGetPackage nuGetPackage)
+        {
+            xw.WriteStartElement("PackageReference");
+            xw.WriteAttributeString("Include", nuGetPackage.Name);
+
+            if (nuGetPackage.Version.IsNotNullOrWhiteSpace())
+            {
+                xw.WriteAttributeString("Version", nuGetPackage.Version);
+            }
+
+            xw.WriteEndElement();
         }
 
         private void WriteProjectReferences(Project project, string projFilePath)
@@ -125,12 +141,12 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
         }
 
-        private void SetTargetFramework(Project project, XmlDocument doc, XmlNode projRootNode)
+        private void SetTargetFramework(Project project, XElement projectElement)
         {
-            var targetFrameworkNode = projRootNode.SelectSingleNode("//PropertyGroup/TargetFramework") ?? throw new ProjectCreationNotPossibleException();
-            string newTargetFrameworks = project.TargetFrameworks.ToTargetFrameworkMoniker();
+            var targetFrameworkElement = projectElement.Element("PropertyGroup")?.Element("TargetFramework") ?? throw new ProjectCreationNotPossibleException();
 
-            targetFrameworkNode.InnerText = newTargetFrameworks;
+            string newTargetFrameworks = project.TargetFrameworks.ToTargetFrameworkMoniker();
+            targetFrameworkElement.SetValue(newTargetFrameworks);
 
             //var targetFrameworkParentGroup = targetFrameworkNode.ParentNode ?? throw new ProjectCreationNotPossibleException();
             //var multipleTargetFrameworksNode = doc.CreateElement("TargetFrameworks");
@@ -140,24 +156,29 @@ namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             //targetFrameworkParentGroup.AppendChild(multipleTargetFrameworksNode);
         }
 
-        private void WriteReferences(Project project, XmlDocument doc, XmlNode projRootNode)
+        private void WriteAssemblyReferences(Project project, XElement projectElement)
         {
             // GAC and library references cannot be added in new Csproj format (via dotnet CLI)
             // see https://github.com/dotnet/sdk/issues/987
             // Therefore, write them manually into the project file
-            if (project.References.Count > 0)
-            {
-                var referencesNode = doc.CreateElement("ItemGroup");
+            var itemGroup = new XElement("ItemGroup");
 
+            using (var xw = itemGroup.CreateWriter())
+            {
                 foreach (var reference in project.References)
                 {
-                    var node = doc.CreateElement("Reference");
-                    node.SetAttribute("Include", reference.Name);
-                    referencesNode.AppendChild(node);
+                    WriteAssemblyReference(xw, reference);
                 }
-
-                projRootNode.AppendChild(referencesNode);
             }
+
+            projectElement.Add(itemGroup);
+        }
+
+        private void WriteAssemblyReference(XmlWriter xw, Reference reference)
+        {
+            xw.WriteStartElement("Reference");
+            xw.WriteAttributeString("Include", reference.Name);
+            xw.WriteEndElement();
         }
 
         private void CreateProjectFile(Project project, string projRootPath)
