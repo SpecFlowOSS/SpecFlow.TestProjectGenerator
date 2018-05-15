@@ -77,7 +77,7 @@ namespace SpecFlow.TestProjectGenerator
                         }
                     };
 
-
+                    var before = DateTime.Now;
                     process.Start();
 
                     process.BeginOutputReadLine();
@@ -88,6 +88,10 @@ namespace SpecFlow.TestProjectGenerator
                     {
                         throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete");
                     }
+
+                    var after = DateTime.Now;
+                    var diff = after - before;
+                    outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
                 }
             }
 
