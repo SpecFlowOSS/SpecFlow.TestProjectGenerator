@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class SolutionWriter
     {

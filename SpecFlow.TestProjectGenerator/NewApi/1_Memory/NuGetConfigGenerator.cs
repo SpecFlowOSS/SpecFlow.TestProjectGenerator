@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Xml;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class NuGetConfigGenerator : XmlFileGeneratorBase
     {

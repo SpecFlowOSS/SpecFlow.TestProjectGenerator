@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace SpecFlow.TestProjectGenerator.Helpers
+namespace TechTalk.SpecFlow.TestProjectGenerator.Helpers
 {
     public static class FileSystemHelper
     {

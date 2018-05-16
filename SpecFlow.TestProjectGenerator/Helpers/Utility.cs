@@ -1,6 +1,6 @@
 ﻿using Microsoft.FSharp.Core;
 
-namespace SpecFlow.TestProjectGenerator.Helpers
+namespace TechTalk.SpecFlow.TestProjectGenerator.Helpers
 {
     static class Utility
     {

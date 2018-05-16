@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using SpecFlow.TestProjectGenerator.NewApi.Driver;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
 {
     public abstract class BaseBindingsGenerator
     {

@@ -7,10 +7,10 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
-using SpecFlow.TestProjectGenerator.Helpers;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 {
     public class VSTestExecutionDriver
     {

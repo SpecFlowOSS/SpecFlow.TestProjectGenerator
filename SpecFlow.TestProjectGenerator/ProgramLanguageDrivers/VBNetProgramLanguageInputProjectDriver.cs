@@ -1,6 +1,6 @@
-﻿using SpecFlow.TestProjectGenerator.Inputs;
+﻿using TechTalk.SpecFlow.TestProjectGenerator.Inputs;
 
-namespace SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
+namespace TechTalk.SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
 {
     class VBNetProgramLanguageInputProjectDriver : ProgramLanguageInputProjectDriver
     {

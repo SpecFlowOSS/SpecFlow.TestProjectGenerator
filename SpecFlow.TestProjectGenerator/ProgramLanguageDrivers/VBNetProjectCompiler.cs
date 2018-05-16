@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Text;
 using Microsoft.Build.Evaluation;
-using SpecFlow.TestProjectGenerator.Inputs;
+using TechTalk.SpecFlow.TestProjectGenerator.Inputs;
 
-namespace SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
+namespace TechTalk.SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
 {
     internal class VBNetProjectCompiler : ProgramLanguageProjectCompiler
     {

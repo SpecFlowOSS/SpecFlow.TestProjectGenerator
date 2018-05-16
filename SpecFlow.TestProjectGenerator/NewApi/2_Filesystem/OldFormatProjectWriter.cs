@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Xml;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public class OldFormatProjectWriter : XmlFileGeneratorBase, IProjectWriter
     {

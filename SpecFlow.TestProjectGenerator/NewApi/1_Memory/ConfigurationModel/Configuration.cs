@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel
 {
     public class Configuration
     {

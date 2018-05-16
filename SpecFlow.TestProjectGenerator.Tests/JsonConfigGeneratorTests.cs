@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
 using Xunit;
 
-namespace SpecFlow.TestProjectGenerator.Tests
+namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 {
     public class JsonConfigGeneratorTests
     {
@@ -18,7 +18,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void FileNameIsAppConfig()
         {
-            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration { UnitTestProvider = TechTalk.SpecFlow.TestProjectGenerator.UnitTestProvider.SpecRun };
             var projectFile = _jsonConfigGenerator.Generate(configuration);
             projectFile.Path.Should().Be("specflow.json");
         }
@@ -26,7 +26,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void BuildActionIsNone()
         {
-            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration { UnitTestProvider = TechTalk.SpecFlow.TestProjectGenerator.UnitTestProvider.SpecRun };
             var projectFile = _jsonConfigGenerator.Generate(configuration);
             projectFile.BuildAction.Should().Be("None");
         }
@@ -34,7 +34,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void UnitTestProvider()
         {
-            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration { UnitTestProvider = TechTalk.SpecFlow.TestProjectGenerator.UnitTestProvider.SpecRun };
             var projectFile = _jsonConfigGenerator.Generate(configuration);
 
             projectFile.Content.Should().Contain("\"unitTestProvider\":{\"name\":\"SpecRun\"}");
@@ -43,7 +43,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void SinglePlugin()
         {
-            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration { UnitTestProvider = TechTalk.SpecFlow.TestProjectGenerator.UnitTestProvider.SpecRun };
             configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
             var projectFile = _jsonConfigGenerator.Generate(configuration);
 
@@ -54,7 +54,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void MultiplePlugins()
         {
-            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration { UnitTestProvider = TechTalk.SpecFlow.TestProjectGenerator.UnitTestProvider.SpecRun };
             configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
             configuration.Plugins.Add(new SpecFlowPlugin("SpecFlow+Excel"));
             var projectFile = _jsonConfigGenerator.Generate(configuration);
@@ -67,7 +67,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void PluginWithPath()
         {
-            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration { UnitTestProvider = TechTalk.SpecFlow.TestProjectGenerator.UnitTestProvider.SpecRun };
             configuration.Plugins.Add(new SpecFlowPlugin("SpecRun", "pathToPluginFolder"));
             var projectFile = _jsonConfigGenerator.Generate(configuration);
 
@@ -78,7 +78,7 @@ namespace SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void SingleAdditionalStepAssembly()
         {
-            var configuration = new Configuration { UnitTestProvider = TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration { UnitTestProvider = TechTalk.SpecFlow.TestProjectGenerator.UnitTestProvider.SpecRun };
             configuration.StepAssemblies.Add(new StepAssembly("AdditionalStepAssembly"));
 
             var projectFile = _jsonConfigGenerator.Generate(configuration);

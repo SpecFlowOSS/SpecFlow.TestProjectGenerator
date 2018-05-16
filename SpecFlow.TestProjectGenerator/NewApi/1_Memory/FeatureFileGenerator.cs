@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class FeatureFileGenerator
     {

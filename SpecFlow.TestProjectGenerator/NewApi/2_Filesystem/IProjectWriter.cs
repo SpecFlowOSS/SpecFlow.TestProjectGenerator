@@ -1,6 +1,6 @@
-﻿using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+﻿using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 {
     public interface IProjectWriter
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
 {
     public static class TargetFrameworkExtensions
     {

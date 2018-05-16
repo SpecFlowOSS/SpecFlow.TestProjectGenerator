@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
-using SpecFlow.TestProjectGenerator.NewApi;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
 
-namespace SpecFlow.TestProjectGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator
 {
 
     public class ProcessResult

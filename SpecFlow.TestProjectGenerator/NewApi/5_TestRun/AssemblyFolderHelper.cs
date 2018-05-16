@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 {
     public static class AssemblyFolderHelper
     {

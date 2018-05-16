@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.FSharp.Core;
-using SpecFlow.TestProjectGenerator.Helpers;
-using SpecFlow.TestProjectGenerator.Inputs;
-using SpecFlow.TestProjectGenerator.ProgramLanguageDrivers;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
+using TechTalk.SpecFlow.TestProjectGenerator.Inputs;
+using TechTalk.SpecFlow.TestProjectGenerator.ProgramLanguageDrivers;
 
-namespace SpecFlow.TestProjectGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class InputProjectDriver
     {

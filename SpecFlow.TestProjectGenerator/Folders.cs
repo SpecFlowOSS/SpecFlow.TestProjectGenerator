@@ -1,9 +1,9 @@
-﻿using SpecFlow.TestProjectGenerator.Helpers;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 
-namespace SpecFlow.TestProjectGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class Folders
     {

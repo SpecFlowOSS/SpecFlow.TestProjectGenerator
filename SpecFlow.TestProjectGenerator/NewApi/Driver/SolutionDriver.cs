@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
-using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
-using SpecFlow.TestProjectGenerator.NewApi._3_NuGet;
-using SpecFlow.TestProjectGenerator.NewApi._4_Compile;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._3_NuGet;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._4_Compile;
 
-namespace SpecFlow.TestProjectGenerator.NewApi.Driver
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 {
     public class SolutionDriver
     {

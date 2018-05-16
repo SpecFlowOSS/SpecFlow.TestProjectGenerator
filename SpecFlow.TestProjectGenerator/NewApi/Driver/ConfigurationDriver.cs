@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 
-namespace SpecFlow.TestProjectGenerator.NewApi.Driver
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 {
     public class ConfigurationDriver
     {

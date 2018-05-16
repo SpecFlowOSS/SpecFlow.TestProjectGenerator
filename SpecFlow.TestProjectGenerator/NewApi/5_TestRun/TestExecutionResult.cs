@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 {
     public class TestExecutionResult
     {

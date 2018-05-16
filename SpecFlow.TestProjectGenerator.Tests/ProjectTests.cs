@@ -2,15 +2,15 @@
 using System.IO;
 using FluentAssertions;
 using Moq;
-using SpecFlow.TestProjectGenerator.NewApi;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
-using SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
 using Xunit;
 
 // ReSharper disable InconsistentNaming
 
-namespace SpecFlow.TestProjectGenerator.Tests
+namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 {
     public class ProjectTests
     {

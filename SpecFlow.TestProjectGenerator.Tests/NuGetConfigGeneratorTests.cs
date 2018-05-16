@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 
-namespace SpecFlow.TestProjectGenerator.Tests
+namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 {
     public class NuGetConfigGeneratorTests
     {

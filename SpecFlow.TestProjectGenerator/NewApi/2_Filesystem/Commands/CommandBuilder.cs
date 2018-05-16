@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands
 {
     public class CommandBuilder
     {

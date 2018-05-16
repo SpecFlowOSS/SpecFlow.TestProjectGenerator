@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class ProjectCreationNotPossibleException : Exception
     {

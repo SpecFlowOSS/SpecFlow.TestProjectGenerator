@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class ProjectFileFactory
     {

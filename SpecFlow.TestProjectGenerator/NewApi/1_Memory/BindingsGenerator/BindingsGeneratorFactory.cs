@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
 {
     public class BindingsGeneratorFactory
     {

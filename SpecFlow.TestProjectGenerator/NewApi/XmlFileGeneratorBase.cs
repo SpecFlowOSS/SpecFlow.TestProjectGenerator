@@ -2,7 +2,7 @@
 using System.Text;
 using System.Xml;
 
-namespace SpecFlow.TestProjectGenerator.NewApi
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi
 {
     public abstract class XmlFileGeneratorBase
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using SpecFlow.TestProjectGenerator.NewApi.Driver;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class ProjectBuilder
     {

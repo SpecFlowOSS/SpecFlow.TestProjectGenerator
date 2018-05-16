@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using SpecFlow.TestProjectGenerator.Helpers;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 
-namespace SpecFlow.TestProjectGenerator.NewApi
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi
 {
     public class TestProjectFolders
     {

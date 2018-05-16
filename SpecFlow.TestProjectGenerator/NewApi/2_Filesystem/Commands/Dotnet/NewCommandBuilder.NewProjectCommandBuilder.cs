@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
 {
     public partial class NewCommandBuilder
     {

@@ -1,19 +1,22 @@
-﻿using SpecFlow.TestProjectGenerator.NewApi._1_Memory;
+﻿using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 
-namespace SpecFlow.TestProjectGenerator.NewApi
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi
 {
     public class TestRunConfiguration
     {
-        public TestRunConfiguration(ProgrammingLanguage programmingLanguage, ProjectFormat projectFormat, TargetFramework targetFramework)
+        public TestRunConfiguration(ProgrammingLanguage programmingLanguage, ProjectFormat projectFormat, TargetFramework targetFramework, UnitTestProvider unitTestProvider)
         {
             ProgrammingLanguage = programmingLanguage;
             ProjectFormat = projectFormat;
             TargetFramework = targetFramework;
+            UnitTestProvider = unitTestProvider;
         }
 
         public ProgrammingLanguage ProgrammingLanguage { get; set; }
         public ProjectFormat ProjectFormat { get; set; }
 
         public TargetFramework TargetFramework { get; set; }
+
+        public UnitTestProvider UnitTestProvider { get; set; }
     }
 }

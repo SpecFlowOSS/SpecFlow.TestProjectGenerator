@@ -4,12 +4,12 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
-using SpecFlow.TestProjectGenerator.Helpers;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel.Dependencies;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel.Dependencies;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
 {
     public class AppConfigGenerator : XmlFileGeneratorBase, IConfigurationGenerator
     {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SpecFlow.TestProjectGenerator.Inputs
+namespace TechTalk.SpecFlow.TestProjectGenerator.Inputs
 {
     public class BindingClassInput : FileInput
     {

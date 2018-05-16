@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.TestProjectGenerator.NewApi.Driver
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 {
     public enum ParameterType
     {

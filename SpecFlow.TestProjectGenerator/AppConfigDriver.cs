@@ -1,6 +1,6 @@
 ﻿using System.Configuration;
 
-namespace SpecFlow.TestProjectGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class AppConfigDriver
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpecFlow.TestProjectGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class GitVersionInfo
     {

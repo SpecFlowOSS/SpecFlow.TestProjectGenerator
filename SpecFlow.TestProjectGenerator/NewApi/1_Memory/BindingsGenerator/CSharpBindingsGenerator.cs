@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SpecFlow.TestProjectGenerator.Helpers;
-using SpecFlow.TestProjectGenerator.NewApi.Driver;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
 {
     public class CSharpBindingsGenerator : BaseBindingsGenerator
     {

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
-using SpecFlow.TestProjectGenerator.Helpers;
-using SpecFlow.TestProjectGenerator.Inputs;
-using SpecFlow.TestProjectGenerator.NewApi;
-using SpecFlow.TestProjectGenerator.ProgramLanguageDrivers;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
+using TechTalk.SpecFlow.TestProjectGenerator.Inputs;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
+using TechTalk.SpecFlow.TestProjectGenerator.ProgramLanguageDrivers;
 
-namespace SpecFlow.TestProjectGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class ProjectCompiler
     {

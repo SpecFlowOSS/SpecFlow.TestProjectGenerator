@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._3_NuGet
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._3_NuGet
 {
     public class NuGet
     {

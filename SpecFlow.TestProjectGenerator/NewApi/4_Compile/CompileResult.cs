@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
-
-namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._4_Compile
 {
     public class CompileResult
     {

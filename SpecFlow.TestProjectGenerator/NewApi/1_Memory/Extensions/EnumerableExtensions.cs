@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
 {
     public static class EnumerableExtensions
     {

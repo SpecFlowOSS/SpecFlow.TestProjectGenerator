@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
 {
     public class ConfigurationGeneratorFactory
     {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using SpecFlow.TestProjectGenerator.NewApi;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
 
-namespace SpecFlow.TestProjectGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class VisualStudioFinder
     {

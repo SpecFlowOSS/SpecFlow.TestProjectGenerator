@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Text.RegularExpressions;
+﻿using System.IO;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._4_Compile
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._4_Compile
 {
     public class Compiler
     {

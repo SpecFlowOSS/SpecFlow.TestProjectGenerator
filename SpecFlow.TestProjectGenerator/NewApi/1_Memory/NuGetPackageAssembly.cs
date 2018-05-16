@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class NuGetPackageAssembly
     {

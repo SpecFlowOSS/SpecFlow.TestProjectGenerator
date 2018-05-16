@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.TestProjectGenerator.Inputs
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.Inputs
 {
     public class CodeFileInput : FileInputWithContent
     {

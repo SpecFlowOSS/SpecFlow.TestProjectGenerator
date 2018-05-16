@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.TestProjectGenerator
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public enum UnitTestProvider
     {

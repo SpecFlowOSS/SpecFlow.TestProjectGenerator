@@ -1,6 +1,6 @@
-﻿using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
+﻿using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
 {
     public interface IConfigurationGenerator
     {

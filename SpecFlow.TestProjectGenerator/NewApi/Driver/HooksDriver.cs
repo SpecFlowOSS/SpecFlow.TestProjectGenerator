@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using FluentAssertions;
-using SpecFlow.TestProjectGenerator.NewApi._5_TestRun;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun;
 
-namespace SpecFlow.TestProjectGenerator.NewApi.Driver
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 {
     public class HooksDriver
     {

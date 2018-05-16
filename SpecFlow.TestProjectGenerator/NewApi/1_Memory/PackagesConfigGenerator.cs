@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class PackagesConfigGenerator : XmlFileGeneratorBase
     {

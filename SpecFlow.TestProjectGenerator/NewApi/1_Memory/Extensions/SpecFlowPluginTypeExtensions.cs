@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
 {
     public static class SpecFlowPluginTypeExtensions
     {

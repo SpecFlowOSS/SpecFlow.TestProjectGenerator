@@ -1,11 +1,10 @@
-﻿using System;
-using FluentAssertions;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
+﻿using FluentAssertions;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
 using Xunit;
 
 // ReSharper disable InconsistentNaming
 
-namespace SpecFlow.TestProjectGenerator.Tests
+namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 {
     public class BindingsGeneratorTests
     {

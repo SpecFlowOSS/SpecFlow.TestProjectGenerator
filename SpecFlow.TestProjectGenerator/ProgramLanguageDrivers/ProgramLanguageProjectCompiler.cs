@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Build.Evaluation;
-using SpecFlow.TestProjectGenerator.Inputs;
+using TechTalk.SpecFlow.TestProjectGenerator.Inputs;
 
-namespace SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
+namespace TechTalk.SpecFlow.TestProjectGenerator.ProgramLanguageDrivers
 {
     internal abstract class ProgramLanguageProjectCompiler : IProgramLanguageProjectCompiler
     {

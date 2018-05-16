@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem.Commands.Dotnet
 {
     public class BuildCommandBuilder : BaseCommandBuilder
     {

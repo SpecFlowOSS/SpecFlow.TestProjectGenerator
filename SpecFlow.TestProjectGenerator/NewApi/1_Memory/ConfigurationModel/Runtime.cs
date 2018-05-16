@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel.Dependencies;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel.Dependencies;
 
-namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel
 {
     public class Runtime
     {

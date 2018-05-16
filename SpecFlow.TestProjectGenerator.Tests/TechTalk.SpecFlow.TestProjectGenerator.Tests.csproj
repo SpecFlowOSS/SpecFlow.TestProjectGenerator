@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpecFlow.TestProjectGenerator\SpecFlow.TestProjectGenerator.csproj" />
+    <ProjectReference Include="..\SpecFlow.TestProjectGenerator\TechTalk.SpecFlow.TestProjectGenerator.csproj" />
   </ItemGroup>
 
 </Project>

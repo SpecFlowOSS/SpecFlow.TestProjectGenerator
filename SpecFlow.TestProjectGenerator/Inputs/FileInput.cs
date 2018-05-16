@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace SpecFlow.TestProjectGenerator.Inputs
+namespace TechTalk.SpecFlow.TestProjectGenerator.Inputs
 {
     public abstract class FileInput
     {
