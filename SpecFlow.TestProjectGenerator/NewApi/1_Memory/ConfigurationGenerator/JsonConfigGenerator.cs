@@ -212,6 +212,12 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
             jsonWriter.WritePropertyName("stopAtFirstError");
             jsonWriter.WriteValue(runtime.StopAtFirstError);
 
+            if (runtime.ObsoleteBehavior.IsNotNullOrWhiteSpace())
+            {
+                jsonWriter.WritePropertyName("obsoleteBehavior");
+                jsonWriter.WriteValue(runtime.ObsoleteBehavior);
+            }
+
             if (runtime.Dependencies.Count > 0)
             {
                 jsonWriter.WritePropertyName("dependencies");

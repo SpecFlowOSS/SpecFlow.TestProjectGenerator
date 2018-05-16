@@ -23,7 +23,22 @@ public class {0}
 
         public override ProjectFile GenerateBindingClassFile(string content)
         {
+            content = AddMissingNamespace(content, "using System;");
+            content = AddMissingNamespace(content, "using System.IO;");
+            content = AddMissingNamespace(content, "using TechTalk.SpecFlow;");
+
+
             return new ProjectFile($"BindingsClass_{Guid.NewGuid():N}.cs", "Compile", content);
+        }
+
+        private string AddMissingNamespace(string content, string @namespace)
+        {
+            if (!content.Contains(@namespace))
+            {
+                content = @namespace + Environment.NewLine + content;
+            }
+
+            return content;
         }
 
         public override ProjectFile GenerateStepDefinition(string method)

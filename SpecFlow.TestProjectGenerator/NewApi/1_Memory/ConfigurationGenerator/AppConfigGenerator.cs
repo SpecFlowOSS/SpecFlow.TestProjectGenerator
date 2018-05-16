@@ -177,6 +177,11 @@ namespace SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator
             writer.WriteAttributeString("stopAtFirstError", ToXmlString(runtime.StopAtFirstError));
             writer.WriteAttributeString("missingOrPendingStepsOutcome", runtime.MissingOrPendingStepsOutcome.ToString());
 
+            if (runtime.ObsoleteBehavior.IsNotNullOrWhiteSpace())
+            {
+                writer.WriteAttributeString("obsoleteBehavior", runtime.ObsoleteBehavior);
+            }
+
             if (runtime.Dependencies.Count > 0)
             {
                 writer.WriteStartElement("dependencies");

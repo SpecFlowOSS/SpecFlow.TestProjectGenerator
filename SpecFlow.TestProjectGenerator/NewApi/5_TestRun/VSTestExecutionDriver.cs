@@ -95,13 +95,19 @@ namespace SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Total = int.Parse(summaryElement.Attribute("total").Value);
                 executionResult.Executed = int.Parse(summaryElement.Attribute("executed").Value);
                 executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
-                executionResult.Failed = int.Parse(summaryElement.Attribute("failed").Value);
-                executionResult.Pending = isXUnit ? Regex.Matches(output, "XUnitPendingStepException").Count / 2 : int.Parse(summaryElement.Attribute("inconclusive").Value);
+                executionResult.Pending = isXUnit ? GetXUnitPendingCount(output) : int.Parse(summaryElement.Attribute("inconclusive").Value);
+                executionResult.Failed = int.Parse(summaryElement.Attribute("failed").Value) - executionResult.Pending;
                 executionResult.Ignored = executionResult.Total - executionResult.Executed;
                 executionResult.Output = output;
             }
 
             LastTestExecutionResult = executionResult;
+        }
+
+        private int GetXUnitPendingCount(string output)
+        {
+            return Regex.Matches(output, "XUnitPendingStepException").Count / 2 +
+                   Regex.Matches(output, "XUnitInconclusiveException").Count / 2;
         }
 
         private IEnumerable<string> FindFilePath(string[] lines, string ending, string starting)

@@ -148,5 +148,10 @@ namespace SpecFlow.TestProjectGenerator.NewApi.Driver
                 default: throw new ArgumentOutOfRangeException(nameof(providerName), providerName, "Unknown unit test provider");
             }
         }
+
+        public void SetRuntimeObsoleteBehavior(string obsoleteBehaviorValue)
+        {
+            _projectsDriver.DefaultProject.Configuration.Runtime.Value.ObsoleteBehavior = obsoleteBehaviorValue;
+        }
     }
 }
