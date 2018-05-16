@@ -87,21 +87,41 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(nameTable);
             namespaceManager.AddNamespace("mstest", "http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
 
-            bool isXUnit = output.Contains("xUnit.net");
-
             var summaryElement = testResult.XPathSelectElement("//mstest:ResultSummary/mstest:Counters", namespaceManager);
             if (summaryElement != null)
             {
                 executionResult.Total = int.Parse(summaryElement.Attribute("total").Value);
                 executionResult.Executed = int.Parse(summaryElement.Attribute("executed").Value);
                 executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
-                executionResult.Pending = isXUnit ? GetXUnitPendingCount(output) : int.Parse(summaryElement.Attribute("inconclusive").Value);
+                executionResult.Pending = GetPendingCount(_testRunConfiguration, output, summaryElement, testResult, namespaceManager);
                 executionResult.Failed = int.Parse(summaryElement.Attribute("failed").Value) - executionResult.Pending;
                 executionResult.Ignored = executionResult.Total - executionResult.Executed;
                 executionResult.Output = output;
             }
 
             LastTestExecutionResult = executionResult;
+        }
+
+        private int GetPendingCount(TestRunConfiguration testRunConfiguration, string output, XElement summaryElement, XDocument testResult, XmlNamespaceManager namespaceManager)
+        {
+            switch (testRunConfiguration.UnitTestProvider)
+            {
+                case UnitTestProvider.MSTest:
+                    var unitTestResultMessageElements = testResult.XPathSelectElements("//mstest:Results/mstest:UnitTestResult/mstest:Output/mstest:ErrorInfo/mstest:Message", namespaceManager);
+
+                    return unitTestResultMessageElements.Where(e => e.Value.Contains("Microsoft.VisualStudio.TestTools.UnitTesting.AssertInconclusiveException")).Count();
+
+                    break;
+                case UnitTestProvider.XUnit:
+                    return GetXUnitPendingCount(output);
+                case UnitTestProvider.NUnit3:
+                    var unitTestResultElements = testResult.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager);
+
+                    return unitTestResultElements.Attributes("outcome").Where(a => a.Value == "NotExecuted").Count();
+
+            }
+
+            return int.Parse(summaryElement.Attribute("inconclusive").Value);
         }
 
         private int GetXUnitPendingCount(string output)

@@ -145,8 +145,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
             {
                 Language = language,
                 Format = _testRunConfiguration.ProjectFormat,
-                TargetFrameworks = _testRunConfiguration.TargetFramework
+                TargetFrameworks = _testRunConfiguration.TargetFramework,
             };
+
+            project.Configuration.UnitTestProvider = _testRunConfiguration.UnitTestProvider;
 
             if (projectName.IsNotNullOrWhiteSpace())
             {
