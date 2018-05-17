@@ -28,6 +28,11 @@ End Class";
             return new ProjectFile($"{randomClassName}.vb", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
         }
 
+        public override ProjectFile GenerateLoggerClass(string pathToLogFile)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)
         {
             string parameter = "";
@@ -52,7 +57,38 @@ End Class";
 
             return $@"<[{attributeName}](""{regex}"")> Public Sub {methodName}({parameter}) 
                                 
+                                    Global::Log.LogStep()
                                     {methodImplementation}
+                                End Sub";
+        }
+
+        protected override string GetLoggingStepDefinitionCode(string methodName, string attributeName, string regex, ParameterType parameterType, string argumentName)
+        {
+            string parameter = "";
+
+            if (argumentName.IsNotNullOrWhiteSpace())
+            {
+                switch (parameterType)
+                {
+                    case ParameterType.Normal:
+                        parameter = $"{argumentName} As Object";
+                        break;
+                    case ParameterType.Table:
+                        parameter = $"{argumentName} As Table";
+                        break;
+                    case ParameterType.DocString:
+                        parameter = $"{argumentName} As String";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(parameterType), parameterType, null);
+                }
+            }
+
+            string attributeRegex = regex.IsNullOrWhiteSpace() ? string.Empty : $@"""{regex}""";
+
+            return $@"<[{attributeName}]({attributeRegex})> Public Sub {methodName}({parameter}) 
+                                
+                                    Global::Log.LogStep()
                                 End Sub";
         }
 

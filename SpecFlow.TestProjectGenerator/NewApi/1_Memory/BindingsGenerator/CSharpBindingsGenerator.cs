@@ -48,6 +48,30 @@ public class {0}
             return new ProjectFile($"{randomClassName}.cs", "Compile", fileContent);
         }
 
+        public override ProjectFile GenerateLoggerClass(string pathToLogFile)
+        {
+            string fileContent = $@"
+using System;
+using System.IO;
+using System.Runtime.CompilerServices;
+
+internal static class Log
+{{
+    private const string LogFileLocation = @""{pathToLogFile}"";
+
+    internal static void LogStep([CallerMemberName] string stepName = null)
+    {{
+        File.AppendAllText(LogFileLocation, $@""-> step: {{stepName}}"");
+    }}
+
+    internal static void LogHook([CallerMemberName] string stepName = null)
+    {{
+        File.AppendAllText(LogFileLocation, $@""-> hook: {{stepName}}"");
+    }}
+}}";
+            return new ProjectFile("Log.cs", "Compile", fileContent);
+        }
+
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)
         {
             string parameter = "";
@@ -72,7 +96,38 @@ public class {0}
             
             return $@"[{attributeName}(@""{regex}"")] public void {methodName}({parameter}) 
                                 {{
+                                    global::Log.LogStep();
                                     {methodImplementation}
+                                }}";
+        }
+
+        protected override string GetLoggingStepDefinitionCode(string methodName, string attributeName, string regex, ParameterType parameterType, string argumentName)
+        {
+            string parameter = "";
+            
+            if (argumentName.IsNotNullOrWhiteSpace())
+            {
+                switch (parameterType)
+                {
+                    case ParameterType.Normal:
+                        parameter = $"object {argumentName}";
+                        break;
+                    case ParameterType.Table:
+                        parameter = $"Table {argumentName}";
+                        break;
+                    case ParameterType.DocString:
+                        parameter = $"string {argumentName}";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(parameterType), parameterType, null);
+                }
+            }
+
+            string attributeRegex = regex.IsNullOrWhiteSpace() ? string.Empty : $@"@""{regex}""";
+
+            return $@"[{attributeName}({attributeRegex})] public void {methodName}({parameter}) 
+                                {{
+                                    global::Log.LogStep();
                                 }}";
         }
 
@@ -103,6 +158,7 @@ public class {0}
             string scopeMethodAttributes = ToScopeTags(methodScopeAttributeTags);
             string staticKeyword = isStatic ? "static" : string.Empty;
 
+
             return $@"
 using System;
 using System.Collections;
@@ -120,7 +176,7 @@ public class {$"HooksClass_{Guid.NewGuid():N}"}
     {scopeMethodAttributes}
     public {staticKeyword} void {name}()
     {{
-        Console.WriteLine(""-> hook: {name}"");
+        global::Log.LogHook(); 
         {code}
     }}   
 }}

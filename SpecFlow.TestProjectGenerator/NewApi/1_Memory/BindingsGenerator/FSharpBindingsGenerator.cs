@@ -25,7 +25,17 @@ type {0}() =
             return new ProjectFile($"{randomClassName}.fs", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
         }
 
+        public override ProjectFile GenerateLoggerClass(string pathToLogFile)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override string GetLoggingStepDefinitionCode(string methodName, string attributeName, string regex, ParameterType parameterType, string argumentName)
         {
             throw new NotImplementedException();
         }

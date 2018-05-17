@@ -13,24 +13,29 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 {
     public class SolutionDriver
     {
+        public const string DefaultProjectName = "DefaultTestProject";
+
         private readonly NuGetConfigGenerator _nuGetConfigGenerator;
+        private readonly TestRunConfiguration _testRunConfiguration;
+        private readonly ProjectBuilderFactory _projectBuilderFactory;
         private readonly Folders _folders;
         private readonly NuGet _nuGet;
         private readonly TestProjectFolders _testProjectFolders;
-        private readonly ProjectsDriver _projectsDriver;
         private readonly Compiler _compiler;
         private readonly IOutputWriter _outputWriter;
         private readonly Solution _solution;
+        private readonly Dictionary<string, ProjectBuilder> _projects = new Dictionary<string, ProjectBuilder>();
         private bool _isWrittenOnDisk;
         private CompileResult _compileResult;
 
-        public SolutionDriver(NuGetConfigGenerator nuGetConfigGenerator, Folders folders, NuGet nuGet, TestProjectFolders testProjectFolders, ProjectsDriver projectsDriver, Compiler compiler, IOutputWriter outputWriter)
+        public SolutionDriver(NuGetConfigGenerator nuGetConfigGenerator, TestRunConfiguration testRunConfiguration, ProjectBuilderFactory projectBuilderFactory, Folders folders, NuGet nuGet, TestProjectFolders testProjectFolders, Compiler compiler, IOutputWriter outputWriter)
         {
             _nuGetConfigGenerator = nuGetConfigGenerator;
+            _testRunConfiguration = testRunConfiguration;
+            _projectBuilderFactory = projectBuilderFactory;
             _folders = folders;
             _nuGet = nuGet;
             _testProjectFolders = testProjectFolders;
-            _projectsDriver = projectsDriver;
             _compiler = compiler;
             _outputWriter = outputWriter;
             NuGetSources = new List<NuGetSource> { new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder), new NuGetSource("LocalExternalPackages", _folders.ExternalNuGetFolder) };
@@ -44,9 +49,36 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public string SolutionName => $"TestSolution_{SolutionGuid:N}";
 
+        public IReadOnlyDictionary<string, ProjectBuilder> Projects => _projects;
+
+        private ProjectBuilder _defaultProject;
+        public ProjectBuilder DefaultProject
+        {
+            get
+            {
+                if (_defaultProject == null)
+                {
+                    _defaultProject = _projectBuilderFactory.CreateProject(DefaultProjectName, _testRunConfiguration.ProgrammingLanguage);
+                    _projects.Add(_defaultProject.ProjectName, _defaultProject);
+                }
+
+                return _defaultProject;
+            }
+        }
+
+        public void AddProject(ProjectBuilder project)
+        {
+            if (_defaultProject == null)
+            {
+                _defaultProject = project;
+            }
+
+            _projects.Add(project.ProjectName, project);
+        }
+
         public void CompileSolution()
         {
-            foreach (var project in _projectsDriver.Projects.Values)
+            foreach (var project in Projects.Values)
             {
                 project.GenerateConfigurationFile();
             }
@@ -61,12 +93,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
         {
             if (_isWrittenOnDisk) return;
 
-            foreach (var project in _projectsDriver.Projects.Values)
+            foreach (var project in Projects.Values)
             {
                 project.Build();
             }
 
-            foreach (var project in _projectsDriver.Projects.Values)
+            foreach (var project in Projects.Values)
             {
                 _solution.AddProject(project.Build());
             }

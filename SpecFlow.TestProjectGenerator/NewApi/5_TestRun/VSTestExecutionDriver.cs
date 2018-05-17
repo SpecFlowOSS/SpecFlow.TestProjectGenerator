@@ -36,11 +36,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
         public void CheckIsBindingMethodExecuted(string methodName, int timesExecuted)
         {
-            LastTestExecutionResult.Should().NotBeNull();
-            var regex = new Regex($@"-> done: \S+\.{methodName}");
+            string pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
+            string logFileContent = File.ReadAllText(pathToLogFile);
+            
+            var regex = new Regex($@"-> step: {methodName}");
 
-            regex.Match(LastTestExecutionResult.Output).Success.Should().BeTrue($"method {methodName} was not executed.");
-            regex.Matches(LastTestExecutionResult.Output).Count.Should().Be(timesExecuted);
+            regex.Match(logFileContent).Success.Should().BeTrue($"method {methodName} was not executed.");
+            regex.Matches(logFileContent).Count.Should().Be(timesExecuted);
         }
 
         public void CheckOutputContainsText(string text)
@@ -111,7 +113,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
                     return unitTestResultMessageElements.Where(e => e.Value.Contains("Microsoft.VisualStudio.TestTools.UnitTesting.AssertInconclusiveException")).Count();
 
-                    break;
                 case UnitTestProvider.XUnit:
                     return GetXUnitPendingCount(output);
                 case UnitTestProvider.NUnit3:

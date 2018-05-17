@@ -6,96 +6,33 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 {
     public class ConfigurationDriver
     {
-        private readonly ProjectsDriver _projectsDriver;
+        private readonly SolutionDriver _solutionDriver;
 
-        public ConfigurationDriver(ProjectsDriver projectsDriver)
+        public ConfigurationDriver(SolutionDriver solutionDriver)
         {
-            _projectsDriver = projectsDriver;
-        }
-
-        public void AddPlugin(SpecFlowPlugin specFlowPlugin)
-        {
-            _projectsDriver.DefaultProject.Configuration.Plugins.Add(specFlowPlugin);
-        }
-
-        public void AddPlugin(string projectName, SpecFlowPlugin specFlowPlugin)
-        {
-            _projectsDriver.Projects[projectName].Configuration.Plugins.Add(specFlowPlugin);
+            _solutionDriver = solutionDriver;
         }
 
         public void AddStepAssembly(StepAssembly stepAssembly)
         {
-            AddStepAssembly(_projectsDriver.DefaultProject, stepAssembly);
-        }
-
-        public void AddStepAssembly(string projectName, StepAssembly stepAssembly)
-        {
-            var project = _projectsDriver.Projects[projectName];
-            AddStepAssembly(project, stepAssembly);
-        }
-
-        public void AddConfigSection(AppConfigSection appConfigSection)
-        {
-            _projectsDriver.DefaultProject.Configuration.AppConfigSection.Add(appConfigSection);
-        }
-
-        public void AddConfigSection(string projectName, AppConfigSection appConfigSection)
-        {
-            _projectsDriver.Projects[projectName].Configuration.AppConfigSection.Add(appConfigSection);
+            AddStepAssembly(_solutionDriver.DefaultProject, stepAssembly);
         }
 
         public void SetUnitTestProvider(string unitTestProviderName)
         {
-            SetUnitTestProvider(_projectsDriver.DefaultProject, unitTestProviderName);
-            _projectsDriver.DefaultProject.Configuration.UnitTestProvider = GetUnitTestProvider(unitTestProviderName);
+            SetUnitTestProvider(_solutionDriver.DefaultProject, unitTestProviderName);
+            _solutionDriver.DefaultProject.Configuration.UnitTestProvider = GetUnitTestProvider(unitTestProviderName);
         }
 
-        public void SetUnitTestProvider(string projectName, string unitTestProviderName)
-        {
-            var project = _projectsDriver.Projects[projectName];
-            SetUnitTestProvider(project, unitTestProviderName);
-        }
+        public void SetConfigurationFormat(ConfigurationFormat configurationFormat) => SetConfigurationFormat(_solutionDriver.DefaultProject, configurationFormat);
 
-        public void SetBindingCulture(CultureInfo bindingCulture) => SetBindingCulture(_projectsDriver.DefaultProject, bindingCulture);
-        public void SetBindingCulture(string projectName, CultureInfo bindingCulture) => SetBindingCulture(_projectsDriver.Projects[projectName], bindingCulture);
+        public void SetIsRowTestsAllowed(bool isAllowed) => SetIsRowTestsAllowed(_solutionDriver.DefaultProject, isAllowed);
 
-        public void SetFeatureLanguage(CultureInfo featureLanguage) => SetFeatureLanguage(_projectsDriver.DefaultProject, featureLanguage);
-        public void SetFeatureLanguage(string projectName, CultureInfo featureLanguage) => SetFeatureLanguage(_projectsDriver.Projects[projectName], featureLanguage);
-
-        public void SetConfigurationFormat(ConfigurationFormat configurationFormat) => SetConfigurationFormat(_projectsDriver.DefaultProject, configurationFormat);
-        public void SetConfigurationFormat(string projectName, ConfigurationFormat configurationFormat) => SetConfigurationFormat(_projectsDriver.Projects[projectName], configurationFormat);
-
-        public void SetIsRowTestsAllowed(string projectName, bool isAllowed) => SetIsRowTestsAllowed(_projectsDriver.Projects[projectName], isAllowed);
-        public void SetIsRowTestsAllowed(bool isAllowed) => SetIsRowTestsAllowed(_projectsDriver.DefaultProject, isAllowed);
-
-        public void AddGeneratorRegisterDependency(string type, string @as) => AddGeneratorRegisterDependency(_projectsDriver.DefaultProject, type, @as);
-        public void AddGeneratorRegisterDependency(string type, string @as, string name) => AddGeneratorRegisterDependency(_projectsDriver.DefaultProject, type, @as, name);
-        public void AddGeneratorRegisterDependency(string projectName, string type, string @as, string name) => AddGeneratorRegisterDependency(_projectsDriver.Projects[projectName], type, @as, name);
-
-        public void AddRuntimeRegisterDependency(string type, string @as) => AddRuntimeRegisterDependency(_projectsDriver.DefaultProject, type, @as);
-        public void AddRuntimeRegisterDependency(string type, string @as, string name) => AddRuntimeRegisterDependency(_projectsDriver.DefaultProject, type, @as, name);
-        public void AddRuntimeRegisterDependency(string projectName, string type, string @as, string name) => AddRuntimeRegisterDependency(_projectsDriver.Projects[projectName], type, @as, name);
+        public void AddRuntimeRegisterDependency(string type, string @as) => AddRuntimeRegisterDependency(_solutionDriver.DefaultProject, type, @as);
 
         private (string type, string @as) GetFullTypeAs(ProjectBuilder project, string type, string @as)
         {
             return ($"{type}, {project.ProjectName}", $"{@as}, TechTalk.SpecFlow");
-        }
-
-        public void AddGeneratorRegisterDependency(ProjectBuilder project, string type, string @as)
-        {
-            (type, @as) = GetFullTypeAs(project, type, @as);
-            project.Configuration.Generator.Value.AddRegisterDependency(type, @as);
-        }
-        public void AddGeneratorRegisterDependency(ProjectBuilder project, string type, string @as, string name)
-        {
-            (type, @as) = GetFullTypeAs(project, type, @as);
-            project.Configuration.Generator.Value.AddRegisterDependency(type, @as, name);
-        }
-
-        public void AddRuntimeRegisterDependency(ProjectBuilder project, string type, string @as, string name)
-        {
-            (type, @as) = GetFullTypeAs(project, type, @as);
-            project.Configuration.Runtime.Value.AddRegisterDependency(type, @as, name);
         }
 
         public void AddRuntimeRegisterDependency(ProjectBuilder project, string type, string @as)
@@ -112,6 +49,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
         public void SetFeatureLanguage(ProjectBuilder project, CultureInfo featureLanguage)
         {
             project.Configuration.FeatureLanguage = featureLanguage;
+        }
+
+        public void SetFeatureLanguage(string featureLanguage)
+        {
+            var featureLanguageCultureInfo = CultureInfo.GetCultureInfo(featureLanguage);
+            SetFeatureLanguage(_solutionDriver.DefaultProject, featureLanguageCultureInfo);
         }
 
         public void SetUnitTestProvider(ProjectBuilder project, string unitTestProviderName)
@@ -151,7 +94,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public void SetRuntimeObsoleteBehavior(string obsoleteBehaviorValue)
         {
-            _projectsDriver.DefaultProject.Configuration.Runtime.Value.ObsoleteBehavior = obsoleteBehaviorValue;
+            _solutionDriver.DefaultProject.Configuration.Runtime.Value.ObsoleteBehavior = obsoleteBehaviorValue;
         }
     }
 }

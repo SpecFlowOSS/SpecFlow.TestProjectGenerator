@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
@@ -9,23 +10,23 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class ProjectBuilder
     {
+        private readonly TestProjectFolders _testProjectFolders;
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         private readonly CurrentVersionDriver _currentVersionDriver;
         private Project _project;
-        private bool _parallelTestExecution = false;
+        private bool _parallelTestExecution;
 
-        public ProjectBuilder(FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, Configuration configuration, CurrentVersionDriver currentVersionDriver)
+        public ProjectBuilder(TestProjectFolders testProjectFolders, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, Configuration configuration, CurrentVersionDriver currentVersionDriver)
         {
+            _testProjectFolders = testProjectFolders;
             _featureFileGenerator = featureFileGenerator;
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
             _configurationGeneratorFactory = configurationGeneratorFactory;
             Configuration = configuration;
             _currentVersionDriver = currentVersionDriver;
             ProjectName = $"TestProject_{ProjectGuid:N}";
-
-
         }
 
         public void AddProjectReference(string projectPath, ProjectBuilder projectToReference)
@@ -59,16 +60,27 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _project.AddFile(featureFile);
         }
 
-        public void AddStepBinding(string scenarioBlock, string regex, string csharpcode, string vbnetcode)
+        public void AddStepBinding(string attributeName, string regex, string csharpcode, string vbnetcode)
         {
             EnsureProjectExists();
 
-            var methodImplementation = GetCode(_project.ProgrammingLanguage, csharpcode, vbnetcode);
+            string methodImplementation = GetCode(_project.ProgrammingLanguage, csharpcode, vbnetcode);
             var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
 
-            _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, scenarioBlock, regex));
-            _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, scenarioBlock, regex, ParameterType.Table, "tableArg"));
-            _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, scenarioBlock, regex, ParameterType.DocString, "docStringArg"));
+            _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, attributeName, regex));
+            _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, attributeName, regex, ParameterType.Table, "tableArg"));
+            _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, attributeName, regex, ParameterType.DocString, "docStringArg"));
+        }
+
+        public void AddLoggingStepBinding(string attributeName, string methodName, string pathToLogFile, string regex)
+        {
+            EnsureProjectExists();
+            
+            var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
+
+            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, pathToLogFile, attributeName, regex));
+            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, pathToLogFile, attributeName, regex, ParameterType.Table, "tableArg"));
+            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, pathToLogFile, attributeName, regex, ParameterType.DocString, "docStringArg"));
         }
 
         public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
@@ -157,7 +169,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha1", new NuGetPackageAssembly("BoDi, Version=1.4.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
             _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
 
-
+            var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
 
             switch (_project.ProgrammingLanguage)
             {
@@ -165,6 +177,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     AddInitialFSharpReferences();
                     break;
                 case ProgrammingLanguage.CSharp:
+                    _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
+
                     switch (Configuration.UnitTestProvider)
                     {
                         case UnitTestProvider.XUnit when !_parallelTestExecution:
@@ -179,8 +193,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     }
                     break;
             }
-
-
 
             if (IsSpecFlowFeatureProject)
             {

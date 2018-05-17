@@ -11,8 +11,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenera
 
         public ProjectFile GenerateStepDefinition(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType = ParameterType.Normal, string argumentName = null)
         {
-            var method = GetBindingCode(methodName, methodImplementation, attributeName, regex, parameterType, argumentName);
+            string method = GetBindingCode(methodName, methodImplementation, attributeName, regex, parameterType, argumentName);
+            return GenerateStepDefinition(method);
+        }
 
+        public ProjectFile GenerateLoggingStepDefinition(string methodName, string pathToLogFile, string attributeName, string regex, ParameterType parameterType = ParameterType.Normal, string argumentName = null)
+        {
+            string method = GetLoggingStepDefinitionCode(methodName, attributeName, regex, parameterType, argumentName);
             return GenerateStepDefinition(method);
         }
 
@@ -22,7 +27,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenera
             return GenerateBindingClassFile(hookClass);
         }
 
+        public abstract ProjectFile GenerateLoggerClass(string pathToLogFile);
+
         protected abstract string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName);
+
+        protected abstract string GetLoggingStepDefinitionCode(string methodName, string attributeName, string regex, ParameterType parameterType, string argumentName);
+
         protected abstract string GetHookBindingClass(
             string hookType,
             string name,

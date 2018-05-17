@@ -1,50 +1,41 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using FluentAssertions;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 {
     public class HooksDriver
     {
-        private readonly VSTestExecutionDriver _vsTestExecutionDriver;
+        private readonly TestProjectFolders _testProjectFolders;
 
-        public HooksDriver(VSTestExecutionDriver vsTestExecutionDriver)
+        public HooksDriver(TestProjectFolders testProjectFolders)
         {
-            _vsTestExecutionDriver = vsTestExecutionDriver;
+            _testProjectFolders = testProjectFolders;
         }
 
-        public void CheckIsHookExecuted(string methodName, int times)
+        public void CheckIsHookExecuted(string methodName, int timesExecuted)
         {
-            _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
-            var lines = GetLines(_vsTestExecutionDriver.LastTestExecutionResult.Output);
-            lines.Where(l => l == $"-> hook: {methodName}")
-                 .Should()
-                 .HaveCount(times);
+            _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
+
+            string pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
+            string content = File.ReadAllText(pathToHookLogFile);
+            content.Should().NotBeNull();
+
+            var regex = new Regex($@"-> hook: {methodName}");
+
+            regex.Matches(content).Count.Should().Be(timesExecuted);
         }
 
         public void CheckIsHookExecutedInOrder(IEnumerable<string> methodNames)
         {
-            _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
-            var lines = GetLines(_vsTestExecutionDriver.LastTestExecutionResult.Output);
+            _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
+
+            string pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
+            var lines = File.ReadAllLines(pathToHookLogFile);
             var methodNameLines = methodNames.Select(m => $"-> hook: {m}");
             lines.Should().ContainInOrder(methodNameLines);
-        }
-
-        private IEnumerable<string> GetLines(string value)
-        {
-            var lines = new List<string>();
-            using (var sr = new StringReader(value))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    lines.Add(line);
-                }
-            }
-
-            return lines;
         }
     }
 }
