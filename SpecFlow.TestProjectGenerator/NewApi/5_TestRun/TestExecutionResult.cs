@@ -8,6 +8,7 @@
         public int Pending { get; set; }
         public int Ignored { get; set; }
         public string Output { get; set; }
+        public string TrxOutput { get; set; }
         public int Executed { get; set; }
     }
 }

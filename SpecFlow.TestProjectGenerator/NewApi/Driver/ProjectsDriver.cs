@@ -82,11 +82,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 
         private void AddStepBinding(ProjectBuilder targetProject, string bindingCode)
         {
-            if (bindingCode.Contains("{0}"))
-            {
-                bindingCode = string.Format(bindingCode, _testProjectFolders.PathToSolutionDirectory);
-            }
-
             targetProject.AddStepBinding(bindingCode);
         }
 

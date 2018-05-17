@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
@@ -51,6 +52,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                                    .And.Subject.Should().Contain(text);
         }
 
+        public void CheckTrxOutputContainsText(string text)
+        {
+            LastTestExecutionResult.TrxOutput.Should().NotBeNull()
+                                   .And.Subject.Should().Contain(text);
+        }
+
         public void ExecuteTests(string tag = null)
         {
             string vsFolder = _visualStudioFinder.Find();
@@ -83,12 +90,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             var trxFile = trxFiles.Single().Substring(BeginnOfTrxFileLine.Length);
             var testResult = XDocument.Load(trxFile);
 
-            TestExecutionResult executionResult = new TestExecutionResult();
+            var executionResult = new TestExecutionResult();
 
             XmlNameTable nameTable = new NameTable();
-            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(nameTable);
+            var namespaceManager = new XmlNamespaceManager(nameTable);
             namespaceManager.AddNamespace("mstest", "http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
-
+            var unitTestExecutionResults = testResult.XPathSelectElements("mstest:TestRun/mstest:Results/mstest:UnitTestResult/mstest:Output/mstest:StdOut", namespaceManager);
             var summaryElement = testResult.XPathSelectElement("//mstest:ResultSummary/mstest:Counters", namespaceManager);
             if (summaryElement != null)
             {
@@ -99,6 +106,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Failed = int.Parse(summaryElement.Attribute("failed").Value) - executionResult.Pending;
                 executionResult.Ignored = executionResult.Total - executionResult.Executed;
                 executionResult.Output = output;
+                executionResult.TrxOutput = unitTestExecutionResults.Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c.Value)).ToString();
             }
 
             LastTestExecutionResult = executionResult;

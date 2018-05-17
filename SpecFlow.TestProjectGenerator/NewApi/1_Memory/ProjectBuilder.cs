@@ -190,6 +190,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                         case UnitTestProvider.NUnit3 when _parallelTestExecution:
                             _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.Fixtures)]"));
                             break;
+                        case UnitTestProvider.MSTest when _parallelTestExecution:
+                            _project.AddFile(new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.ClassLevel)]"));
+                            break;
                     }
                     break;
             }
@@ -210,10 +213,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 case UnitTestProvider.SpecRunWithMsTest:
                     throw new NotImplementedException();
                 case UnitTestProvider.MSTest:
-                    _project.AddNuGetPackage("MSTest.TestAdapter", "1.2.0");
+                    _project.AddNuGetPackage("MSTest.TestAdapter", "1.3.0");
                     _project.AddNuGetPackage(
                         "MSTest.TestFramework",
-                        "1.2.0",
+                        "1.3.0",
                         new NuGetPackageAssembly(
                             "Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL",
                             "net45\\Microsoft.VisualStudio.TestPlatform.TestFramework.dll"),
