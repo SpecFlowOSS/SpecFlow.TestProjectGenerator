@@ -57,7 +57,7 @@ End Class";
 
             return $@"<[{attributeName}](""{regex}"")> Public Sub {methodName}({parameter}) 
                                 
-                                    Global::Log.LogStep()
+                                    Global.Log.LogStep()
                                     {methodImplementation}
                                 End Sub";
         }
@@ -88,7 +88,7 @@ End Class";
 
             return $@"<[{attributeName}]({attributeRegex})> Public Sub {methodName}({parameter}) 
                                 
-                                    Global::Log.LogStep()
+                                    Global.Log.LogStep()
                                 End Sub";
         }
 

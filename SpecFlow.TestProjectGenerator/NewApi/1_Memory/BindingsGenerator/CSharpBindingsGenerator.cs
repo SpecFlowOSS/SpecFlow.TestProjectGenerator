@@ -61,12 +61,12 @@ internal static class Log
 
     internal static void LogStep([CallerMemberName] string stepName = null)
     {{
-        File.AppendAllText(LogFileLocation, $@""-> step: {{stepName}}"");
+        File.AppendAllText(LogFileLocation, $@""-> step: {{stepName}}{{Environment.NewLine}}"");
     }}
 
     internal static void LogHook([CallerMemberName] string stepName = null)
     {{
-        File.AppendAllText(LogFileLocation, $@""-> hook: {{stepName}}"");
+        File.AppendAllText(LogFileLocation, $@""-> hook: {{stepName}}{{Environment.NewLine}}"");
     }}
 }}";
             return new ProjectFile("Log.cs", "Compile", fileContent);
