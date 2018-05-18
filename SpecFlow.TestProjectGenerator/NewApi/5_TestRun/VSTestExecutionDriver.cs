@@ -107,6 +107,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Ignored = executionResult.Total - executionResult.Executed;
                 executionResult.Output = output;
                 executionResult.TrxOutput = unitTestExecutionResults.Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c.Value)).ToString();
+                executionResult.TestResults = testResult.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager).Select(e => new TestResult()
+                {
+                    Id = e.Attribute("executionId").Value,
+                    Outcome = e.Attribute("outcome").Value,
+                    StdOut = e.XPathSelectElement("//mstest:Output/mstest:StdOut", namespaceManager).Value
+                }).ToList();
             }
 
             LastTestExecutionResult = executionResult;
