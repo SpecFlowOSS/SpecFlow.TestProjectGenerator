@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator
@@ -27,6 +28,8 @@ type {0}() =
         public override ProjectFile GenerateLoggerClass(string pathToLogFile)
         {
             string fileContent = $@"
+namespace LocalApp
+
 open System
 open System.IO
 open System.Runtime.CompilerServices
@@ -45,12 +48,59 @@ type internal Log =
 
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)
         {
-            throw new NotImplementedException();
+            string parameter = "";
+
+            if (argumentName.IsNotNullOrWhiteSpace())
+            {
+                switch (parameterType)
+                {
+                    case ParameterType.Normal:
+                        parameter = $"{argumentName} : Object";
+                        break;
+                    case ParameterType.Table:
+                        parameter = $"{argumentName} : Table";
+                        break;
+                    case ParameterType.DocString:
+                        parameter = $"{argumentName} : string";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(parameterType), parameterType, null);
+                }
+            }
+
+            return $@"
+[<{attributeName}(@""{regex}"")>] let {methodName}({parameter}) : unit =
+    LocalApp.Log.LogStep @""{methodName}""
+    {methodImplementation}
+";
         }
 
         protected override string GetLoggingStepDefinitionCode(string methodName, string attributeName, string regex, ParameterType parameterType, string argumentName)
         {
-            throw new NotImplementedException();
+            string parameter = "";
+
+            if (argumentName.IsNotNullOrWhiteSpace())
+            {
+                switch (parameterType)
+                {
+                    case ParameterType.Normal:
+                        parameter = $"{argumentName} : Object";
+                        break;
+                    case ParameterType.Table:
+                        parameter = $"{argumentName} : Table";
+                        break;
+                    case ParameterType.DocString:
+                        parameter = $"{argumentName} : string";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(parameterType), parameterType, null);
+                }
+            }
+
+            return $@"
+[<{attributeName}(@""{regex}"")>] let {methodName}({parameter}) : unit =
+    LocalApp.Log.LogStep @""{methodName}""
+";
         }
 
         protected override string GetHookBindingClass(
