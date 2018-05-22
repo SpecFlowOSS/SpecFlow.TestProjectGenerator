@@ -49,6 +49,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         private void WriteFileReferences(Project project, XElement projectElement)
         {
+            bool created = false;
+
             var itemGroup = new XElement("ItemGroup");
             using (var xw = itemGroup.CreateWriter())
             {
@@ -57,16 +59,21 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                     foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "COMPILE"))
                     {
                         WriteFileReference(xw, file);
+                        created = true;
                     }
                 }
 
                 foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || f.BuildAction.ToUpper() == "NONE" && f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy))
                 {
                     WriteFileReference(xw, file);
+                    created = true;
                 }
             }
 
-            projectElement.Add(itemGroup);
+            if (created)
+            {
+                projectElement.Add(itemGroup);
+            }
         }
 
         private void WriteFileReference(XmlWriter xw, ProjectFile projectFile)
@@ -89,6 +96,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         private void WriteNuGetPackages(Project project, XElement projectElement)
         {
+            if (!project.NuGetPackages.Any())
+            {
+                return;
+            }
+
             var newNode = new XElement("ItemGroup");
 
             using (var xw = newNode.CreateWriter())
@@ -147,17 +159,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
             string newTargetFrameworks = project.TargetFrameworks.ToTargetFrameworkMoniker();
             targetFrameworkElement.SetValue(newTargetFrameworks);
-
-            //var targetFrameworkParentGroup = targetFrameworkNode.ParentNode ?? throw new ProjectCreationNotPossibleException();
-            //var multipleTargetFrameworksNode = doc.CreateElement("TargetFrameworks");
-            //multipleTargetFrameworksNode.InnerText = newTargetFrameworks;
-
-            //targetFrameworkParentGroup.RemoveChild(targetFrameworkNode);
-            //targetFrameworkParentGroup.AppendChild(multipleTargetFrameworksNode);
         }
 
         private void WriteAssemblyReferences(Project project, XElement projectElement)
         {
+            if (!project.References.Any())
+            {
+                return;
+            }
+
             // GAC and library references cannot be added in new Csproj format (via dotnet CLI)
             // see https://github.com/dotnet/sdk/issues/987
             // Therefore, write them manually into the project file

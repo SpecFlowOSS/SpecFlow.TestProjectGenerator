@@ -238,7 +238,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFrameworks>net45</TargetFrameworks>\r\n  </PropertyGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net45</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
@@ -251,7 +251,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFrameworks>net45</TargetFrameworks>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net45</TargetFramework>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>\r\n</Project>");
         }
 
         [Fact]
@@ -264,7 +264,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFrameworks>net45</TargetFrameworks>\r\n  </PropertyGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net45</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
@@ -279,7 +279,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should().Be("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>\r\n  </PropertyGroup>\r\n</Project>");
+            projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net45;netstandard2.0</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
