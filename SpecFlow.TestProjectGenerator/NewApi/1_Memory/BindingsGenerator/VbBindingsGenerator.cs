@@ -17,6 +17,28 @@ Public Class {0}
     {1}
 End Class";
 
+        public override ProjectFile GenerateLoggerClass(string pathToLogFile)
+        {
+            string fileContent = $@"
+Imports System
+Imports System.IO
+Imports System.Runtime.CompilerServices
+
+Friend Module Log
+    Private Const LogFileLocation As String = ""{pathToLogFile}""
+
+    Friend Sub LogStep(<CallerMemberName()> Optional stepName As String = Nothing)
+        File.AppendAllText(LogFileLocation, $""-> step: {{stepName}}{{Environment.NewLine}}"")
+    End Sub
+
+    Friend Sub LogHook(<CallerMemberName()> Optional stepName As String = Nothing)
+        File.AppendAllText(LogFileLocation, $""-> hook: {{stepName}}{{Environment.NewLine}}"")
+    End Sub
+End Module
+";
+            return new ProjectFile("Log.vb", "Compile", fileContent);
+        }
+
         public override ProjectFile GenerateBindingClassFile(string content)
         {
             return new ProjectFile($"BindingsClass_{Guid.NewGuid():N}.vb", "Compile", content);
@@ -26,11 +48,6 @@ End Class";
         {
             string randomClassName = $"BindingsClass_{Guid.NewGuid():N}";
             return new ProjectFile($"{randomClassName}.vb", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
-        }
-
-        public override ProjectFile GenerateLoggerClass(string pathToLogFile)
-        {
-            throw new NotImplementedException();
         }
 
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)
@@ -57,7 +74,7 @@ End Class";
 
             return $@"<[{attributeName}](""{regex}"")> Public Sub {methodName}({parameter}) 
                                 
-                                    Global.Log.LogStep()
+                                    Log.LogStep()
                                     {methodImplementation}
                                 End Sub";
         }
@@ -88,7 +105,7 @@ End Class";
 
             return $@"<[{attributeName}]({attributeRegex})> Public Sub {methodName}({parameter}) 
                                 
-                                    Global.Log.LogStep()
+                                    Log.LogStep()
                                 End Sub";
         }
 

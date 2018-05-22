@@ -24,10 +24,23 @@ type {0}() =
             string randomClassName = $"BindingsClass_{Guid.NewGuid():N}";
             return new ProjectFile($"{randomClassName}.fs", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
         }
-
         public override ProjectFile GenerateLoggerClass(string pathToLogFile)
         {
-            throw new NotImplementedException();
+            string fileContent = $@"
+open System
+open System.IO
+open System.Runtime.CompilerServices
+
+type internal Log =
+    static member LogFileLocation = @""{pathToLogFile}"";
+
+    static member LogStep ([<CallerMemberName>] ?stepName : string) =
+        File.AppendAllText(Log.LogFileLocation, sprintf @""-> step: %s%s"" stepName.Value Environment.NewLine)
+
+    static member LogHook([<CallerMemberName>] ?stepName : string) =
+        File.AppendAllText(Log.LogFileLocation, sprintf @""-> hook: %s%s"" stepName.Value Environment.NewLine)
+";
+            return new ProjectFile("Log.fs", "Compile", fileContent);
         }
 
         protected override string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName)

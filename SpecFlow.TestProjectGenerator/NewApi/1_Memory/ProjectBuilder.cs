@@ -170,6 +170,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
 
             var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
+            _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
 
             switch (_project.ProgrammingLanguage)
             {
@@ -177,8 +178,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     AddInitialFSharpReferences();
                     break;
                 case ProgrammingLanguage.CSharp:
-                    _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
-
                     switch (Configuration.UnitTestProvider)
                     {
                         case UnitTestProvider.XUnit when !_parallelTestExecution:
