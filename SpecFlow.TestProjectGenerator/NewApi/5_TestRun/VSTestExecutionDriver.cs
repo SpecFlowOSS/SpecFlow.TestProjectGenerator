@@ -39,7 +39,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         {
             string pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
             string logFileContent = File.ReadAllText(pathToLogFile);
-            
+
             var regex = new Regex($@"-> step: {methodName}");
 
             regex.Match(logFileContent).Success.Should().BeTrue($"method {methodName} was not executed.");
@@ -52,10 +52,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                                    .And.Subject.Should().Contain(text);
         }
 
-        public void CheckTrxOutputContainsText(string text)
+        public void CheckAnyOutputContainsText(string text)
         {
-            LastTestExecutionResult.TrxOutput.Should().NotBeNull()
-                                   .And.Subject.Should().Contain(text);
+            bool trxContainsEntry = LastTestExecutionResult.TrxOutput.Contains(text);
+            bool outputContainsEntry = LastTestExecutionResult.Output.Contains(text);
+            bool containsAtAll = trxContainsEntry || outputContainsEntry;
+            containsAtAll.Should().BeTrue($"either Trx output or program output should contain '{text}'");
         }
 
         public void ExecuteTests(string tag = null)
@@ -103,8 +105,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Executed = int.Parse(summaryElement.Attribute("executed").Value);
                 executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
                 executionResult.Pending = GetPendingCount(_testRunConfiguration, output, summaryElement, testResult, namespaceManager);
-                executionResult.Failed = int.Parse(summaryElement.Attribute("failed").Value) - executionResult.Pending;
-                executionResult.Ignored = executionResult.Total - executionResult.Executed;
+                executionResult.Failed = GetFailedCount(_testRunConfiguration, summaryElement, executionResult);
+                executionResult.Ignored = GetIgnoredCount(_testRunConfiguration, executionResult);
                 executionResult.Output = output;
                 executionResult.TrxOutput = unitTestExecutionResults.Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c.Value)).ToString();
                 executionResult.TestResults = testResult.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager).Select(e => new TestResult()
@@ -116,6 +118,28 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             }
 
             LastTestExecutionResult = executionResult;
+        }
+
+        private int GetIgnoredCount(TestRunConfiguration testRunConfiguration, TestExecutionResult executionResult)
+        {
+            switch (testRunConfiguration.UnitTestProvider)
+            {
+                case UnitTestProvider.NUnit3: return executionResult.Total - executionResult.Executed - executionResult.Pending;
+                default: return executionResult.Total - executionResult.Executed;
+            }
+            
+        }
+
+        private int GetFailedCount(TestRunConfiguration testRunConfiguration, XElement summaryElement, TestExecutionResult executionResult)
+        {
+            switch (testRunConfiguration.UnitTestProvider)
+            {
+                case UnitTestProvider.MSTest:
+                case UnitTestProvider.XUnit:
+                    return int.Parse(summaryElement.Attribute("failed").Value) - executionResult.Pending;
+                default:
+                    return int.Parse(summaryElement.Attribute("failed").Value);
+            }
         }
 
         private int GetPendingCount(TestRunConfiguration testRunConfiguration, string output, XElement summaryElement, XDocument testResult, XmlNamespaceManager namespaceManager)
@@ -138,6 +162,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
             return int.Parse(summaryElement.Attribute("inconclusive").Value);
         }
+
+
 
         private int GetXUnitPendingCount(string output)
         {
