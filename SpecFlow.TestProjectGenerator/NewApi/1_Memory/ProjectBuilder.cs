@@ -178,21 +178,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     AddInitialFSharpReferences();
                     break;
                 case ProgrammingLanguage.CSharp:
-                    switch (Configuration.UnitTestProvider)
-                    {
-                        case UnitTestProvider.XUnit when !_parallelTestExecution:
-                            _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]"));
-                            break;
-                        case UnitTestProvider.XUnit:
-                            _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
-                            break;
-                        case UnitTestProvider.NUnit3 when _parallelTestExecution:
-                            _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.Fixtures)]"));
-                            break;
-                        case UnitTestProvider.MSTest when _parallelTestExecution:
-                            _project.AddFile(new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.ClassLevel)]"));
-                            break;
-                    }
+                    AddUnitTestProviderSpecificConfig();
                     break;
             }
 
@@ -245,6 +231,29 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             _project.AddNuGetPackage("Newtonsoft.Json", "11.0.2", new NuGetPackageAssembly("Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll"));
             _project.AddNuGetPackage("FluentAssertions", "5.3.0", new NuGetPackageAssembly("FluentAssertions, Version=5.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a", @"net45\FluentAssertions.dll"));
+        }
+
+        private void AddUnitTestProviderSpecificConfig()
+        {
+            switch (Configuration.UnitTestProvider)
+            {
+                case UnitTestProvider.XUnit when !_parallelTestExecution:
+                    _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]"));
+                    break;
+                case UnitTestProvider.XUnit:
+                    _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
+                    break;
+                case UnitTestProvider.NUnit3 when _parallelTestExecution:
+                    _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.Fixtures)]"));
+                    break;
+                case UnitTestProvider.MSTest when _parallelTestExecution:
+                    _project.AddFile(
+                        new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.ClassLevel)]"));
+                    break;
+                case UnitTestProvider.MSTest when !_parallelTestExecution:
+                    _project.AddFile(new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: DoNotParallelize]"));
+                    break;
+            }
         }
 
         private string GetSpecFlowPublicAssemblyName(string assemblyName)
