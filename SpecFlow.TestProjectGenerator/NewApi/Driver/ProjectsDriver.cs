@@ -50,7 +50,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 
         private void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,  IList<string> classScopeAttributeTags = null)
         {
-            code = $"System.IO.File.AppendAllText(System.IO.Path.Combine(@\"{_testProjectFolders.PathToSolutionDirectory}\", \"hooks.log\"), \"-> hook: {name}\");{Environment.NewLine}{code}";
             project.AddHookBinding(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
