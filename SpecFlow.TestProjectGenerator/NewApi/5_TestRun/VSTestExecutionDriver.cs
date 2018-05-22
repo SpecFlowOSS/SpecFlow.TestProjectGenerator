@@ -68,7 +68,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             var vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetTestAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
 
             var processHelper = new ProcessHelper();
-            string arguments = GenereateVsTestsArguments(tag != null ? $"Category={tag}" : null);
+            string arguments = GenereateVsTestsArguments(tag != null ? $"Category={tag}|TestCategory={tag}" : null);
             ProcessResult processResult;
             try
             {
@@ -155,8 +155,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                     return GetXUnitPendingCount(output);
                 case UnitTestProvider.NUnit3:
                     var unitTestResultElements = testResult.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager);
-
-                    return unitTestResultElements.Attributes("outcome").Where(a => a.Value == "NotExecuted").Count();
+                    
+                    return unitTestResultElements
+                           .Where(r => r.Attribute("outcome")?.Value == "NotExecuted")
+                           .Where(r => r.XPathSelectElement("//mstest:Output/mstest:ErrorInfo/mstest:Message", namespaceManager)?.Value != "Ignored scenario")
+                           .Count();
 
             }
 
