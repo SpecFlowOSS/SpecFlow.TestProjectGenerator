@@ -259,7 +259,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         private string GetSpecFlowPublicAssemblyName(string assemblyName)
         {
 #if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
-            return $"{assemblyName}, Version={_currentVersionDriver.GitVersionInfo.MajorMinorPatch}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL"
+            return $"{assemblyName}, Version={_currentVersionDriver.GitVersionInfo.MajorMinorPatch}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
 #else
             return assemblyName;
 #endif

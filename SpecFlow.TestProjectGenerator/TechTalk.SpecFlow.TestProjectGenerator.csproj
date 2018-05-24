@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>../specflow.snk</AssemblyOriginatorKeyFile>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+
+    <SignAssembly>$(SpecFlow_SignAssembly)</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(SpecFlow_AssemblyOriginatorKeyFile)</AssemblyOriginatorKeyFile>
+
   </PropertyGroup>
 
   <ItemGroup>
