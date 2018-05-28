@@ -84,32 +84,32 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
             var lines = output.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             var trxFiles = FindFilePath(lines, ".trx", BeginnOfTrxFileLine);
-
+            
             if (trxFiles.Count() != 1)
                 throw new Exception("No or to many trx files in output found!" + Environment.NewLine + string.Join(Environment.NewLine, trxFiles));
 
 
             var trxFile = trxFiles.Single().Substring(BeginnOfTrxFileLine.Length);
-            var testResult = XDocument.Load(trxFile);
+            var testResultDocument = XDocument.Load(trxFile);
 
             var executionResult = new TestExecutionResult();
 
             XmlNameTable nameTable = new NameTable();
             var namespaceManager = new XmlNamespaceManager(nameTable);
             namespaceManager.AddNamespace("mstest", "http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
-            var unitTestExecutionResults = testResult.XPathSelectElements("mstest:TestRun/mstest:Results/mstest:UnitTestResult/mstest:Output/mstest:StdOut", namespaceManager);
-            var summaryElement = testResult.XPathSelectElement("//mstest:ResultSummary/mstest:Counters", namespaceManager);
+            var unitTestExecutionResults = testResultDocument.XPathSelectElements("mstest:TestRun/mstest:Results/mstest:UnitTestResult/mstest:Output/mstest:StdOut", namespaceManager);
+            var summaryElement = testResultDocument.XPathSelectElement("//mstest:ResultSummary/mstest:Counters", namespaceManager);
             if (summaryElement != null)
             {
                 executionResult.Total = int.Parse(summaryElement.Attribute("total").Value);
                 executionResult.Executed = int.Parse(summaryElement.Attribute("executed").Value);
                 executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
-                executionResult.Pending = GetPendingCount(_testRunConfiguration, output, summaryElement, testResult, namespaceManager);
+                executionResult.Ignored = GetIgnoredCount(_testRunConfiguration, testResultDocument, executionResult, namespaceManager);
+                executionResult.Pending = GetPendingCount(_testRunConfiguration, testResultDocument, executionResult, output, summaryElement, namespaceManager);
                 executionResult.Failed = GetFailedCount(_testRunConfiguration, summaryElement, executionResult);
-                executionResult.Ignored = GetIgnoredCount(_testRunConfiguration, executionResult);
                 executionResult.Output = output;
                 executionResult.TrxOutput = unitTestExecutionResults.Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c.Value)).ToString();
-                executionResult.TestResults = testResult.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager).Select(e => new TestResult()
+                executionResult.TestResults = testResultDocument.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager).Select(e => new TestResult()
                 {
                     Id = e.Attribute("executionId").Value,
                     Outcome = e.Attribute("outcome").Value,
@@ -120,11 +120,21 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             LastTestExecutionResult = executionResult;
         }
 
-        private int GetIgnoredCount(TestRunConfiguration testRunConfiguration, TestExecutionResult executionResult)
+        private int GetIgnoredCount(TestRunConfiguration testRunConfiguration, XDocument testResultDocument, TestExecutionResult executionResult, XmlNamespaceManager namespaceManager)
         {
             switch (testRunConfiguration.UnitTestProvider)
             {
-                case UnitTestProvider.NUnit3: return executionResult.Total - executionResult.Executed - executionResult.Pending;
+                case UnitTestProvider.NUnit3:
+                    var unitTestResultElements = testResultDocument.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager);
+                    
+                    var elements = from resultElement in unitTestResultElements
+                                   where resultElement.Attribute("outcome")?.Value == "NotExecuted"
+                                   let messageElement = resultElement.XPathSelectElement("//mstest:Output/mstest:ErrorInfo/mstest:Message", namespaceManager)
+                                   where messageElement?.Value.Contains("Ignored scenario") == true
+                                         || messageElement?.Value.Contains("Ignored feature") == true
+                                   select resultElement;
+
+                    return elements.Count();
                 default: return executionResult.Total - executionResult.Executed;
             }
             
@@ -142,25 +152,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             }
         }
 
-        private int GetPendingCount(TestRunConfiguration testRunConfiguration, string output, XElement summaryElement, XDocument testResult, XmlNamespaceManager namespaceManager)
+        private int GetPendingCount(TestRunConfiguration testRunConfiguration, XDocument testResultDocument, TestExecutionResult executionResult, string output, XElement summaryElement, XmlNamespaceManager namespaceManager)
         {
             switch (testRunConfiguration.UnitTestProvider)
             {
                 case UnitTestProvider.MSTest:
-                    var unitTestResultMessageElements = testResult.XPathSelectElements("//mstest:Results/mstest:UnitTestResult/mstest:Output/mstest:ErrorInfo/mstest:Message", namespaceManager);
+                    var unitTestResultMessageElements = testResultDocument.XPathSelectElements("//mstest:Results/mstest:UnitTestResult/mstest:Output/mstest:ErrorInfo/mstest:Message", namespaceManager);
 
                     return unitTestResultMessageElements.Where(e => e.Value.Contains("Microsoft.VisualStudio.TestTools.UnitTesting.AssertInconclusiveException")).Count();
 
                 case UnitTestProvider.XUnit:
                     return GetXUnitPendingCount(output);
                 case UnitTestProvider.NUnit3:
-                    var unitTestResultElements = testResult.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager);
-                    
-                    return unitTestResultElements
-                           .Where(r => r.Attribute("outcome")?.Value == "NotExecuted")
-                           .Where(r => r.XPathSelectElement("//mstest:Output/mstest:ErrorInfo/mstest:Message", namespaceManager)?.Value != "Ignored scenario")
-                           .Count();
-
+                    return executionResult.Total - executionResult.Executed - executionResult.Ignored;
             }
 
             return int.Parse(summaryElement.Attribute("inconclusive").Value);
