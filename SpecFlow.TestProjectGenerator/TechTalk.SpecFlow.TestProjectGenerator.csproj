@@ -23,7 +23,6 @@
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="4.19.4" />
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" />
     <PackageReference Include="Microsoft.Build" Version="15.7.179" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.7.179" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
