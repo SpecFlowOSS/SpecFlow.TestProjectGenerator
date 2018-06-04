@@ -190,7 +190,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             
             _projectCompilerHelper.SaveFileFromResourceTemplate(inputProjectDriver.ProjectFolder, "packages.config", "packages.config", new Dictionary<string, string>()
             {
-                {"NuGetVersion", _currentVersionDriver.GitVersionInfo.NuGetVersion},
+                {"NuGetVersion", _currentVersionDriver.NuGetVersion},
                 {"TestingFrameworkPackage", inputProjectDriver.TestingFrameworkPackage}
             });
 

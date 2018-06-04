@@ -167,7 +167,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             _project = new Project(ProjectName, ProjectGuid, Language, TargetFrameworks, Format);
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha1", new NuGetPackageAssembly("BoDi, Version=1.4.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
-            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
+            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
 
             var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
             _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
@@ -184,7 +184,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             if (IsSpecFlowFeatureProject)
             {
-                _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", _currentVersionDriver.GitVersionInfo.NuGetVersion);
+                _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", _currentVersionDriver.NuGetVersion);
             }
 
             switch (Configuration.UnitTestProvider)
@@ -216,7 +216,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     _project.AddNuGetPackage("xunit.assert", "2.3.1", new NuGetPackageAssembly("xunit.assert, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
                     _project.AddNuGetPackage("xunit.abstractions", "2.0.1", new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
                     _project.AddNuGetPackage("xunit.runner.visualstudio", "2.3.1");
-                    _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.GitVersionInfo.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
+                    _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
                     Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.xUnit", SpecFlowPluginType.Runtime));
                     break;
                 case UnitTestProvider.NUnit3:
