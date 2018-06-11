@@ -231,6 +231,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             _project.AddNuGetPackage("Newtonsoft.Json", "11.0.2", new NuGetPackageAssembly("Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll"));
             _project.AddNuGetPackage("FluentAssertions", "5.3.0", new NuGetPackageAssembly("FluentAssertions, Version=5.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a", @"net45\FluentAssertions.dll"));
+
+            AddAdditionalStuff();
+        }
+
+        protected virtual void AddAdditionalStuff()
+        {
+            
         }
 
         private void AddUnitTestProviderSpecificConfig()
@@ -259,7 +266,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         private string GetSpecFlowPublicAssemblyName(string assemblyName)
         {
 #if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
-            return $"{assemblyName}, Version={_currentVersionDriver.GitVersionInfo.MajorMinorPatch}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
+            return $"{assemblyName}, Version={_currentVersionDriver.SpecFlowVersion}, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
 #else
             return assemblyName;
 #endif
