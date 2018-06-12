@@ -15,7 +15,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
-        private readonly CurrentVersionDriver _currentVersionDriver;
+        protected readonly CurrentVersionDriver _currentVersionDriver;
         private readonly Folders _folders;
         private Project _project;
         private bool _parallelTestExecution;
@@ -195,14 +195,31 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             if (IsSpecFlowFeatureProject)
             {
-                _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", _currentVersionDriver.SpecFlowNuGetVersion);
+                if (_currentVersionDriver.SpecFlowVersion >= new Version(2, 3, 0))
+                {
+                    _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", _currentVersionDriver.SpecFlowNuGetVersion);
+                }
+                else
+                {
+                    _project.AddMSBuildImport($"..\\packages\\SpecFlow.{_currentVersionDriver.SpecFlowVersion}\\tools\\TechTalk.SpecFlow.targets");
+                }
+
+                if (_currentVersionDriver.SpecFlowVersion < new Version(3, 0, 0))
+                {
+                    AddMSBuildTarget("AfterUpdateFeatureFilesInProject", @"<ItemGroup>
+                                                                          <Compile Include=""@(SpecFlowGeneratedFiles)"" />
+                                                                       </ItemGroup>");
+                }
+
+                
+
             }
 
             switch (Configuration.UnitTestProvider)
             {
                 case UnitTestProvider.SpecRun:
                     _project.AddNuGetPackage("SpecRun.Runner", _currentVersionDriver.NuGetVersion);
-                    _project.AddNuGetPackage("SpecRun.SpecFlow.2-4-0", _currentVersionDriver.NuGetVersion, 
+                    _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion, 
                         new NuGetPackageAssembly($"SpecRun.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.SpecFlowPlugin.dll"), 
                         new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL", "net45\\TechTalk.SpecRun.dll"),
                         new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL", "net45\\TechTalk.SpecRun.Common.dll")

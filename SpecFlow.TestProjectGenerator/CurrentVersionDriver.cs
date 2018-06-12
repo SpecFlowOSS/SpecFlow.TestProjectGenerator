@@ -12,23 +12,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             {
                 var specFlowVersion = specFlowAssembly.GetName().Version;
 
-                
-
-                SpecFlowMajor = specFlowVersion.Major;
-                SpecFlowMinor = specFlowVersion.Minor;
-
-                SpecFlowVersion = $"{specFlowVersion.Major}.{specFlowVersion.Minor}.0";
-                SpecFlowVersionDash = $"{specFlowVersion.Major}-{specFlowVersion.Minor}-0";
+                SpecFlowVersion = new Version(specFlowVersion.Major, specFlowVersion.Minor, 0, 0);
             }
         }
 
-        public string SpecFlowVersionDash { get; private set; }
+        public string SpecFlowVersionDash => SpecFlowVersion.ToString().Replace(".", "-");
 
-        public string SpecFlowVersion { get; private set; }
-        public int SpecFlowMajor { get; set; }
-        public int SpecFlowMinor { get; set; }
+        public Version SpecFlowVersion { get; set; }
+
         public string SpecFlowNuGetVersion { get; set; }
         public string NuGetVersion { get; set; }
         public string MajorMinorPatchVersion { get; set; }
+
+
+
     }
 }
