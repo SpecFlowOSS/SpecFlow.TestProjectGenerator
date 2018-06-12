@@ -34,6 +34,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         }
 
         public TestExecutionResult LastTestExecutionResult { get; private set; }
+        public string RunSettingsFile { get; set; }
 
         public void CheckIsBindingMethodExecuted(string methodName, int timesExecuted)
         {
@@ -60,7 +61,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             containsAtAll.Should().BeTrue($"either Trx output or program output should contain '{text}'");
         }
 
-        public void ExecuteTests(string tag = null)
+        public TestExecutionResult ExecuteTests(string tag = null)
         {
             string vsFolder = _visualStudioFinder.Find();
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
@@ -84,10 +85,18 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
             var lines = output.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             var trxFiles = FindFilePath(lines, ".trx", BeginnOfTrxFileLine);
-            
+            var logFiles = FindFilePath(lines, ".log", BeginnOfLogFileLine);
+
             if (trxFiles.Count() != 1)
                 throw new Exception("No or to many trx files in output found!" + Environment.NewLine + string.Join(Environment.NewLine, trxFiles));
 
+            string logFileContent = String.Empty;
+            if (logFiles.Count() == 1)
+            {
+                logFileContent = File.ReadAllText(new Uri(logFiles.Single().Substring(BeginnOfLogFileLine.Length)).LocalPath);
+            }
+
+            var reportFiles = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(i => i.StartsWith("Report file:")).Select(i => i.Substring("Report file: ".Length)).ToList();
 
             var trxFile = trxFiles.Single().Substring(BeginnOfTrxFileLine.Length);
             var testResultDocument = XDocument.Load(trxFile);
@@ -115,9 +124,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                     Outcome = e.Attribute("outcome").Value,
                     StdOut = e.XPathSelectElement("//mstest:Output/mstest:StdOut", namespaceManager).Value
                 }).ToList();
+                executionResult.ReportFiles = reportFiles;
+                executionResult.LogFileContent = logFileContent;
             }
 
             LastTestExecutionResult = executionResult;
+
+            return executionResult;
         }
 
         private int GetIgnoredCount(TestRunConfiguration testRunConfiguration, XDocument testResultDocument, TestExecutionResult executionResult, XmlNamespaceManager namespaceManager)
@@ -199,6 +212,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             if (filter.IsNotNullOrEmpty())
             {
                 arguments += $" /TestCaseFilter:{filter}";
+            }
+
+            if (RunSettingsFile.IsNotNullOrWhiteSpace())
+            {
+                arguments += $" /Settings:{RunSettingsFile}";
             }
 
             return arguments;

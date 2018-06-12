@@ -27,6 +27,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public string SpecFlowVersion { get; private set; }
         public int SpecFlowMajor { get; set; }
         public int SpecFlowMinor { get; set; }
+        public string SpecFlowNuGetVersion { get; set; }
         public string NuGetVersion { get; set; }
+        public string MajorMinorPatchVersion { get; set; }
     }
 }

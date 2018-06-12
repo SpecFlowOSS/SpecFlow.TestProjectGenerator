@@ -14,6 +14,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         public int Executed { get; set; }
 
         public List<TestResult> TestResults { get; set; }
+        public List<string> ReportFiles { get; set; }
+        public int Warning { get; set; }
+        public string LogFileContent { get; set; }
     }
 
     public class TestResult

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
@@ -48,7 +49,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
                 WriteLanguageTargets(xw, project);
 
+                
+
                 WriteNuGetPackageTargetImports(xw, project);
+
+                WriteMSBuildTargets(xw, project);
 
                 // close project tag
                 xw.WriteEndElement();
@@ -56,6 +61,21 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
 
             return projFilePath;
+        }
+
+        private void WriteMSBuildTargets(XmlWriter xmlWriter, Project project)
+        {
+            foreach (var msBuildTarget in project.MSBuildTargets)
+            {
+                xmlWriter.WriteStartElement("Target");
+                xmlWriter.WriteAttributeString("Name", msBuildTarget.Name);
+
+                xmlWriter.WriteRaw(msBuildTarget.Implementation);
+
+                xmlWriter.WriteEndElement();
+            }
+
+             
         }
 
         public void WriteReferences(Project project, string projectFilePath)
