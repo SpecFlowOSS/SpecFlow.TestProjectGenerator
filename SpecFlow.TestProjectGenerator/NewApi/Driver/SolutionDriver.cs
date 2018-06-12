@@ -107,15 +107,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 
             var solutionWriter = new SolutionWriter(_outputWriter);
             solutionWriter.WriteToFileSystem(_solution, _testProjectFolders.PathToSolutionDirectory);
-            // TODO: search all projects for unit tests
-            var proj = _solution.Projects.First();
-
-            _testProjectFolders.ProjectFolder = Path.Combine(_testProjectFolders.PathToSolutionDirectory, proj.Name);
-            _testProjectFolders.ProjectBinOutputPath = Path.Combine(_testProjectFolders.ProjectFolder, GetProjectCompilePath(proj));
-            _testProjectFolders.TestAssemblyFileName = $"{proj.Name}.dll";
-            _testProjectFolders.PathToNuGetPackages = proj.ProjectFormat == ProjectFormat.Old
-                ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages")
-                : _folders.GlobalPackages;
+            
 
             _isWrittenOnDisk = true;
         }
@@ -126,15 +118,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
             _compileResult.IsSuccessful.Should().BeTrue("the project should have compiled successfully.\r\n\r\n------ Build output ------\r\n{0}", _compileResult.Output);
         }
 
-        private string GetProjectCompilePath(Project project)
-        {
-            // TODO: hardcoded "Debug" value should be replaced by a configuration parameter
-            if (project.ProjectFormat == ProjectFormat.New)
-            {
-                return Path.Combine("bin", "Debug", project.TargetFrameworks.ToTargetFrameworkMoniker().Split(';')[0]);
-            }
-
-            return Path.Combine("bin", "Debug");
-        }
+       
     }
 }

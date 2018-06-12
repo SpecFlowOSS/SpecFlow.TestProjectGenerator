@@ -13,6 +13,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
         private readonly List<ProjectFile> _files = new List<ProjectFile>();
 
+        private readonly List<MSBuildTarget> _msBuildTargets = new List<MSBuildTarget>();
+
         public Project(string name, Guid projectGuid, ProgrammingLanguage programmingLanguage, TargetFramework targetFrameworks, ProjectFormat projectFormat, ProjectType projectType = ProjectType.Library)
         {
             ProgrammingLanguage = programmingLanguage;
@@ -47,6 +49,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public IReadOnlyList<Reference> References => _references;
         public IReadOnlyList<ProjectFile> Files => _files;
 
+        public IReadOnlyList<MSBuildTarget> MSBuildTargets => _msBuildTargets;
+
         public void AddNuGetPackage(string name, string version, params NuGetPackageAssembly[] assemblies)
         {
             _nuGetPackages.Add(new NuGetPackage(name, version, assemblies));
@@ -65,6 +69,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public void AddProjectReference(string fullPath, ProjectBuilder projectToReference)
         {
             _projectReferences.Add(new ProjectReference(fullPath, projectToReference));
+        }
+
+        public void AddTarget(string targetName, string implementation)
+        {
+            _msBuildTargets.Add(new MSBuildTarget(targetName, implementation));     
         }
     }
 }

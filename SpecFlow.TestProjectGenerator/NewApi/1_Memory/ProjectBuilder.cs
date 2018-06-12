@@ -5,20 +5,22 @@ using TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
+using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class ProjectBuilder
     {
-        private readonly TestProjectFolders _testProjectFolders;
+        protected readonly TestProjectFolders _testProjectFolders;
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         private readonly CurrentVersionDriver _currentVersionDriver;
+        private readonly Folders _folders;
         private Project _project;
         private bool _parallelTestExecution;
 
-        public ProjectBuilder(TestProjectFolders testProjectFolders, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, Configuration configuration, CurrentVersionDriver currentVersionDriver)
+        public ProjectBuilder(TestProjectFolders testProjectFolders, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory, ConfigurationGeneratorFactory configurationGeneratorFactory, Configuration configuration, CurrentVersionDriver currentVersionDriver, Folders folders)
         {
             _testProjectFolders = testProjectFolders;
             _featureFileGenerator = featureFileGenerator;
@@ -26,6 +28,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _configurationGeneratorFactory = configurationGeneratorFactory;
             Configuration = configuration;
             _currentVersionDriver = currentVersionDriver;
+            _folders = folders;
             ProjectName = $"TestProject_{ProjectGuid:N}";
         }
 
@@ -166,8 +169,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
 
             _project = new Project(ProjectName, ProjectGuid, Language, TargetFrameworks, Format);
+
+
+            _testProjectFolders.ProjectFolder = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _project.Name);
+            _testProjectFolders.ProjectBinOutputPath = Path.Combine(_testProjectFolders.ProjectFolder, GetProjectCompilePath(_project));
+            _testProjectFolders.TestAssemblyFileName = $"{_project.Name}.dll";
+            _testProjectFolders.PathToNuGetPackages = _project.ProjectFormat == ProjectFormat.Old  ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages") : _folders.GlobalPackages;
+            _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
+
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha1", new NuGetPackageAssembly("BoDi, Version=1.4.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
-            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
+            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
 
             var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
             _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
@@ -184,13 +195,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             if (IsSpecFlowFeatureProject)
             {
-                _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", _currentVersionDriver.NuGetVersion);
+                _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", _currentVersionDriver.SpecFlowNuGetVersion);
             }
 
             switch (Configuration.UnitTestProvider)
             {
                 case UnitTestProvider.SpecRun:
-                    throw new NotImplementedException();
+                    _project.AddNuGetPackage("SpecRun.Runner", _currentVersionDriver.NuGetVersion);
+                    _project.AddNuGetPackage("SpecRun.SpecFlow.2-4-0", _currentVersionDriver.NuGetVersion, 
+                        new NuGetPackageAssembly($"SpecRun.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.SpecFlowPlugin.dll"), 
+                        new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL", "net45\\TechTalk.SpecRun.dll"),
+                        new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL", "net45\\TechTalk.SpecRun.Common.dll")
+                        );
+                    Configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
+                    break;
                 case UnitTestProvider.SpecRunWithNUnit:
                     throw new NotImplementedException();
                 case UnitTestProvider.SpecRunWithNUnit2:
@@ -216,7 +234,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     _project.AddNuGetPackage("xunit.assert", "2.3.1", new NuGetPackageAssembly("xunit.assert, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
                     _project.AddNuGetPackage("xunit.abstractions", "2.0.1", new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
                     _project.AddNuGetPackage("xunit.runner.visualstudio", "2.3.1");
-                    _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
+                    _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
                     Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.xUnit", SpecFlowPluginType.Runtime));
                     break;
                 case UnitTestProvider.NUnit3:
@@ -266,7 +284,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         private string GetSpecFlowPublicAssemblyName(string assemblyName)
         {
 #if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
-            return $"{assemblyName}, Version={_currentVersionDriver.SpecFlowVersion}, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
+            return $"{assemblyName}, Version={_currentVersionDriver.SpecFlowVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
 #else
             return assemblyName;
 #endif
@@ -275,6 +293,22 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public void EnableParallelTestExecution()
         {
             _parallelTestExecution = true;
+        }
+
+        private string GetProjectCompilePath(Project project)
+        {
+            // TODO: hardcoded "Debug" value should be replaced by a configuration parameter
+            if (project.ProjectFormat == ProjectFormat.New)
+            {
+                return Path.Combine("bin", "Debug", project.TargetFrameworks.ToTargetFrameworkMoniker().Split(';')[0]);
+            }
+
+            return Path.Combine("bin", "Debug");
+        }
+
+        public void AddMSBuildTarget(string targetName, string implementation)
+        {
+            _project.AddTarget(targetName, implementation);
         }
     }
 }

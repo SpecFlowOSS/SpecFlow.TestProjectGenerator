@@ -7,14 +7,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class ProjectBuilderFactory
     {
-        private readonly FeatureFileGenerator _featureFileGenerator;
-        private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
-        private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
-        private readonly CurrentVersionDriver _currentVersionDriver;
-        private readonly TestProjectFolders _testProjectFolders;
-        private readonly TestRunConfiguration _testRunConfiguration;
+        protected readonly FeatureFileGenerator _featureFileGenerator;
+        protected readonly Folders _folders;
+        protected readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
+        protected readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
+        protected readonly CurrentVersionDriver _currentVersionDriver;
+        protected readonly TestProjectFolders _testProjectFolders;
+        protected readonly TestRunConfiguration _testRunConfiguration;
 
-        public ProjectBuilderFactory(TestProjectFolders testProjectFolders, TestRunConfiguration testRunConfiguration, CurrentVersionDriver currentVersionDriver, ConfigurationGeneratorFactory configurationGeneratorFactory, BindingsGeneratorFactory bindingsGeneratorFactory, FeatureFileGenerator featureFileGenerator)
+        public ProjectBuilderFactory(TestProjectFolders testProjectFolders, TestRunConfiguration testRunConfiguration, CurrentVersionDriver currentVersionDriver, ConfigurationGeneratorFactory configurationGeneratorFactory, BindingsGeneratorFactory bindingsGeneratorFactory, FeatureFileGenerator featureFileGenerator,
+            Folders folders)
         {
             _testProjectFolders = testProjectFolders;
             _testRunConfiguration = testRunConfiguration;
@@ -22,6 +24,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _configurationGeneratorFactory = configurationGeneratorFactory;
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
             _featureFileGenerator = featureFileGenerator;
+            _folders = folders;
         }
 
         public ProjectBuilder CreateProject(string language)
@@ -56,12 +59,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
         private ProjectBuilder CreateProjectInternal(string projectName, ProgrammingLanguage language)
         {
-            var project = new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, new Configuration(), _currentVersionDriver)
-            {
-                Language = language,
-                Format = _testRunConfiguration.ProjectFormat,
-                TargetFrameworks = _testRunConfiguration.TargetFramework,
-            };
+            var project = CreateProjectBuilder();
+            project.TargetFrameworks = _testRunConfiguration.TargetFramework;
+            project.Format = _testRunConfiguration.ProjectFormat;
+            project.Language = language;
 
             project.Configuration.UnitTestProvider = _testRunConfiguration.UnitTestProvider;
 
@@ -71,6 +72,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             }
 
             return project;
+        }
+
+        protected virtual ProjectBuilder CreateProjectBuilder()
+        {
+            return new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, new Configuration(), _currentVersionDriver, _folders);
         }
     }
 }

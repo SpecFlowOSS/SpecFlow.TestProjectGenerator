@@ -25,7 +25,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._4_Compile
 
             if (msBuildProcess.ExitCode == 0)
             {
-                _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
+                
             }
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);

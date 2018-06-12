@@ -10,5 +10,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi
         public TargetFramework TargetFramework { get; set; }
 
         public UnitTestProvider UnitTestProvider { get; set; }
+        public string SpecFlowVersion { get; set; }
     }
 }
