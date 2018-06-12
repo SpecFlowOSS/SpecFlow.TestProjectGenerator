@@ -53,7 +53,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
                 WriteNuGetPackageTargetImports(xw, project);
 
+                WriteMSBuildImports(xw, project);
                 WriteMSBuildTargets(xw, project);
+                
 
                 // close project tag
                 xw.WriteEndElement();
@@ -61,6 +63,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
             }
 
             return projFilePath;
+        }
+
+        private void WriteMSBuildImports(XmlWriter xmlWriter, Project project)
+        {
+            foreach (var msBuildImport in project.MSBuildImports)
+            {
+                WriteMSBuildImport(xmlWriter, msBuildImport.MsbuildTargetFile);
+            }
         }
 
         private void WriteMSBuildTargets(XmlWriter xmlWriter, Project project)

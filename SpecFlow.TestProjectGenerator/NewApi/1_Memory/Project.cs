@@ -14,6 +14,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         private readonly List<ProjectFile> _files = new List<ProjectFile>();
 
         private readonly List<MSBuildTarget> _msBuildTargets = new List<MSBuildTarget>();
+        private readonly List<MSBuildImport> _msbuildImports = new List<MSBuildImport>();
 
         public Project(string name, Guid projectGuid, ProgrammingLanguage programmingLanguage, TargetFramework targetFrameworks, ProjectFormat projectFormat, ProjectType projectType = ProjectType.Library)
         {
@@ -50,6 +51,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public IReadOnlyList<ProjectFile> Files => _files;
 
         public IReadOnlyList<MSBuildTarget> MSBuildTargets => _msBuildTargets;
+        public IReadOnlyList<MSBuildImport> MSBuildImports => _msbuildImports;
 
         public void AddNuGetPackage(string name, string version, params NuGetPackageAssembly[] assemblies)
         {
@@ -74,6 +76,21 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public void AddTarget(string targetName, string implementation)
         {
             _msBuildTargets.Add(new MSBuildTarget(targetName, implementation));     
+        }
+
+        public void AddMSBuildImport(string msbuildTargetFile)
+        {
+            _msbuildImports.Add(new MSBuildImport(msbuildTargetFile));
+        }
+    }
+
+    public class MSBuildImport
+    {
+        public string MsbuildTargetFile { get; }
+
+        public MSBuildImport(string msbuildTargetFile)
+        {
+            MsbuildTargetFile = msbuildTargetFile;
         }
     }
 }
