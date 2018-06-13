@@ -24,6 +24,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
                     writer.WriteStartElement("configuration");
 
                     WriteConfigSections(writer, configuration.AppConfigSection);
+
+                    WriteAppSettings(writer, configuration);
+
                     WriteSpecFlow(writer, configuration);
 
                     writer.WriteEndElement();
@@ -32,6 +35,21 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
                     return _projectFileFactory.FromStream(ms, "app.config", "None", Encoding.UTF8);
                 }
             }
+        }
+
+        private void WriteAppSettings(XmlWriter writer, Configuration configuration)
+        {
+            writer.WriteStartElement("appSettings");
+
+            foreach (var configurationAppSetting in configuration.AppSettings)
+            {
+                writer.WriteStartElement("add");
+                writer.WriteAttributeString("key", configurationAppSetting.key);
+                writer.WriteAttributeString("value", configurationAppSetting.value);
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
         }
 
         private void WriteSpecFlow(XmlWriter writer, Configuration configuration)

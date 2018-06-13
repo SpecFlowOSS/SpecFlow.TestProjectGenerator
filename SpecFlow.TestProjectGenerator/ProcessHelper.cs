@@ -25,7 +25,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
     public class ProcessHelper
     {
-        private static TimeSpan _timeout = TimeSpan.FromMinutes(10);
+        private static TimeSpan _timeout = TimeSpan.FromMinutes(15);
         private static readonly int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
 
         public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
