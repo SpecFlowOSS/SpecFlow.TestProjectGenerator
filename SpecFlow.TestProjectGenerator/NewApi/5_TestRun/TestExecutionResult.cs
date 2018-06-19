@@ -28,6 +28,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         public string Title { get; set; }
         public string Feature { get; set; }
         public int ScheduleOrder { get; set; }
+        public List<TestStepResult> Steps { get; set; }
+    }
 
+    public class TestStepResult
+    {
+        public string Step { get; set; }
+        public string Error { get; set; }
+        public string Result { get; set; }
     }
 }

@@ -61,12 +61,22 @@ internal static class Log
 
     internal static void LogStep([CallerMemberName] string stepName = null)
     {{
-        File.AppendAllText(LogFileLocation, $@""-> step: {{stepName}}{{Environment.NewLine}}"");
+        WriteToFile($@""-> step: {{stepName}}{{Environment.NewLine}}"");
     }}
 
     internal static void LogHook([CallerMemberName] string stepName = null)
     {{
-        File.AppendAllText(LogFileLocation, $@""-> hook: {{stepName}}{{Environment.NewLine}}"");
+        WriteToFile($@""-> hook: {{stepName}}{{Environment.NewLine}}"");
+    }}
+
+    static void WriteToFile(string line)
+    {{
+        using (FileStream fs = File.Open(LogFileLocation, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+        {{
+            byte[] bytes = System.Text.Encoding.ASCII.GetBytes(line);
+            fs.Write(bytes, 0, bytes.Length);
+            fs.Close();
+        }}
     }}
 }}";
             return new ProjectFile("Log.cs", "Compile", fileContent);

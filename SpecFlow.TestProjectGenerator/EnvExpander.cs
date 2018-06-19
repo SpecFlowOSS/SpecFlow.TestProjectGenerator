@@ -29,7 +29,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     var longPath = new StringBuilder(255);
                     GetLongPathName(envVarValue, longPath, longPath.Capacity);
 
-                    result = result.Replace(envVariableName, longPath.ToString());
+                    result = result.Replace(envVariableName, longPath.ToString().Replace("\\", "\\\\"));
                 }
             }
 
