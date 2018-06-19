@@ -208,6 +208,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                         new NuGetPackageAssembly(
                             "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL",
                             "net45\\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll"));
+                    _project.AddNuGetPackage("SpecFlow.MSTest", _currentVersionDriver.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"));
+                    Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.MSTest", SpecFlowPluginType.Runtime));
                     break;
                 case UnitTestProvider.XUnit:
                     _project.AddNuGetPackage("xunit.core", "2.3.1");
@@ -222,9 +224,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 case UnitTestProvider.NUnit3:
                     _project.AddNuGetPackage("NUnit", "3.8.1", new NuGetPackageAssembly("nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL", "net45\\nunit.framework.dll"));
                     _project.AddNuGetPackage("NUnit3TestAdapter", "3.8.0");
+                    _project.AddNuGetPackage("SpecFlow.NUnit", _currentVersionDriver.NuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"));
+                    Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.NUnit", SpecFlowPluginType.Runtime));
                     break;
-                case UnitTestProvider.NUnit2:
-                    throw new NotImplementedException();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
