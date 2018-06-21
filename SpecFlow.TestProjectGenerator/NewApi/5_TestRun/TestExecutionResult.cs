@@ -17,7 +17,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         public List<string> ReportFiles { get; set; }
         public int Warning { get; set; }
         public string LogFileContent { get; set; }
-        
+        public bool ValidLicense { get; set; }
     }
 
     public class TestResult

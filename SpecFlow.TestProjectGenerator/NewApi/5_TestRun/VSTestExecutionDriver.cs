@@ -96,12 +96,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 logFileContent = File.ReadAllText(new Uri(logFiles.Single().Substring(BeginnOfLogFileLine.Length)).LocalPath);
             }
 
-            var reportFiles = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(i => i.StartsWith("Report file:")).Select(i => i.Substring("Report file: ".Length)).ToList();
+            var reportFiles = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(i => i.StartsWith("Report file:")).Select(i => i.Substring("Report file: ".Length)).Select(i => new Uri(i).AbsolutePath).ToList();
 
             var trxFile = trxFiles.Single().Substring(BeginnOfTrxFileLine.Length);
             var testResultDocument = XDocument.Load(trxFile);
 
-            var executionResult = new TestExecutionResult();
+            var executionResult = new TestExecutionResult()
+            {
+                ValidLicense = false //not possible to check license with VSTest execution
+            };
 
             XmlNameTable nameTable = new NameTable();
             var namespaceManager = new XmlNamespaceManager(nameTable);

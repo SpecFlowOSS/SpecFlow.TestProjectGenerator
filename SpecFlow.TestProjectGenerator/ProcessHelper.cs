@@ -32,7 +32,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             var parameters = string.Format(argumentsFormat, arguments);
 
-            outputWriter.WriteLine("Starting external program: \"{0}\" {1}", executablePath, parameters);
+            outputWriter.WriteLine("Starting external program: \"{0}\" {1} in {2}", executablePath, parameters, workingDirectory);
             var psi = CreateProcessStartInfo(workingDirectory, executablePath, parameters);
 
 
