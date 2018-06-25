@@ -16,7 +16,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern int GetLongPathName(string path, StringBuilder longPath, int longPathLength);
 
-        public static string ExpandEnvironmentWithLongFilenames(string text)
+        public static string ExpandEnvironmentWithLongFilenames(string text, bool escapeBackslash = true)
         {
             var result = text;
             foreach (var envVariablesWithPath in _envVariablesWithPaths)
@@ -29,7 +29,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     var longPath = new StringBuilder(255);
                     GetLongPathName(envVarValue, longPath, longPath.Capacity);
 
-                    result = result.Replace(envVariableName, longPath.ToString().Replace("\\", "\\\\"));
+                    if (escapeBackslash)
+                    {
+                        result = result.Replace(envVariableName, longPath.ToString().Replace("\\", "\\\\"));
+                    }
                 }
             }
 
