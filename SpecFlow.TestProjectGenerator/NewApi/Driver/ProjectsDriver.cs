@@ -104,5 +104,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
         {
             _solutionDriver.DefaultProject.EnableParallelTestExecution();
         }
+
+        public void AddNuGetPackage(string nugetPackage, string nugetVersion)
+        {
+            _solutionDriver.DefaultProject.AddNuGetPackage(nugetPackage, nugetVersion);
+        }
     }
 }

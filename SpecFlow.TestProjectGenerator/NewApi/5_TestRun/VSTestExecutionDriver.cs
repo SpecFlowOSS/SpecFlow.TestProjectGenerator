@@ -35,6 +35,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
         public TestExecutionResult LastTestExecutionResult { get; private set; }
         public string RunSettingsFile { get; set; }
+        public string Filter { get; set; }
 
         public void CheckIsBindingMethodExecuted(string methodName, int timesExecuted)
         {
@@ -61,7 +62,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             containsAtAll.Should().BeTrue($"either Trx output or program output should contain '{text}'");
         }
 
-        public TestExecutionResult ExecuteTests(string tag = null)
+        public TestExecutionResult ExecuteTests()
         {
             string vsFolder = _visualStudioFinder.Find();
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
@@ -69,7 +70,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             var vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetTestAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
 
             var processHelper = new ProcessHelper();
-            string arguments = GenereateVsTestsArguments(tag != null ? $"Category={tag}|TestCategory={tag}" : null);
+            string arguments = GenereateVsTestsArguments();
             ProcessResult processResult;
             try
             {
@@ -203,7 +204,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                    select trimmed;
         }
 
-        private string GenereateVsTestsArguments(string filter)
+        private string GenereateVsTestsArguments()
         {
             string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx";
 
@@ -212,9 +213,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 arguments += $" /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
             }
 
-            if (filter.IsNotNullOrEmpty())
+            if (Filter.IsNotNullOrEmpty())
             {
-                arguments += $" /TestCaseFilter:{filter}";
+                arguments += $" /TestCaseFilter:{Filter}";
             }
 
             if (RunSettingsFile.IsNotNullOrWhiteSpace())

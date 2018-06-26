@@ -238,15 +238,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     throw new ArgumentOutOfRangeException();
             }
 
-            _project.AddNuGetPackage("Newtonsoft.Json", "11.0.2", new NuGetPackageAssembly("Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll"));
-            _project.AddNuGetPackage("FluentAssertions", "5.3.0", new NuGetPackageAssembly("FluentAssertions, Version=5.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a", @"net45\FluentAssertions.dll"));
+            _project.AddNuGetPackage("Newtonsoft.Json", "11.0.2");
+            _project.AddNuGetPackage("FluentAssertions", "5.3.0");
 
             AddAdditionalStuff();
         }
 
         private void ConfigureNUnit()
         {
-            _project.AddNuGetPackage("NUnit", "3.8.1", new NuGetPackageAssembly("nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL", "net45\\nunit.framework.dll"));
+            _project.AddNuGetPackage("NUnit", "3.8.1");
             _project.AddNuGetPackage("NUnit3TestAdapter", "3.8.0");
         }
 
@@ -347,6 +347,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public void AddMSBuildTarget(string targetName, string implementation)
         {
             _project.AddTarget(targetName, implementation);
+        }
+
+        public void AddNuGetPackage(string nugetPackage, string nugetVersion)
+        {
+            _project.AddNuGetPackage(nugetPackage, nugetVersion);
         }
     }
 }
