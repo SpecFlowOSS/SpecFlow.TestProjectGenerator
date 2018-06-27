@@ -114,6 +114,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             var summaryElement = testResultDocument.XPathSelectElement("//mstest:ResultSummary/mstest:Counters", namespaceManager);
             if (summaryElement != null)
             {
+                executionResult.TestResults = testResultDocument.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager).Select(e => new TestResult()
+                {
+                    Id = e.Attribute("executionId").Value,
+                    Outcome = e.Attribute("outcome").Value,
+                    StdOut = e.XPathSelectElement("//mstest:Output/mstest:StdOut", namespaceManager).Value
+                }).ToList();
                 executionResult.Total = int.Parse(summaryElement.Attribute("total").Value);
                 executionResult.Executed = int.Parse(summaryElement.Attribute("executed").Value);
                 executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
@@ -122,12 +128,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Failed = GetFailedCount(_testRunConfiguration, summaryElement, executionResult);
                 executionResult.Output = output;
                 executionResult.TrxOutput = unitTestExecutionResults.Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c.Value)).ToString();
-                executionResult.TestResults = testResultDocument.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager).Select(e => new TestResult()
-                {
-                    Id = e.Attribute("executionId").Value,
-                    Outcome = e.Attribute("outcome").Value,
-                    StdOut = e.XPathSelectElement("//mstest:Output/mstest:StdOut", namespaceManager).Value
-                }).ToList();
+                
                 executionResult.ReportFiles = reportFiles;
                 executionResult.LogFileContent = logFileContent;
             }
@@ -152,6 +153,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                                    select resultElement;
 
                     return elements.Count();
+                case UnitTestProvider.SpecRun:
+                    return executionResult.TestResults.Where(tr => tr.StdOut.Contains("TechTalk.SpecRun.IgnoredTestException")).Count();
+
                 default: return executionResult.Total - executionResult.Executed;
             }
             
@@ -182,6 +186,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                     return GetXUnitPendingCount(output);
                 case UnitTestProvider.NUnit3:
                     return executionResult.Total - executionResult.Executed - executionResult.Ignored;
+                case UnitTestProvider.SpecRun:
+                    return executionResult.TestResults.Where(tr => tr.StdOut.Contains("TechTalk.SpecRun.PendingTestException")).Count();
             }
 
             return int.Parse(summaryElement.Attribute("inconclusive").Value);
