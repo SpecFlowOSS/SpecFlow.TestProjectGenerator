@@ -35,6 +35,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
         public TestExecutionResult LastTestExecutionResult { get; private set; }
         public string RunSettingsFile { get; set; }
+        public string Filter { get; set; }
 
         public void CheckIsBindingMethodExecuted(string methodName, int timesExecuted)
         {
@@ -61,7 +62,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             containsAtAll.Should().BeTrue($"either Trx output or program output should contain '{text}'");
         }
 
-        public TestExecutionResult ExecuteTests(string tag = null)
+        public TestExecutionResult ExecuteTests()
         {
             string vsFolder = _visualStudioFinder.Find();
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
@@ -69,7 +70,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             var vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetTestAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
 
             var processHelper = new ProcessHelper();
-            string arguments = GenereateVsTestsArguments(tag != null ? $"Category={tag}|TestCategory={tag}" : null);
+            string arguments = GenereateVsTestsArguments();
             ProcessResult processResult;
             try
             {
@@ -96,12 +97,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 logFileContent = File.ReadAllText(new Uri(logFiles.Single().Substring(BeginnOfLogFileLine.Length)).LocalPath);
             }
 
-            var reportFiles = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(i => i.StartsWith("Report file:")).Select(i => i.Substring("Report file: ".Length)).ToList();
+            var reportFiles = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(i => i.StartsWith("Report file:")).Select(i => i.Substring("Report file: ".Length)).Select(i => new Uri(i).AbsolutePath).ToList();
 
             var trxFile = trxFiles.Single().Substring(BeginnOfTrxFileLine.Length);
             var testResultDocument = XDocument.Load(trxFile);
 
-            var executionResult = new TestExecutionResult();
+            var executionResult = new TestExecutionResult()
+            {
+                ValidLicense = false //not possible to check license with VSTest execution
+            };
 
             XmlNameTable nameTable = new NameTable();
             var namespaceManager = new XmlNamespaceManager(nameTable);
@@ -110,6 +114,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             var summaryElement = testResultDocument.XPathSelectElement("//mstest:ResultSummary/mstest:Counters", namespaceManager);
             if (summaryElement != null)
             {
+                executionResult.TestResults = testResultDocument.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager).Select(e => new TestResult()
+                {
+                    Id = e.Attribute("executionId").Value,
+                    Outcome = e.Attribute("outcome").Value,
+                    StdOut = e.XPathSelectElement("//mstest:Output/mstest:StdOut", namespaceManager).Value
+                }).ToList();
                 executionResult.Total = int.Parse(summaryElement.Attribute("total").Value);
                 executionResult.Executed = int.Parse(summaryElement.Attribute("executed").Value);
                 executionResult.Succeeded = int.Parse(summaryElement.Attribute("passed").Value);
@@ -118,12 +128,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 executionResult.Failed = GetFailedCount(_testRunConfiguration, summaryElement, executionResult);
                 executionResult.Output = output;
                 executionResult.TrxOutput = unitTestExecutionResults.Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c.Value)).ToString();
-                executionResult.TestResults = testResultDocument.XPathSelectElements("//mstest:Results/mstest:UnitTestResult", namespaceManager).Select(e => new TestResult()
-                {
-                    Id = e.Attribute("executionId").Value,
-                    Outcome = e.Attribute("outcome").Value,
-                    StdOut = e.XPathSelectElement("//mstest:Output/mstest:StdOut", namespaceManager).Value
-                }).ToList();
                 executionResult.ReportFiles = reportFiles;
                 executionResult.LogFileContent = logFileContent;
             }
@@ -148,6 +152,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                                    select resultElement;
 
                     return elements.Count();
+                case UnitTestProvider.SpecRun:
+                    return executionResult.TestResults.Where(tr => tr.StdOut.Contains("TechTalk.SpecRun.IgnoredTestException")).Count();
+
                 default: return executionResult.Total - executionResult.Executed;
             }
             
@@ -178,6 +185,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                     return GetXUnitPendingCount(output);
                 case UnitTestProvider.NUnit3:
                     return executionResult.Total - executionResult.Executed - executionResult.Ignored;
+                case UnitTestProvider.SpecRun:
+                    return executionResult.TestResults.Where(tr => tr.StdOut.Contains("TechTalk.SpecRun.PendingTestException")).Count();
             }
 
             return int.Parse(summaryElement.Attribute("inconclusive").Value);
@@ -200,7 +209,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                    select trimmed;
         }
 
-        private string GenereateVsTestsArguments(string filter)
+        private string GenereateVsTestsArguments()
         {
             string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx";
 
@@ -209,9 +218,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 arguments += $" /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
             }
 
-            if (filter.IsNotNullOrEmpty())
+            if (Filter.IsNotNullOrEmpty())
             {
-                arguments += $" /TestCaseFilter:{filter}";
+                arguments += $" /TestCaseFilter:{Filter}";
+            }
+
+            if (RunSettingsFile.IsNotNullOrWhiteSpace())
+            {
+                arguments += $" /Settings:{RunSettingsFile}";
             }
 
             if (RunSettingsFile.IsNotNullOrWhiteSpace())

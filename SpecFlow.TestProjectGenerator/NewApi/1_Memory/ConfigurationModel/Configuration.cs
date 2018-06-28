@@ -14,5 +14,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationM
         public CultureInfo BindingCulture { get; set; }
         public Lazy<Generator> Generator { get; } = new Lazy<Generator>(() => new Generator());
         public Lazy<Runtime> Runtime { get; } = new Lazy<Runtime>(() => new Runtime());
+
+        public List<(string key, string value)> AppSettings { get; set; } = new List<(string key, string value)>();
     }
 }

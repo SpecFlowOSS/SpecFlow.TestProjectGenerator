@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
@@ -9,7 +10,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         {
             Name = name;
             Version = version;
-            Assemblies = new ReadOnlyCollection<NuGetPackageAssembly>(assemblies);
+            Assemblies = new ReadOnlyCollection<NuGetPackageAssembly>(assemblies.Where(a => a != null).ToList());
         }
 
         public string Name { get; }

@@ -53,6 +53,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         public IReadOnlyList<MSBuildTarget> MSBuildTargets => _msBuildTargets;
         public IReadOnlyList<MSBuildImport> MSBuildImports => _msbuildImports;
 
+        public void AddNuGetPackage(string name, string version)
+        {
+            _nuGetPackages.Add(new NuGetPackage(name, version, KnownAssemblyNames.Get(name, version)));
+        }
+
         public void AddNuGetPackage(string name, string version, params NuGetPackageAssembly[] assemblies)
         {
             _nuGetPackages.Add(new NuGetPackage(name, version, assemblies));

@@ -19,6 +19,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
                     return AppendMoniker(tf & ~TargetFramework.Net45, stringBuilder.AppendTargetFrameworkMoniker("net45"));
                 }
 
+                if ((tf & TargetFramework.Net35) == TargetFramework.Net35)
+                {
+                    return AppendMoniker(tf & ~TargetFramework.Net35, stringBuilder.AppendTargetFrameworkMoniker("net35"));
+                }
+
                 if ((tf & TargetFramework.Netcoreapp20) == TargetFramework.Netcoreapp20)
                 {
                     return AppendMoniker(tf & ~TargetFramework.Netcoreapp20, stringBuilder.AppendTargetFrameworkMoniker("netcoreapp2.0"));
@@ -58,6 +63,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
                 if ((tf & TargetFramework.Net45) == TargetFramework.Net45)
                 {
                     return AppendMoniker(tf & ~TargetFramework.Net45, stringBuilder.AppendTargetFrameworkMoniker("v4.5"));
+                }
+
+                if ((tf & TargetFramework.Net35) == TargetFramework.Net35)
+                {
+                    return AppendMoniker(tf & ~TargetFramework.Net35, stringBuilder.AppendTargetFrameworkMoniker("v3.5"));
                 }
 
                 if ((tf & TargetFramework.Netcoreapp20) == TargetFramework.Netcoreapp20

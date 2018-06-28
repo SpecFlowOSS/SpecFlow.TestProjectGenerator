@@ -238,14 +238,17 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
 
         private void WriteNuGetPackage(XmlWriter xw, NuGetPackage package)
         {
-            foreach (var assembly in package.Assemblies)
+            if (package.Assemblies != null)
             {
-                xw.WriteStartElement("Reference");
-                xw.WriteAttributeString("Include", assembly.PublicAssemblyName);
+                foreach (var assembly in package.Assemblies)
+                {
+                    xw.WriteStartElement("Reference");
+                    xw.WriteAttributeString("Include", assembly.PublicAssemblyName);
 
-                xw.WriteElementString("HintPath", Path.Combine("..", "packages", $"{package.Name}.{package.Version}", "lib", assembly.RelativeHintPath));
+                    xw.WriteElementString("HintPath", Path.Combine("..", "packages", $"{package.Name}.{package.Version}", "lib", assembly.RelativeHintPath));
 
-                xw.WriteEndElement();
+                    xw.WriteEndElement();
+                }
             }
         }
 

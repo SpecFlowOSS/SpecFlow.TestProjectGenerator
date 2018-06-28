@@ -25,14 +25,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
     public class ProcessHelper
     {
-        private static TimeSpan _timeout = TimeSpan.FromMinutes(10);
+        private static TimeSpan _timeout = TimeSpan.FromMinutes(15);
         private static readonly int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
 
         public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
         {
             var parameters = string.Format(argumentsFormat, arguments);
 
-            outputWriter.WriteLine("Starting external program: \"{0}\" {1}", executablePath, parameters);
+            outputWriter.WriteLine("Starting external program: \"{0}\" {1} in {2}", executablePath, parameters, workingDirectory);
             var psi = CreateProcessStartInfo(workingDirectory, executablePath, parameters);
 
 
