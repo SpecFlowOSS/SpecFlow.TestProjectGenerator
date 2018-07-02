@@ -12,20 +12,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 {
                     "Newtonsoft.Json", new Dictionary<string, NuGetPackageAssembly>()
                     {
-                        {"", new NuGetPackageAssembly("Newtonsoft.Json, Version={0}, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll")},
+                        {"default", new NuGetPackageAssembly("Newtonsoft.Json, Version={0}, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll")},
                         {"11.0.2", new NuGetPackageAssembly("Newtonsoft.Json, Version=11.0.0.0}, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll")},
                     }
                 },
                 {
                     "FluentAssertions", new Dictionary<string, NuGetPackageAssembly>()
                     {
-                        {"", new NuGetPackageAssembly("FluentAssertions, Version={0}.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a", @"net45\FluentAssertions.dll")},
+                        {"default", new NuGetPackageAssembly("FluentAssertions, Version={0}.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a", @"net45\FluentAssertions.dll")},
                     }
                 },
                 {
                     "NUnit", new Dictionary<string, NuGetPackageAssembly>()
                     {
-                        {"", new NuGetPackageAssembly("nunit.framework, Version={0}.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL", "net45\\nunit.framework.dll")},
+                        {"default", new NuGetPackageAssembly("nunit.framework, Version={0}.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL", "net45\\nunit.framework.dll")},
                         {"2.6.4", new NuGetPackageAssembly("nunit.framework", "nunit.framework.dll")},
                         {"3.0.0", new NuGetPackageAssembly("nunit.framework", "net45\\nunit.framework.dll")},
                         {"3.0.1", new NuGetPackageAssembly("nunit.framework", "net45\\nunit.framework.dll")},
@@ -50,7 +50,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 }
                 else
                 {
-                    nugetPackageAssembly = packageAssembly[""];
+                    nugetPackageAssembly = packageAssembly["default"];
                 }
 
                 return new NuGetPackageAssembly(GetPublicAssemblyName(version, nugetPackageAssembly), nugetPackageAssembly.RelativeHintPath);
