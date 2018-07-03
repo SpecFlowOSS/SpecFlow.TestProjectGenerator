@@ -153,7 +153,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
                     return elements.Count();
                 case UnitTestProvider.SpecRun:
-                    return executionResult.TestResults.Where(tr => tr.StdOut.Contains("TechTalk.SpecRun.IgnoredTestException")).Count();
+                    return executionResult.TestResults.Where(tr => tr.StdOut.Contains("-> Ignored")).Count();
 
                 default: return executionResult.Total - executionResult.Executed;
             }
@@ -186,7 +186,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 case UnitTestProvider.NUnit3:
                     return executionResult.Total - executionResult.Executed - executionResult.Ignored;
                 case UnitTestProvider.SpecRun:
-                    return executionResult.TestResults.Where(tr => tr.StdOut.Contains("TechTalk.SpecRun.PendingTestException")).Count();
+                    return executionResult.TestResults.Where(tr => tr.StdOut.Contains("TechTalk.SpecRun.PendingTestException") || tr.StdOut.Contains("No matching step definition found for the step.")).Count();
             }
 
             return int.Parse(summaryElement.Attribute("inconclusive").Value);
@@ -228,10 +228,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 arguments += $" /Settings:{RunSettingsFile}";
             }
 
-            if (RunSettingsFile.IsNotNullOrWhiteSpace())
-            {
-                arguments += $" /Settings:{RunSettingsFile}";
-            }
 
             return arguments;
         }

@@ -38,7 +38,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
             _testProjectFolders = testProjectFolders;
             _compiler = compiler;
             _outputWriter = outputWriter;
-            NuGetSources = new List<NuGetSource> { new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder) /*, new NuGetSource("LocalExternalPackages", _folders.ExternalNuGetFolder)*/ };
+            NuGetSources = new List<NuGetSource> { new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)};
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
