@@ -12,7 +12,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 
         public AppConfigGeneratorTests()
         {
-            _appConfigGenerator = new AppConfigGenerator();
+            _appConfigGenerator = new AppConfigGenerator(new CurrentVersionDriver());
         }
 
         [Fact]

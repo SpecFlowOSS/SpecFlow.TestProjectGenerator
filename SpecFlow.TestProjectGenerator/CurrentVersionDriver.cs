@@ -14,6 +14,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 SpecFlowVersion = new Version(specFlowVersion.Major, specFlowVersion.Minor, 0, 0);
             }
+            else
+            {
+                SpecFlowVersion = new Version(1, 0);
+            }
         }
 
         public string SpecFlowVersionDash => SpecFlowVersion.ToString().Replace(".", "-");

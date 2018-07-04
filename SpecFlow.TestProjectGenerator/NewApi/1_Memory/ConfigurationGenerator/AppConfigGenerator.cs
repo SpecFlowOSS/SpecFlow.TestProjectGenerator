@@ -13,7 +13,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
 {
     public class AppConfigGenerator : XmlFileGeneratorBase, IConfigurationGenerator
     {
+        private readonly CurrentVersionDriver _currentVersionDriver;
         private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
+
+        public AppConfigGenerator(CurrentVersionDriver currentVersionDriver)
+        {
+            this._currentVersionDriver = currentVersionDriver;
+        }
 
         public ProjectFile Generate(Configuration configuration)
         {
@@ -56,7 +62,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
         {
             writer.WriteStartElement("specFlow");
 
-            WriteUnitTestProvider(writer, configuration.UnitTestProvider.ToName());
+            if (_currentVersionDriver.SpecFlowVersion < new Version(3, 0))
+            {
+                WriteUnitTestProvider(writer, configuration.UnitTestProvider.ToName());
+            }
+            
             if (configuration.BindingCulture != null)
             {
                 WriteBindingCulture(writer, configuration.BindingCulture);
@@ -78,7 +88,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
             }
 
             WriteStepAssemblies(writer, configuration.StepAssemblies);
-            WritePlugins(writer, configuration.Plugins);
+            
+            if (_currentVersionDriver.SpecFlowVersion < new Version(3, 0))
+            {
+                WritePlugins(writer, configuration.Plugins);
+            }
 
             writer.WriteEndElement();
         }
