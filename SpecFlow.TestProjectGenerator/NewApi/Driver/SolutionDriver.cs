@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._3_NuGet;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._4_Compile;
@@ -38,7 +37,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
             _testProjectFolders = testProjectFolders;
             _compiler = compiler;
             _outputWriter = outputWriter;
-            NuGetSources = new List<NuGetSource> { new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)};
+            NuGetSources = new List<NuGetSource>
+            {
+                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder),
+                new NuGetSource("SpecFlow CI", "https://ci.appveyor.com/nuget/specflow-ci")
+            };
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
@@ -91,7 +94,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public void WriteToDisk()
         {
-            if (_isWrittenOnDisk) return;
+            if (_isWrittenOnDisk)
+            {
+                return;
+            }
 
             foreach (var project in Projects.Values)
             {
@@ -107,7 +113,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 
             var solutionWriter = new SolutionWriter(_outputWriter);
             solutionWriter.WriteToFileSystem(_solution, _testProjectFolders.PathToSolutionDirectory);
-            
+
 
             _isWrittenOnDisk = true;
         }
@@ -118,6 +124,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
             _compileResult.IsSuccessful.Should().BeTrue("the project should have compiled successfully.\r\n\r\n------ Build output ------\r\n{0}", _compileResult.Output);
         }
 
-       
+
     }
 }
