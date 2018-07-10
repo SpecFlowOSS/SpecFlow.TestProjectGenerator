@@ -213,9 +213,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         {
             string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx";
 
-            if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
+            if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
             {
-                arguments += $" /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
+                if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
+                {
+                    arguments += $" /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
+                }
             }
 
             if (Filter.IsNotNullOrEmpty())
