@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Xml;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
@@ -15,13 +17,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 {
                     writer.WriteStartElement("configuration");
 
-                    writer.WriteStartElement("packageSources");
-
-                    WriteNuGetSources(writer, nuGetSources);
-
-                    WriteNuGetOrgSource(writer);
-
-                    writer.WriteEndElement();
+                    WritePackageSources(nuGetSources, writer);
+                    WriteAPIKeys(writer, nuGetSources);
 
                     writer.WriteEndElement();
                     writer.Flush();
@@ -29,6 +26,32 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     return _projectFileFactory.FromStream(ms, "nuget.config", "None");
                 }
             }
+        }
+
+        private void WriteAPIKeys(XmlWriter writer, NuGetSource[] nuGetSources)
+        {
+            writer.WriteStartElement("apikeys");
+
+            foreach (var nuGetSource in nuGetSources.Where(ng => ng.APIKey.IsNotNullOrWhiteSpace()))
+            {
+                writer.WriteStartElement("add");
+                writer.WriteAttributeString("key", nuGetSource.Key);
+                writer.WriteAttributeString("value", nuGetSource.APIKey);
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+        }
+
+        private void WritePackageSources(NuGetSource[] nuGetSources, XmlWriter writer)
+        {
+            writer.WriteStartElement("packageSources");
+
+            WriteNuGetSources(writer, nuGetSources);
+
+            WriteNuGetOrgSource(writer);
+
+            writer.WriteEndElement();
         }
 
         private void WriteNuGetSources(XmlWriter writer, NuGetSource[] nuGetSources)
