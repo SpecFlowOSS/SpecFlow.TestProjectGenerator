@@ -5,7 +5,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._3_NuGet
 {
     public class NuGet
     {
-        private readonly Folders _folders;
+        protected readonly Folders _folders;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly IOutputWriter _outputWriter;
 
@@ -18,7 +18,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._3_NuGet
 
         public void Restore()
         {
-            var processPath = Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine", "4.5.1", "tools", "NuGet.exe");
+            var processPath = GetPathToNuGetExe();
 
             if (!File.Exists(processPath))
             {
@@ -36,6 +36,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._3_NuGet
                 throw new Exception("NuGet restore failed - rebuild solution to generate latest packages " + Environment.NewLine +
                                     $"{_testProjectFolders.PathToSolutionDirectory} {processPath} {commandLineArgs}" + Environment.NewLine + processResult.CombinedOutput);
             }
+        }
+
+        protected virtual string GetPathToNuGetExe()
+        {
+            return Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine", "4.5.1", "tools", "NuGet.exe");
         }
     }
 }
