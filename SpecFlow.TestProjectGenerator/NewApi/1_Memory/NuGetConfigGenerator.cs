@@ -32,12 +32,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         {
             writer.WriteStartElement("apikeys");
 
-            foreach (var nuGetSource in nuGetSources.Where(ng => ng.APIKey.IsNotNullOrWhiteSpace()))
+            if (nuGetSources != null)
             {
-                writer.WriteStartElement("add");
-                writer.WriteAttributeString("key", nuGetSource.Key);
-                writer.WriteAttributeString("value", nuGetSource.APIKey);
-                writer.WriteEndElement();
+                foreach (var nuGetSource in nuGetSources.Where(ng => ng.APIKey.IsNotNullOrWhiteSpace()))
+                {
+                    writer.WriteStartElement("add");
+                    writer.WriteAttributeString("key", nuGetSource.Key);
+                    writer.WriteAttributeString("value", nuGetSource.APIKey);
+                    writer.WriteEndElement();
+                }
             }
 
             writer.WriteEndElement();
