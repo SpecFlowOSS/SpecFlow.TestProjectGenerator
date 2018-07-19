@@ -62,6 +62,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             var project = CreateProjectBuilder();
             project.TargetFrameworks = _testRunConfiguration.TargetFramework;
             project.Format = _testRunConfiguration.ProjectFormat;
+            project.ConfigurationFormat = _testRunConfiguration.ConfigurationFormat;
             project.Language = language;
 
             project.Configuration.UnitTestProvider = _testRunConfiguration.UnitTestProvider;
