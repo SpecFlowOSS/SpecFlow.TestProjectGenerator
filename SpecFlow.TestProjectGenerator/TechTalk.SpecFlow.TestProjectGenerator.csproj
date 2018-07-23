@@ -18,7 +18,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Services.NuGet.CredentialProvider" Version="0.37.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NuGet.CommandLine" Version="4.5.1" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.3.0" />
     <PackageReference Include="vswhere" Version="2.3.2" />
   </ItemGroup>
 
