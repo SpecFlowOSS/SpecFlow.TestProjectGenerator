@@ -73,7 +73,7 @@ internal static class Log
     {{
         using (FileStream fs = File.Open(LogFileLocation, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
         {{
-            byte[] bytes = System.Text.Encoding.ASCII.GetBytes(line);
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(line);
             fs.Write(bytes, 0, bytes.Length);
             fs.Close();
         }}

@@ -40,7 +40,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         public void CheckIsBindingMethodExecuted(string methodName, int timesExecuted)
         {
             string pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-            string logFileContent = File.ReadAllText(pathToLogFile);
+            string logFileContent = File.ReadAllText(pathToLogFile, Encoding.UTF8);
 
             var regex = new Regex($@"-> step: {methodName}");
 
