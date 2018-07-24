@@ -107,7 +107,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             EnsureProjectExists();
 
             var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
-            _project.AddFile(bindingsGenerator.GenerateBindingClassFile(fullBindingClass));
+            var replacedBindingClass = fullBindingClass.Replace("$ProjectDir$", _testProjectFolders.ProjectFolder);
+            _project.AddFile(bindingsGenerator.GenerateBindingClassFile(replacedBindingClass));
         }
 
         public void GenerateConfigurationFile()
