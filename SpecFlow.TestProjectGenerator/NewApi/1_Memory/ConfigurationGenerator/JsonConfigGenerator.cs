@@ -12,6 +12,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
 {
     public class JsonConfigGenerator : IConfigurationGenerator
     {
+        private readonly CurrentVersionDriver _currentVersionDriver;
+
+        public JsonConfigGenerator(CurrentVersionDriver currentVersionDriver)
+        {
+            _currentVersionDriver = currentVersionDriver;
+        }
+
         public ProjectFile Generate(Configuration configuration)
         {
             using (var stringWriter = new StringWriter())
@@ -40,7 +47,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
             jsonWriter.WritePropertyName("specflow");
             jsonWriter.WriteStartObject();
 
-            WriteUnitTestProvider(jsonWriter, configuration.UnitTestProvider.ToName());
+            if (_currentVersionDriver.SpecFlowVersion < new Version(3, 0))
+            {
+                WriteUnitTestProvider(jsonWriter, configuration.UnitTestProvider.ToName());
+            }
 
             if (configuration.FeatureLanguage != null)
             {
@@ -63,7 +73,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
             }
 
             WriteStepAssemblies(jsonWriter, configuration.StepAssemblies);
-            WritePlugins(jsonWriter, configuration.Plugins);
+
+            if (_currentVersionDriver.SpecFlowVersion < new Version(3, 0))
+            {
+                WritePlugins(jsonWriter, configuration.Plugins);
+            }
 
             // close specflow object
             jsonWriter.WriteEndObject();

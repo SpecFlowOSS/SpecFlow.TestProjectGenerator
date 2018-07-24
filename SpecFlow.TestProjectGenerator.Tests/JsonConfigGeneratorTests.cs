@@ -12,7 +12,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 
         public JsonConfigGeneratorTests()
         {
-            _jsonConfigGenerator = new JsonConfigGenerator();
+            _jsonConfigGenerator = new JsonConfigGenerator(new CurrentVersionDriver());
         }
 
         [Fact]
