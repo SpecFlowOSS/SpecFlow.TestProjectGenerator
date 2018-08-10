@@ -59,6 +59,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             EnsureProjectExists();
 
             var featureFile = _featureFileGenerator.Generate(featureFileContent);
+            if (Format == ProjectFormat.Old)
+            {
+                string codeBehindFile = null;
+                switch (Language)
+                {
+                    case ProgrammingLanguage.CSharp:
+                        codeBehindFile = featureFile.Path + ".cs";
+                        break;
+                    case ProgrammingLanguage.VB:
+                        codeBehindFile = featureFile.Path + ".vb";
+                        break;
+                }
+
+                if (codeBehindFile != null)
+                {
+                    _project.AddFile(new ProjectFile(codeBehindFile, "Compile", null));
+                }
+            }
 
             _project.AddFile(featureFile);
         }

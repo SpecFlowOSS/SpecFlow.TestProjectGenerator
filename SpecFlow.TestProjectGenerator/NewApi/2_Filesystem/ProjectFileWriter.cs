@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
@@ -21,7 +22,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem
                 Directory.CreateDirectory(folderPath);
             }
 
-            File.WriteAllText(absolutePath, projectFile.Content);
+            if (projectFile.Content.IsNotNullOrWhiteSpace())
+            {
+                File.WriteAllText(absolutePath, projectFile.Content);
+            }
         }
     }
 }
