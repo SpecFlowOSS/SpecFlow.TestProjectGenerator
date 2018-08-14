@@ -29,7 +29,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             Configuration = configuration;
             _currentVersionDriver = currentVersionDriver;
             _folders = folders;
-            ProjectName = $"TestProject_{ProjectGuid:N}";
+            ProjectName = $"TestProj_{ProjectGuid:N}";
         }
 
         public void AddProjectReference(string projectPath, ProjectBuilder projectToReference)

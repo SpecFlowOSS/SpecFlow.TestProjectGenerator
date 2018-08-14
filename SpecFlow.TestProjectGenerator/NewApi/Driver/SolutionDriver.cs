@@ -50,7 +50,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
 
         public IList<NuGetSource> NuGetSources { get; }
 
-        public string SolutionName => $"TestSolution_{SolutionGuid:N}";
+        public string SolutionName => $"SLN_{SolutionGuid:N}";
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects => _projects;
 
