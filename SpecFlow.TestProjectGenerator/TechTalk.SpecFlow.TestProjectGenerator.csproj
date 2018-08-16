@@ -13,9 +13,6 @@
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.4.0" />
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="Microsoft.Build" Version="15.7.179" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.7.179" />
-    <PackageReference Include="Microsoft.VisualStudio.Services.NuGet.CredentialProvider" Version="0.37.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NuGet.CommandLine" Version="4.5.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
@@ -27,9 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="2.1.65">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65">
       <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
