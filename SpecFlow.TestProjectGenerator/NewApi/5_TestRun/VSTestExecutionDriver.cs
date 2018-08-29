@@ -164,7 +164,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         {
             switch (testRunConfiguration.UnitTestProvider)
             {
-                case UnitTestProvider.MSTest:
                 case UnitTestProvider.XUnit:
                     return int.Parse(summaryElement.Attribute("failed").Value) - executionResult.Pending;
                 default:
@@ -179,7 +178,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                 case UnitTestProvider.MSTest:
                     var unitTestResultMessageElements = testResultDocument.XPathSelectElements("//mstest:Results/mstest:UnitTestResult/mstest:Output/mstest:ErrorInfo/mstest:Message", namespaceManager);
 
-                    return unitTestResultMessageElements.Where(e => e.Value.Contains("Microsoft.VisualStudio.TestTools.UnitTesting.AssertInconclusiveException")).Count();
+                    return unitTestResultMessageElements.Where(e => e.Value.Contains("Assert.Inconclusive failed.")).Count();
 
                 case UnitTestProvider.XUnit:
                     return GetXUnitPendingCount(output);
