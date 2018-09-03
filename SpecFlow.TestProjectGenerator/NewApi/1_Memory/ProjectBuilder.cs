@@ -11,6 +11,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
     public class ProjectBuilder
     {
+        public const string NUnit3PackageName = "NUnit";
+        public const string NUnit3PackageVersion = "3.10.1";
+        public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
+        public const string NUnit3TestAdapterPackageVersion = "3.10.0";
         protected readonly TestProjectFolders _testProjectFolders;
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
@@ -269,8 +273,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
         private void ConfigureNUnit()
         {
-            _project.AddNuGetPackage("NUnit", "3.8.1");
-            _project.AddNuGetPackage("NUnit3TestAdapter", "3.8.0");
+            _project.AddNuGetPackage(NUnit3PackageName, NUnit3PackageVersion);
+            _project.AddNuGetPackage(NUnit3TestAdapterPackageName, NUnit3TestAdapterPackageVersion);
             
 
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
