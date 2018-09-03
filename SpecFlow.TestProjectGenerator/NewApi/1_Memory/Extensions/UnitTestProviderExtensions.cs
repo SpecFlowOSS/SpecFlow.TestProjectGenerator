@@ -14,7 +14,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions
                 case UnitTestProvider.MSTest: return "MSTest";
                 case UnitTestProvider.NUnit2: return "NUnit2";
                 case UnitTestProvider.NUnit3: return "NUnit";
-                case UnitTestProvider.XUnit: return "XUnit";
+                case UnitTestProvider.xUnit: return "XUnit";
                 case UnitTestProvider.SpecRun: return "SpecRun";
                 default: throw new ArgumentOutOfRangeException(nameof(unitTestProvider), unitTestProvider, "value is not known");
             }

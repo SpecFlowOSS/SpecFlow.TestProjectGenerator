@@ -252,7 +252,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 case UnitTestProvider.MSTest:
                     ConfigureMSTest();
                     break;
-                case UnitTestProvider.XUnit:
+                case UnitTestProvider.xUnit:
                     ConfigureXUnit();
                     break;
                 case UnitTestProvider.NUnit3:
@@ -339,10 +339,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         {
             switch (Configuration.UnitTestProvider)
             {
-                case UnitTestProvider.XUnit when !_parallelTestExecution:
+                case UnitTestProvider.xUnit when !_parallelTestExecution:
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]"));
                     break;
-                case UnitTestProvider.XUnit:
+                case UnitTestProvider.xUnit:
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
                     break;
                 case UnitTestProvider.NUnit3 when _parallelTestExecution:

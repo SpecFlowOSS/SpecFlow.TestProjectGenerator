@@ -7,7 +7,7 @@
         SpecRunWithNUnit2,
         SpecRunWithMsTest,
         MSTest,
-        XUnit,
+        xUnit,
         NUnit3,
         NUnit2
         

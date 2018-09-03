@@ -164,7 +164,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         {
             switch (testRunConfiguration.UnitTestProvider)
             {
-                case UnitTestProvider.XUnit:
+                case UnitTestProvider.xUnit:
                     return int.Parse(summaryElement.Attribute("failed").Value) - executionResult.Pending;
                 default:
                     return int.Parse(summaryElement.Attribute("failed").Value);
@@ -180,7 +180,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
                     return unitTestResultMessageElements.Where(e => e.Value.Contains("Assert.Inconclusive failed.")).Count();
 
-                case UnitTestProvider.XUnit:
+                case UnitTestProvider.xUnit:
                     return GetXUnitPendingCount(output);
                 case UnitTestProvider.NUnit3:
                     return executionResult.Total - executionResult.Executed - executionResult.Ignored;

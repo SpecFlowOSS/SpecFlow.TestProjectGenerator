@@ -86,7 +86,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
                 case "specrun+mstest": return UnitTestProvider.SpecRunWithMsTest;
                 case "specrun": return UnitTestProvider.SpecRun;
                 case "mstest": return UnitTestProvider.MSTest;
-                case "xunit": return UnitTestProvider.XUnit;
+                case "xunit": return UnitTestProvider.xUnit;
                 case "nunit": return UnitTestProvider.NUnit3;
                 default: throw new ArgumentOutOfRangeException(nameof(providerName), providerName, "Unknown unit test provider");
             }
