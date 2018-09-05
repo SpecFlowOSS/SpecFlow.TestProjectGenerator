@@ -13,6 +13,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenera
 using System;
 using System.IO;
 using System.Xml;
+using System.Linq;
 using TechTalk.SpecFlow;
 
 [Binding]
