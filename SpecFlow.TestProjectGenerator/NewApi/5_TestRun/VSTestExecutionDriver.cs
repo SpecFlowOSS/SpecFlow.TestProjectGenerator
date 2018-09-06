@@ -171,7 +171,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
 
         private TestExecutionResult CalculateSpecRunTestExecutionResult(TestExecutionResult testExecutionResult)
         {
-            testExecutionResult.Ignored = testExecutionResult.TestResults.Where(tr => tr.StdOut.Contains("-> Ignored")).Count();
+            testExecutionResult.Ignored = testExecutionResult.TestResults
+                                                             .Where(tr => tr.StdOut != null)
+                                                             .Where(tr => tr.StdOut.Contains("-> Ignored"))
+                                                             .Count();
             testExecutionResult.Pending = testExecutionResult.TestResults.Where(
                 tr => tr.StdOut.Contains("TechTalk.SpecRun.PendingTestException")
                       || tr.StdOut.Contains("No matching step definition found for the step.")).Count();
@@ -190,6 +193,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
         private TestExecutionResult CalculateMsTestTestExecutionResult(TestExecutionResult testExecutionResult)
         {
             testExecutionResult.Pending = testExecutionResult.TestResults
+                                                             .Where(r => r.ErrorMessage != null)
                                                              .Select(r => r.ErrorMessage)
                                                              .Count(m => m.Contains("Assert.Inconclusive failed"));
             testExecutionResult.Ignored = testExecutionResult.Total - testExecutionResult.Executed - testExecutionResult.Pending;
@@ -212,8 +216,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
                               let outputElement = unitTestResultElement.Element(xmlns + "Output")
                               let idAttribute = unitTestResultElement.Attribute("executionId")
                               let outcomeAttribute = unitTestResultElement.Attribute("outcome")
-                              let stdOutElement = outputElement.Element(xmlns + "StdOut")
-                              let errorInfoElement = outputElement.Element(xmlns + "ErrorInfo")
+                              let stdOutElement = outputElement?.Element(xmlns + "StdOut")
+                              let errorInfoElement = outputElement?.Element(xmlns + "ErrorInfo")
                               let errorMessage = errorInfoElement?.Element(xmlns + "Message")
                               where idAttribute != null
                               where outcomeAttribute != null
