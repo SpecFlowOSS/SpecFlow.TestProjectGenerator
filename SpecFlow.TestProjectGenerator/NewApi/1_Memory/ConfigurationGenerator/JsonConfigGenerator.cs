@@ -42,11 +42,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
         private void WriteSpecFlow(JsonWriter jsonWriter, Configuration configuration)
         {
             configuration.FeatureLanguage = configuration.FeatureLanguage ?? CultureInfo.GetCultureInfo("en-US");
-
-            // open specflow object
-            jsonWriter.WritePropertyName("specflow");
-            jsonWriter.WriteStartObject();
-
+            
             if (_currentVersionDriver.SpecFlowVersion < new Version(3, 0))
             {
                 WriteUnitTestProvider(jsonWriter, configuration.UnitTestProvider.ToName());
@@ -78,9 +74,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationG
             {
                 WritePlugins(jsonWriter, configuration.Plugins);
             }
-
-            // close specflow object
-            jsonWriter.WriteEndObject();
         }
 
         private void WriteUnitTestProvider(JsonWriter jsonWriter, string unitTestProvider)
