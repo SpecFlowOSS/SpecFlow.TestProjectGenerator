@@ -193,7 +193,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 
             _project = new Project(ProjectName, ProjectGuid, Language, TargetFrameworks, Format);
 
-
             _testProjectFolders.ProjectFolder = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _project.Name);
             _testProjectFolders.ProjectBinOutputPath = Path.Combine(_testProjectFolders.ProjectFolder, GetProjectCompilePath(_project));
             _testProjectFolders.TestAssemblyFileName = $"{_project.Name}.dll";
@@ -201,7 +200,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
 
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha1", new NuGetPackageAssembly("BoDi, Version=1.4.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
-            _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
+
+            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
+            {
+                // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
+                _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
+            }
+            else
+            {
+                _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
+            }
 
             var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
             _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
@@ -263,7 +271,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     ConfigureNUnit();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new InvalidOperationException(@"Invalid unit test provider.");
             }
 
             _project.AddNuGetPackage("Newtonsoft.Json", "11.0.2");
@@ -324,14 +332,38 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
         private void ConfigureRunner()
         {
             _project.AddNuGetPackage("SpecRun.Runner", _currentVersionDriver.NuGetVersion);
+
+            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
+            {
+                ConfigureRunnerForSpecFlow3();
+            }
+            else
+            {
+                ConfigureRunnerForSpecFlow2();
+            }
+        }
+
+        private void ConfigureRunnerForSpecFlow2()
+        {
             _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
-                new NuGetPackageAssembly($"SpecRun.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.SpecFlowPlugin.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    "net45\\TechTalk.SpecRun.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    "net45\\TechTalk.SpecRun.Common.dll")
+                                     new NuGetPackageAssembly($"SpecRun.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.SpecFlowPlugin.dll"),
+                                     new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                                                              "net45\\TechTalk.SpecRun.dll"),
+                                     new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                                                              "net45\\TechTalk.SpecRun.Common.dll")
             );
             Configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
+        }
+
+        private void ConfigureRunnerForSpecFlow3()
+        {
+            _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
+                                     new NuGetPackageAssembly($"SpecRun.SpecFlowPlugin.Runtime, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.SpecFlowPlugin.Runtime.dll"),
+                                     new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                                                              "net45\\TechTalk.SpecRun.dll"),
+                                     new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                                                              "net45\\TechTalk.SpecRun.Common.dll")
+            );
         }
 
         protected virtual void AddAdditionalStuff()
