@@ -17,6 +17,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                 {
                     writer.WriteStartElement("configuration");
 
+                    WriteConfig(writer);
+
                     WritePackageSources(nuGetSources, writer);
                     WriteAPIKeys(writer, nuGetSources);
 
@@ -26,6 +28,18 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     return _projectFileFactory.FromStream(ms, "nuget.config", "None");
                 }
             }
+        }
+
+        private void WriteConfig(XmlWriter writer)
+        {
+            writer.WriteStartElement("config");
+
+            writer.WriteStartElement("add");
+            writer.WriteAttributeString("key", "dependencyversion");
+            writer.WriteAttributeString("value", "Highest");
+            writer.WriteEndElement();
+
+            writer.WriteEndElement();
         }
 
         private void WriteAPIKeys(XmlWriter writer, NuGetSource[] nuGetSources)
