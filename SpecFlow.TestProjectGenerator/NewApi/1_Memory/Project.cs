@@ -58,9 +58,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             _nuGetPackages.Add(new NuGetPackage(name, version, KnownAssemblyNames.Get(name, version)));
         }
 
+        public void AddNuGetPackage(string name, string version, string allowedVersions)
+        {
+            _nuGetPackages.Add(new NuGetPackage(name, version, allowedVersions, KnownAssemblyNames.Get(name, version)));
+        }
+
         public void AddNuGetPackage(string name, string version, params NuGetPackageAssembly[] assemblies)
         {
             _nuGetPackages.Add(new NuGetPackage(name, version, assemblies));
+        }
+
+        public void AddNuGetPackage(string name, string version, string allowedVersions, params NuGetPackageAssembly[] assemblies)
+        {
+            _nuGetPackages.Add(new NuGetPackage(name, version, allowedVersions, assemblies));
         }
 
         public void AddReference(string name)

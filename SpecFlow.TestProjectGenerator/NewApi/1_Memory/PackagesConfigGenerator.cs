@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.Extensions;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
@@ -24,6 +25,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                         xw.WriteStartElement("package");
                         xw.WriteAttributeString("id", package.Name);
                         xw.WriteAttributeString("version", package.Version);
+
+                        if (package.AllowedVersions.IsNotNullOrWhiteSpace())
+                        {
+                            xw.WriteAttributeString("allowedVersions", package.AllowedVersions);
+                        }
 
                         if (!(tfm is null))
                         {
