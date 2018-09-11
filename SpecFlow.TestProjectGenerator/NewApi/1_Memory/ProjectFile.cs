@@ -1,5 +1,8 @@
-﻿namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
+﻿using System.Diagnostics;
+
+namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
 {
+    [DebuggerDisplay("{" + nameof(Path) + ("} [{" + nameof(BuildAction) + "}]"))]
     public class ProjectFile  //FeatureFiles, Code, App.Config, NuGet.Config, packages.config,
     {
         public ProjectFile(string path, string buildAction, string content, CopyToOutputDirectory copyToOutputDirectory = CopyToOutputDirectory.DoNotCopy)
