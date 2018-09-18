@@ -25,7 +25,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._3_NuGet
                 throw new FileNotFoundException("NuGet.exe could not be found! Is the version number correct?", processPath);
             }
 
-            var commandLineArgs = $"restore {_testProjectFolders.SolutionFileName} -SolutionDirectory . ";
+            var commandLineArgs = $"restore {_testProjectFolders.SolutionFileName} -SolutionDirectory . -NoCache";
 
 
             var nugetRestore = new ProcessHelper();
