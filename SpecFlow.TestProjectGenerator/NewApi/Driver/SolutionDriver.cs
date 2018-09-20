@@ -40,7 +40,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi.Driver
             NuGetSources = new List<NuGetSource>
             {
                 new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder),
-                new NuGetSource("SpecFlow CI", "https://ci.appveyor.com/nuget/specflow-ci")
+                new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json")
             };
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
