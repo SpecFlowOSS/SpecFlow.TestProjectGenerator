@@ -204,11 +204,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
                 // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
-                _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, _currentVersionDriver.SpecFlowAllowedNuGetVersions, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
+                _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
             }
             else
             {
-                _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, _currentVersionDriver.SpecFlowAllowedNuGetVersions, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
+                _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
             }
 
             var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
