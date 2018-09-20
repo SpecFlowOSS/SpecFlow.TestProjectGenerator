@@ -60,7 +60,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             containsAtAll.Should().BeTrue($"either Trx output or program output should contain '{text}'");
         }
 
-        public void ExecuteTests()
+        public TestExecutionResult ExecuteTests()
         {
             string vsFolder = _visualStudioFinder.Find();
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
@@ -99,6 +99,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._5_TestRun
             var testResultDocument = XDocument.Load(trxFile);
 
             LastTestExecutionResult = CalculateTestExecutionResultFromTrx(testResultDocument, _testRunConfiguration, output, reportFiles, logFileContent);
+            return LastTestExecutionResult;
         }
 
         private IEnumerable<string> GetReportFiles(string output)
