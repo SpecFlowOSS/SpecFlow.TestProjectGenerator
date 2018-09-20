@@ -63,25 +63,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
             EnsureProjectExists();
 
             var featureFile = _featureFileGenerator.Generate(featureFileContent);
-            if (Format == ProjectFormat.Old)
-            {
-                string codeBehindFile = null;
-                switch (Language)
-                {
-                    case ProgrammingLanguage.CSharp:
-                        codeBehindFile = featureFile.Path + ".cs";
-                        break;
-                    case ProgrammingLanguage.VB:
-                        codeBehindFile = featureFile.Path + ".vb";
-                        break;
-                }
-
-                if (codeBehindFile != null)
-                {
-                    _project.AddFile(new ProjectFile(codeBehindFile, "Compile", null));
-                }
-            }
-
+         
             _project.AddFile(featureFile);
         }
 
@@ -235,7 +217,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory
                     _project.AddMSBuildImport($"..\\packages\\SpecFlow.{_currentVersionDriver.SpecFlowVersion}\\tools\\TechTalk.SpecFlow.targets");
                 }
 
-                if (_currentVersionDriver.SpecFlowVersion < new Version(3, 0, 0))
+                if (_project.ProjectFormat == ProjectFormat.Old)
                 {
                     AddMSBuildTarget("AfterUpdateFeatureFilesInProject", @"<ItemGroup>
                                                                           <Compile Include=""@(SpecFlowGeneratedFiles)"" />
