@@ -4,8 +4,8 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
+using TechTalk.SpecFlow.TestProjectGenerator.Dotnet;
 using TechTalk.SpecFlow.TestProjectGenerator.Extensions;
-using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter.Commands.Dotnet;
 using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter

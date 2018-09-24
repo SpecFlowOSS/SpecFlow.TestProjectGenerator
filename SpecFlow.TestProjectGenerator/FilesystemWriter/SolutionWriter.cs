@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
-using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter.Commands.Dotnet;
+using TechTalk.SpecFlow.TestProjectGenerator.Dotnet;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 {

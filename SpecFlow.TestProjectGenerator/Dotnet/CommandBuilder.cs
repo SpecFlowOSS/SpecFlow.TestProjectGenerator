@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter.Commands
+namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
 {
     public class CommandBuilder
     {

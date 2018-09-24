@@ -1,4 +1,4 @@
-﻿namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter.Commands.Dotnet
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
 {
     public abstract class BaseCommandBuilder
     {
