@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
+using TechTalk.SpecFlow.TestProjectGenerator.ConfigurationModel;
+using TechTalk.SpecFlow.TestProjectGenerator.Data;
+using TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationGenerator;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.ConfigurationModel;
 using Xunit;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Tests

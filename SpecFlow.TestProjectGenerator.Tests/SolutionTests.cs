@@ -2,9 +2,10 @@
 using System.IO;
 using FluentAssertions;
 using Moq;
+using TechTalk.SpecFlow.TestProjectGenerator.Data;
+using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._2_Filesystem;
 using Xunit;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Tests

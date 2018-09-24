@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 

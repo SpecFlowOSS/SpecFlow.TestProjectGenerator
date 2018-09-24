@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory.BindingsGenerator;
+using TechTalk.SpecFlow.TestProjectGenerator.Factories.BindingsGenerator;
 using Xunit;
 
 // ReSharper disable InconsistentNaming
