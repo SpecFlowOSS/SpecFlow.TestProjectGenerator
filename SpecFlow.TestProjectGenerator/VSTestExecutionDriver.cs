@@ -172,13 +172,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private TestExecutionResult CalculateSpecRunTestExecutionResult(TestExecutionResult testExecutionResult)
         {
-            testExecutionResult.Ignored = testExecutionResult.TestResults
-                                                             .Where(tr => tr.StdOut != null)
-                                                             .Where(tr => tr.StdOut.Contains("-> Ignored"))
-                                                             .Count();
-            testExecutionResult.Pending = testExecutionResult.TestResults.Where(
-                tr => tr.StdOut.Contains("TechTalk.SpecRun.PendingTestException")
-                      || tr.StdOut.Contains("No matching step definition found for the step.")).Count();
+            bool FilterIgnored(TestResult testResult) => testResult.StdOut.Contains("-> Ignored");
+
+            bool FilterPending(TestResult testResult) => testResult.StdOut.Contains("TechTalk.SpecRun.PendingTestException")
+                                                         || testResult.StdOut.Contains("No matching step definition found for the step.");
+
+            var testResultsWithOutput = testExecutionResult.TestResults.Where(tr => !(tr?.StdOut is null)).ToArray();
+
+            testExecutionResult.Ignored = testResultsWithOutput.Where(FilterIgnored).Count();
+            testExecutionResult.Pending = testResultsWithOutput.Where(FilterPending).Count();
 
             return testExecutionResult;
         }
