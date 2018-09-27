@@ -341,12 +341,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureRunnerForSpecFlow3()
         {
+            var targetframework = TargetFrameworks != TargetFramework.Netcoreapp20 ? "net45" : "netcoreapp2.0";
             _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
-                                     new NuGetPackageAssembly($"SpecRun.Runtime.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.Runtime.SpecFlowPlugin.dll"),
-                                     new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                                                              "net45\\TechTalk.SpecRun.dll"),
-                                     new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                                                              "net45\\TechTalk.SpecRun.Common.dll")
+                                 new NuGetPackageAssembly($"SpecRun.Runtime.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL", 
+                                     $"{targetframework}\\SpecRun.Runtime.SpecFlowPlugin.dll"),
+                                 new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                                     $"{targetframework}\\TechTalk.SpecRun.dll"),
+                                 new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                                     $"{targetframework}\\TechTalk.SpecRun.Common.dll")
             );
         }
 
