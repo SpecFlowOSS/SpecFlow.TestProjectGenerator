@@ -128,6 +128,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
             xw.WriteElementString("Configuration", "Debug");
             xw.WriteElementString("Platform", "AnyCPU");
+            xw.WriteElementString("AutoGenerateBindingRedirects", "true");
             
             
             xw.WriteElementString("ProjectGuid", project.ProjectGuid.ToString("B"));
