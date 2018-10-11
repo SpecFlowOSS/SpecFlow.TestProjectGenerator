@@ -14,6 +14,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     "Newtonsoft.Json", new Dictionary<string, NuGetPackageAssembly>()
                     {
                         {"default", new NuGetPackageAssembly("Newtonsoft.Json, Version={0}, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll")},
+                        {"10.0.3", new NuGetPackageAssembly("Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll")},
                         {"11.0.2", new NuGetPackageAssembly("Newtonsoft.Json, Version=11.0.0.0}, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL", "net45\\Newtonsoft.Json.dll")},
                     }
                 },

@@ -184,6 +184,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
 
             _project.AddNuGetPackage("BoDi", "1.4.0-alpha1", new NuGetPackageAssembly("BoDi, Version=1.4.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
+            _project.AddNuGetPackage("Gherkin", "5.1.0", new NuGetPackageAssembly("Gherkin, Version=5.0.0.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
 
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
@@ -258,7 +259,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     throw new InvalidOperationException(@"Invalid unit test provider.");
             }
 
-            _project.AddNuGetPackage("Newtonsoft.Json", "11.0.2");
+            _project.AddNuGetPackage("Newtonsoft.Json", "10.0.3");
             _project.AddNuGetPackage("FluentAssertions", "5.3.0");
             AddAdditionalStuff();
         }
