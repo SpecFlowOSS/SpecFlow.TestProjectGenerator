@@ -279,13 +279,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureXUnit()
         {
-            _project.AddNuGetPackage("xunit.core", "2.3.1");
-            _project.AddNuGetPackage("xunit.extensibility.core", "2.3.1", new NuGetPackageAssembly("xunit.core, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.core.dll"));
-            _project.AddNuGetPackage("xunit.extensibility.execution", "2.3.1",
-                new NuGetPackageAssembly("xunit.execution.desktop, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
-            _project.AddNuGetPackage("xunit.assert", "2.3.1", new NuGetPackageAssembly("xunit.assert, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
-            _project.AddNuGetPackage("xunit.abstractions", "2.0.1", new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
-            _project.AddNuGetPackage("xunit.runner.visualstudio", "2.3.1");
+            _project.AddNuGetPackage("xunit.core", "2.4.0");
+            _project.AddNuGetPackage("xunit.extensibility.core", "2.4.0", new NuGetPackageAssembly("xunit.core, Version=2.4.0.4049, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.core.dll"));
+            _project.AddNuGetPackage("xunit.extensibility.execution", "2.4.0",
+                new NuGetPackageAssembly("xunit.execution.desktop, Version=2.4.0.4049, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
+            _project.AddNuGetPackage("xunit.assert", "2.4.0", new NuGetPackageAssembly("xunit.assert, Version=2.4.0.4049, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
+            _project.AddNuGetPackage("xunit.abstractions", "2.0.3", new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
+            _project.AddNuGetPackage("xunit.runner.visualstudio", "2.4.0");
 
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
