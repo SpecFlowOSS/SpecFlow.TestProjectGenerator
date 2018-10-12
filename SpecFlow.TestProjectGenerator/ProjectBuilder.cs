@@ -296,10 +296,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureMSTest()
         {
-            _project.AddNuGetPackage("MSTest.TestAdapter", "1.3.0");
+            _project.AddNuGetPackage("MSTest.TestAdapter", "1.3.2");
             _project.AddNuGetPackage(
                 "MSTest.TestFramework",
-                "1.3.0",
+                "1.3.2",
                 new NuGetPackageAssembly(
                     "Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL",
                     "net45\\Microsoft.VisualStudio.TestPlatform.TestFramework.dll"),
