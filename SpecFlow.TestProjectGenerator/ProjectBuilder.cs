@@ -14,7 +14,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
     public class ProjectBuilder
     {
         public const string NUnit3PackageName = "NUnit";
-        public const string NUnit3PackageVersion = "3.10.1";
+        public const string NUnit3PackageVersion = "3.11.0";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit3TestAdapterPackageVersion = "3.10.0";
         protected readonly TestProjectFolders _testProjectFolders;
