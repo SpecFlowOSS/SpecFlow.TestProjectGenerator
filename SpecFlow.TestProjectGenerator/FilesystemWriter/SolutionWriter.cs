@@ -27,7 +27,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             }
 
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
-            createSolutionCommand.Execute(new ProjectCreationNotPossibleException("Could not create solution."));
+            createSolutionCommand.Execute((innerException) => new ProjectCreationNotPossibleException("Could not create solution.", innerException));
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
 
             WriteProjects(solution, outputPath, solutionFilePath);

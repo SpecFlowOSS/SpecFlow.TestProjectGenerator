@@ -140,7 +140,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
                 reference.ToProject(projFilePath)
                          .Build()
-                         .Execute(new ProjectCreationNotPossibleException($"Writing ProjectRefences failed."));
+                         .Execute(innerException => new ProjectCreationNotPossibleException($"Writing ProjectRefences failed.", innerException));
             }
         }
 
@@ -203,7 +203,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                                        .WithLanguage(project.ProgrammingLanguage)
                                        .Build();
 
-            newProjCommand.Execute(new ProjectCreationNotPossibleException("Execution of dotnet new failed."));
+            newProjCommand.Execute(innerExceptions => new ProjectCreationNotPossibleException("Execution of dotnet new failed.", innerExceptions));
         }
     }
 }

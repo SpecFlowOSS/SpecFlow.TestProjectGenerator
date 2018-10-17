@@ -30,6 +30,21 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
             return new CommandResult(processResult.ExitCode, processResult.CombinedOutput);
         }
 
+        public CommandResult Execute(Func<Exception, Exception> exceptionFunction) 
+        {
+            var solutionCreateProcessHelper = new ProcessHelper();
+
+            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, ".", ExecutablePath, ArgumentsFormat);
+            if (processResult.ExitCode != 0)
+            {
+                var innerException = new Exception(processResult.CombinedOutput);
+
+                throw exceptionFunction(innerException);
+            }
+
+            return new CommandResult(processResult.ExitCode, processResult.CombinedOutput);
+        }
+
         public CommandResult Execute(Exception ex)
         {
             var solutionCreateProcessHelper = new ProcessHelper();
@@ -38,6 +53,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
             if (processResult.ExitCode != 0)
             {
                 var innerException = new Exception(processResult.CombinedOutput);
+                
                 throw ex;
             }
 
