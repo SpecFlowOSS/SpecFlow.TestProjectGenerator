@@ -255,10 +255,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private IEnumerable<string> FindFilePath(string[] lines, string ending, string starting)
         {
             return from l in lines
-                   let trimmed = l.Trim()
-                   where trimmed.StartsWith(starting)
-                   where trimmed.EndsWith(ending)
-                   select trimmed.Substring(starting.Length);
+                let trimmed = l.Trim()
+                let start = trimmed.IndexOf(starting)
+                where trimmed.Contains(starting)
+                where trimmed.EndsWith(ending)
+                select trimmed.Substring(start + starting.Length);
         }
 
         private string GenereateVsTestsArguments()
