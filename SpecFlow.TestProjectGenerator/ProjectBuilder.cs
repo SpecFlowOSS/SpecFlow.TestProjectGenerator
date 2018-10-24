@@ -226,11 +226,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                                                                           <Compile Include=""@(SpecFlowGeneratedFiles)"" />
                                                                        </ItemGroup>");
                 }
-
-                if (TargetFrameworks == TargetFramework.Netcoreapp20)
-                {
-                    _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "15.8.0");
-                }
             }
 
             switch (Configuration.UnitTestProvider)
