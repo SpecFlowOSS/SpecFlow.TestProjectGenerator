@@ -78,7 +78,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _projects.Add(project.ProjectName, project);
         }
 
-        public void CompileSolution()
+        public void CompileSolution(BuildTool buildTool)
         {
             foreach (var project in Projects.Values)
             {
@@ -88,7 +88,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             WriteToDisk();
             _nuGet.Restore();
 
-            _compileResult = _compiler.Run();
+            _compileResult = _compiler.Run(buildTool);
         }
 
         public void WriteToDisk()
@@ -124,5 +124,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         }
 
 
+    }
+
+    public enum BuildTool
+    {
+        MSBuild,
+        DotnetBuild,
+        DotnetMSBuild
     }
 }
