@@ -88,7 +88,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             string logFileContent =
                 logFiles.Length == 1
-                ? File.ReadAllText(new Uri(logFiles.Single()).LocalPath)
+                ? File.ReadAllText(new Uri(Uri.UnescapeDataString(logFiles.Single())).LocalPath)
                 : string.Empty;
 
             var reportFiles = GetReportFiles(output);
