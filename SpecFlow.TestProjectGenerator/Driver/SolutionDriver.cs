@@ -39,6 +39,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             NuGetSources = new List<NuGetSource>
             {
                 new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder),
+                new NuGetSource("LocalCheckedInPackages", Path.Combine(_folders.SourceRoot, "LocalNuGetFeed")),
                 new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json")
             };
             _solution = new Solution(SolutionName);
