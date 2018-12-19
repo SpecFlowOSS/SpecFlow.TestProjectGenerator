@@ -71,8 +71,8 @@ type internal Log =
 
             return $@"
 [<{attributeName}(@""{regex}"")>] let {methodName}({parameter}) : unit =
-    LocalApp.Log.LogStep @""{methodName}""
     {methodImplementation}
+    LocalApp.Log.LogStep @""{methodName}""
 ";
         }
 
