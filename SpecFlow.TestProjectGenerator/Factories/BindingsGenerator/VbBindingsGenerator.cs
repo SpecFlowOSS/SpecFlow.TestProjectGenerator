@@ -151,8 +151,8 @@ Public Class {Guid.NewGuid()}
     <[{hookType}({hookTypeAttributeTagsString})]>_
     {methodScopeAttributes}
     Public {staticKeyword} Sub {name}()
-        Console.WriteLine(""-> hook: {name}"")
         {code}
+        Console.WriteLine(""-> hook: {name}"")
     End Sub
 End Class
 ";

@@ -188,8 +188,8 @@ public class {$"HooksClass_{Guid.NewGuid():N}"}
     {scopeMethodAttributes}
     public {staticKeyword} void {name}()
     {{
-        global::Log.LogHook(); 
         {code}
+        global::Log.LogHook(); 
     }}   
 }}
 ";
