@@ -124,6 +124,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         }
 
 
+        public void CheckSolutionShouldHaseCompileError()
+        {
+            _compileResult.Should().NotBeNull("the project should have compiled");
+            _compileResult.IsSuccessful.Should().BeFalse("There should be a compile error");
+        }
     }
 
     public enum BuildTool

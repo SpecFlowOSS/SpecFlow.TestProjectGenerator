@@ -298,6 +298,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                     xw.WriteElementString("CopyToOutputDirectory", file.CopyToOutputDirectory.GetCopyToOutputDirectoryString());
                 }
 
+                foreach (var additionalMsBuildProperty in file.AdditionalMsBuildProperties)
+                {
+                    xw.WriteElementString(additionalMsBuildProperty.Key, additionalMsBuildProperty.Value);
+                }
+
                 xw.WriteEndElement();
                 _fileWriter.Write(file, projectRootPath);
             }

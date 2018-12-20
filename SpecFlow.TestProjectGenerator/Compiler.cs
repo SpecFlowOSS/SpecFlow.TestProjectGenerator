@@ -37,7 +37,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _outputWriter.WriteLine($"Invoke MsBuild from {msBuildPath}");
 
             var processHelper = new ProcessHelper();
-            var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, msBuildPath, $"/bl /nologo /v:m \"{_testProjectFolders.PathToSolutionFile}\"");
+            var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, msBuildPath, $"-restore -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"");
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);
         }

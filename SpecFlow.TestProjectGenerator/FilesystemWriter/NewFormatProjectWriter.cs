@@ -63,7 +63,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                     }
                 }
 
-                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || f.BuildAction.ToUpper() == "NONE" && f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy))
+                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || f.BuildAction.ToUpper() == "NONE" && (f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy || f.AdditionalMsBuildProperties.Any())))
                 {
                     WriteFileReference(xw, file);
                     created = true;
@@ -85,7 +85,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             {
                 xw.WriteElementString("CopyToOutputDirectory", projectFile.CopyToOutputDirectory.GetCopyToOutputDirectoryString());
             }
-            
+
+            foreach (var additionalMsBuildProperty in projectFile.AdditionalMsBuildProperties)
+            {
+                xw.WriteElementString(additionalMsBuildProperty.Key, additionalMsBuildProperty.Value);
+            }
+
             xw.WriteEndElement();
         }
 

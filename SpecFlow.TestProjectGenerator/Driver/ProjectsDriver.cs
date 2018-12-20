@@ -94,9 +94,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             project.AddBindingClass(rawBindingClass);
         }
 
+        public void AddFile(string fileName, string fileContent, string compileAction, Dictionary<string, string> additionalMSBuildProperties)
+        {
+            _solutionDriver.DefaultProject.AddFile(new ProjectFile(fileName, compileAction, fileContent, CopyToOutputDirectory.CopyAlways, additionalMSBuildProperties));
+        }
+
         public void AddFile(string fileName, string fileContent, string compileAction = "None")
         {
-            _solutionDriver.DefaultProject.AddFile(new ProjectFile(fileName, compileAction, fileContent, CopyToOutputDirectory.CopyAlways));
+            _solutionDriver.DefaultProject.AddFile(new ProjectFile(fileName, compileAction, fileContent, CopyToOutputDirectory.CopyAlways, new Dictionary<string, string>()));
         }
 
         public void EnableTestParallelExecution()
