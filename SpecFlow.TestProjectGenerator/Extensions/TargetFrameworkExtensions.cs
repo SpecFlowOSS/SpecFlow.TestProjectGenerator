@@ -45,6 +45,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Extensions
                     return AppendMoniker(tf & ~TargetFramework.Netcoreapp21, stringBuilder.AppendTargetFrameworkMoniker("netcoreapp2.1"));
                 }
 
+                if ((tf & TargetFramework.Netcoreapp22) == TargetFramework.Netcoreapp22)
+                {
+                    return AppendMoniker(tf & ~TargetFramework.Netcoreapp22, stringBuilder.AppendTargetFrameworkMoniker("netcoreapp2.2"));
+                }
+
                 return stringBuilder;
             }
 
