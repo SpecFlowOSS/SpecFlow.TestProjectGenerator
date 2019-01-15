@@ -29,8 +29,9 @@ public class {0}
             content = AddMissingNamespace(content, "using System.IO;");
             content = AddMissingNamespace(content, "using TechTalk.SpecFlow;");
 
-
-            return new ProjectFile($"BindingsClass_{Guid.NewGuid():N}.cs", "Compile", content);
+            string classNameGuidString = $"{Guid.NewGuid():N}".Substring(24);
+            string randomClassName = $"BindingsClass_{classNameGuidString}";
+            return new ProjectFile($"{randomClassName}.cs", "Compile", content);
         }
 
         private string AddMissingNamespace(string content, string @namespace)
@@ -45,7 +46,8 @@ public class {0}
 
         public override ProjectFile GenerateStepDefinition(string method)
         {
-            string randomClassName = $"BindingsClass_{Guid.NewGuid():N}";
+            string classNameGuidString = $"{Guid.NewGuid():N}".Substring(24);
+            string randomClassName = $"BindingsClass_{classNameGuidString}";
             string fileContent = string.Format(BindingsClassTemplate, randomClassName, method);
             return new ProjectFile($"{randomClassName}.cs", "Compile", fileContent);
         }

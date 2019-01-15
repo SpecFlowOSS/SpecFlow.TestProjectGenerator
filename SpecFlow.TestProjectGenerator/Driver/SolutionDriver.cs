@@ -49,7 +49,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
         public IList<NuGetSource> NuGetSources { get; }
 
-        public string SolutionName => $"S{SolutionGuid:N}";
+        public string SolutionName => $"S{SolutionGuid.ToString("N").Substring(24)}";
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects => _projects;
 

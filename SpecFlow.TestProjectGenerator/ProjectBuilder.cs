@@ -35,7 +35,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             Configuration = configuration;
             _currentVersionDriver = currentVersionDriver;
             _folders = folders;
-            ProjectName = $"TestProj_{ProjectGuid:N}";
+            string projectGuidString = $"{ProjectGuid:N}".Substring(24);
+            ProjectName = $"TestProj_{projectGuidString}";
         }
 
         public void AddProjectReference(string projectPath, ProjectBuilder projectToReference)

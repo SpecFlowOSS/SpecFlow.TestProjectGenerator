@@ -18,12 +18,15 @@ type {0}() =
 
         public override ProjectFile GenerateBindingClassFile(string content)
         {
-            return new ProjectFile($"BindingsClass_{Guid.NewGuid():N}.fs", "Compile", content);
+            string classNameGuidString = $"{Guid.NewGuid():N}".Substring(24);
+            string randomClassName = $"BindingsClass_{classNameGuidString}";
+            return new ProjectFile($"{randomClassName}.fs", "Compile", content);
         }
 
         public override ProjectFile GenerateStepDefinition(string method)
         {
-            string randomClassName = $"BindingsClass_{Guid.NewGuid():N}";
+            string classNameGuidString = $"{Guid.NewGuid():N}".Substring(24);
+            string randomClassName = $"BindingsClass_{classNameGuidString}";
             return new ProjectFile($"{randomClassName}.fs", "Compile", string.Format(BindingsClassTemplate, randomClassName, method));
         }
         public override ProjectFile GenerateLoggerClass(string pathToLogFile)
