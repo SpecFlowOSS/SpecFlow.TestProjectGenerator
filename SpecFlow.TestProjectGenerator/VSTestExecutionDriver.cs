@@ -18,6 +18,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private readonly TestProjectFolders _testProjectFolders;
         private readonly IOutputWriter _outputWriter;
         private readonly TestRunConfiguration _testRunConfiguration;
+        private UriCleaner _uriCleaner;
 
         private const string BeginnOfTrxFileLine = "Results File: ";
         private const string BeginnOfLogFileLine = "Log file: ";
@@ -29,6 +30,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _testProjectFolders = testProjectFolders;
             _outputWriter = outputWriter;
             _testRunConfiguration = testRunConfiguration;
+            _uriCleaner = new UriCleaner();
         }
 
         public TestExecutionResult LastTestExecutionResult { get; private set; }
@@ -65,7 +67,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             string vsFolder = _visualStudioFinder.Find();
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
 
-            var vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetTestAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
+            var vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
 
             var processHelper = new ProcessHelper();
             string arguments = GenereateVsTestsArguments();
@@ -86,9 +88,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             var trxFiles = FindFilePath(lines, ".trx", BeginnOfTrxFileLine).ToArray();
             var logFiles = FindFilePath(lines, ".log", BeginnOfLogFileLine).ToArray();
 
+           
+
             string logFileContent =
                 logFiles.Length == 1
-                ? File.ReadAllText(new Uri(Uri.UnescapeDataString(logFiles.Single())).LocalPath)
+                ? File.ReadAllText(_uriCleaner.ConvertSlashes(_uriCleaner.StripSchema(Uri.UnescapeDataString(logFiles.Single()))))
                 : string.Empty;
 
             var reportFiles = GetReportFiles(output);

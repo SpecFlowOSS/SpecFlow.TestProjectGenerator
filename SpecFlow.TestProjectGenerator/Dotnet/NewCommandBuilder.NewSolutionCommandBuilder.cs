@@ -23,7 +23,7 @@
             {
                 string arguments = $"new sln";
                 arguments = AddArgument(arguments, "-n", _name);
-                arguments = AddArgument(arguments, "-o", _rootPath);
+                arguments = AddArgument(arguments, "-o", "\"" + _rootPath + "\"");
 
                 return arguments;
             }
