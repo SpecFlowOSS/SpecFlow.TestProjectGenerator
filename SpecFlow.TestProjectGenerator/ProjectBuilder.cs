@@ -184,8 +184,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _testProjectFolders.PathToNuGetPackages = _project.ProjectFormat == ProjectFormat.Old  ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages") : _folders.GlobalPackages;
             _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
 
-            _project.AddNuGetPackage("BoDi", "1.4.0-alpha1", new NuGetPackageAssembly("BoDi, Version=1.4.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
-            _project.AddNuGetPackage("Gherkin", "6.0.0-beta1", new NuGetPackageAssembly("Gherkin, Version=6.0.0.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
+            _project.AddNuGetPackage("BoDi", "1.4.1", new NuGetPackageAssembly("BoDi, Version=1.4.1.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
+            _project.AddNuGetPackage("Gherkin", "6.0.0", new NuGetPackageAssembly("Gherkin, Version=6.0.0.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
             _project.AddNuGetPackage("Utf8Json", "1.3.7", new NuGetPackageAssembly("Utf8Json, Version=1.3.7.0, Culture=neutral, PublicKeyToken=8a73d3ba7e392e27", "net45\\Utf8Json.dll"));
             _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.4.0", new NuGetPackageAssembly("System.Threading.Tasks.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51", "portable-net45+win8+wp8+wpa81\\System.Threading.Tasks.Extensions.dll"));
 
