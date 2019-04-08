@@ -36,7 +36,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public string FindMSBuild()
         {
-            var msbuildExe = Path.Combine(Find(), "MSBuild", "15.0", "Bin", "msbuild.exe");
+            var msbuildExe = Path.Combine(Find(), "MSBuild", "Current", "Bin", "msbuild.exe");
             return msbuildExe;
         }
 
