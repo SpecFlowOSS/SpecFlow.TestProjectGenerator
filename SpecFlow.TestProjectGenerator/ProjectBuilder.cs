@@ -7,6 +7,7 @@ using TechTalk.SpecFlow.TestProjectGenerator.Driver;
 using TechTalk.SpecFlow.TestProjectGenerator.Extensions;
 using TechTalk.SpecFlow.TestProjectGenerator.Factories.BindingsGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerator;
+using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
@@ -160,8 +161,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void AddInitialOldFormatFSharpReferences()
         {
-            _project.AddNuGetPackage("FSharp.Compiler.Tools", "10.0.2");
-            _project.AddReference("FSharp.Core");
+            _project.AddNuGetPackage("FSharp.Compiler.Tools", "10.2.1");
+            _project.AddNuGetPackage("FSharp.Core", "4.6.2", new NuGetPackageAssembly("FSharp.Core, Version=4.6.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "net45\\FSharp.Core.dll"));
             _project.AddReference("System.Numerics");
         }
 
@@ -413,6 +414,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public void AddNuGetPackage(string nugetPackage, string nugetVersion)
         {
+            EnsureProjectExists();
             _project.AddNuGetPackage(nugetPackage, nugetVersion);
         }
 
