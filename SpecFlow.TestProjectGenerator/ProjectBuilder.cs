@@ -225,13 +225,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                 {
                     _project.AddMSBuildImport($"..\\packages\\SpecFlow.{_currentVersionDriver.SpecFlowVersion}\\tools\\TechTalk.SpecFlow.targets");
                 }
-
-                if (_project.ProjectFormat == ProjectFormat.Old)
-                {
-                    AddMSBuildTarget("AfterUpdateFeatureFilesInProject", @"<ItemGroup>
-                                                                          <Compile Include=""@(SpecFlowGeneratedFiles)"" />
-                                                                       </ItemGroup>");
-                }
             }
 
             switch (Configuration.UnitTestProvider)
