@@ -192,6 +192,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "15.9.0");
 
+            if (_project.ProjectFormat == ProjectFormat.Old)
+            {
+                _project.AddNuGetPackage("Cucumber.Messages", "1.0.0-beta.3", new NuGetPackageAssembly("Cucumber.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b10c5988214f940c", "net45\\Cucumber.Messages.dll"));
+                _project.AddNuGetPackage("Google.Protobuf", "3.7.0", new NuGetPackageAssembly("Google.Protobuf, Version=3.7.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604", "net45\\Google.Protobuf.dll"));
+            }
+
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
                 // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
