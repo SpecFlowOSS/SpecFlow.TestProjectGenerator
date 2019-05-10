@@ -7,7 +7,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class VisualStudioFinder
     {
-        private const string VsWhereParameter = @"-latest -products * -requires Microsoft.VisualStudio.PackageGroup.TestTools.Core -property installationPath";
+        private const string VsWhereInstallationPathParameter = @"-latest -products * -requires Microsoft.VisualStudio.PackageGroup.TestTools.Core -property installationPath";
+        private const string VsWhereMsBuildParameter = @"-latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe";
         private readonly Folders _folders;
         private readonly IOutputWriter _outputWriter;
 
@@ -19,7 +20,17 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public string Find()
         {
-            string vsWherePath = Path.Combine(_folders.GlobalPackages, "vswhere", "2.3.2", "tools", "vswhere.exe");
+            return ExecuteVsWhere(VsWhereInstallationPathParameter);
+        }
+
+        public string FindMSBuild()
+        {
+            return ExecuteVsWhere(VsWhereMsBuildParameter);
+        }
+
+        private string ExecuteVsWhere(string vsWhereParameters)
+        {
+            string vsWherePath = Path.Combine(_folders.GlobalPackages, "vswhere", "2.6.7", "tools", "vswhere.exe");
 
             if (!File.Exists(vsWherePath))
             {
@@ -27,22 +38,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             var ph = new ProcessHelper();
-            var processResult = ph.RunProcess(_outputWriter, ".", vsWherePath, VsWhereParameter);
-
+            var processResult = ph.RunProcess(_outputWriter, ".", vsWherePath, vsWhereParameters);
 
             var lines = processResult.CombinedOutput.Split(new string[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
             return lines.First();
-        }
-
-        public string FindMSBuild()
-        {
-            var msbuildExe = Path.Combine(Find(), "MSBuild", "Current", "Bin", "msbuild.exe");
-            return msbuildExe;
-        }
-
-        public string FindDevEnv()
-        {
-            return Path.Combine(Find(), "Common7", "IDE", "devenv.exe");
         }
     }
 }
