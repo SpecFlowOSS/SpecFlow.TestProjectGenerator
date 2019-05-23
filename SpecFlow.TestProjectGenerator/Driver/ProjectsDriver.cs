@@ -33,6 +33,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _solutionDriver.AddProject(projectBuilder);
         }
 
+        public void CreateProject(string projectName, string language, ProjectType projectType)
+        {
+            var projectBuilder = _projectBuilderFactory.CreateProject(projectName, language);
+            projectBuilder.ProjectType = projectType;
+            _solutionDriver.AddProject(projectBuilder);
+        }
+
         public void AddHookBinding(string eventType, string name, string hookTypeAttributeTagsString, string methodScopeAttributeTagsString = null, string classScopeAttributeTagsString = null, string code = "", int? order = null)
         {
             var hookTypeAttributeTags = hookTypeAttributeTagsString?.Split(',').Select(t => t.Trim()).ToArray();

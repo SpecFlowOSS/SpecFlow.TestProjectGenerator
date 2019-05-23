@@ -53,7 +53,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
         public IReadOnlyList<MSBuildTarget> MSBuildTargets => _msBuildTargets;
         public IReadOnlyList<MSBuildImport> MSBuildImports => _msbuildImports;
 
-        public void AddNuGetPackage(string name, string version)
+        public void AddNuGetPackage(string name, string version = null)
         {
             _nuGetPackages.Add(new NuGetPackage(name, version, KnownAssemblyNames.Get(name, version)));
         }

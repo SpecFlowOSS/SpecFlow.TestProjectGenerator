@@ -198,7 +198,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
         private void CreateProjectFile(Project project, string projRootPath)
         {
-            string template = project.ProjectType == ProjectType.Exe ? "console" : "classlib";
+            string template;
+
+            switch (project.ProjectType)
+            {
+                case ProjectType.Library:
+                    template = "classlib";
+                    break;
+                case ProjectType.Exe:
+                    template = "console";
+                    break;
+                case ProjectType.ASPNetCore:
+                    template = "web";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(project.ProjectType), $"ProjectType {project.ProjectType} is not supported");
+            }
+
+            
 
             var newProjCommand = DotNet.New(_outputWriter)
                                        .Project()
