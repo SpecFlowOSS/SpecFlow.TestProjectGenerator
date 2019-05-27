@@ -219,7 +219,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private List<TestResult> GetTestResults(XElement testRunElement, XNamespace xmlns)
         {
-            var testResults = from unitTestResultElement in testRunElement.Element(xmlns + "Results")?.Elements(xmlns + "UnitTestResult")
+            var testResults = from unitTestResultElement in testRunElement.Element(xmlns + "Results")?.Elements(xmlns + "UnitTestResult") ?? Enumerable.Empty<XElement>()
                               let outputElement = unitTestResultElement.Element(xmlns + "Output")
                               let idAttribute = unitTestResultElement.Attribute("executionId")
                               let outcomeAttribute = unitTestResultElement.Attribute("outcome")
