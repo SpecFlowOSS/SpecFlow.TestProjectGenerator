@@ -121,7 +121,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             foreach (var env in environmentVariables)
             {
-                processStartInfo.EnvironmentVariables.Add(env.Key, env.Value);
+                processStartInfo.Environment.Add(env.Key, env.Value);
             }
 
             return processStartInfo;
