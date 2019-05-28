@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using FluentAssertions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
+using TechTalk.SpecFlow.TestProjectGenerator.Driver;
 using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
@@ -18,18 +19,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private readonly TestProjectFolders _testProjectFolders;
         private readonly IOutputWriter _outputWriter;
         private readonly TestRunConfiguration _testRunConfiguration;
+        private readonly TestSuiteInitializationDriver _testSuiteInitializationDriver;
         private UriCleaner _uriCleaner;
 
         private const string BeginnOfTrxFileLine = "Results File: ";
         private const string BeginnOfLogFileLine = "Log file: ";
 
-        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, IOutputWriter outputWriter, TestRunConfiguration testRunConfiguration)
+        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, IOutputWriter outputWriter, TestRunConfiguration testRunConfiguration, TestSuiteInitializationDriver testSuiteInitializationDriver)
         {
             _visualStudioFinder = visualStudioFinder;
             _appConfigDriver = appConfigDriver;
             _testProjectFolders = testProjectFolders;
             _outputWriter = outputWriter;
             _testRunConfiguration = testRunConfiguration;
+            _testSuiteInitializationDriver = testSuiteInitializationDriver;
             _uriCleaner = new UriCleaner();
         }
 
@@ -67,14 +70,21 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             string vsFolder = _visualStudioFinder.Find();
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
 
-            var vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
+            string vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
+
+            var envVariables = new Dictionary<string, string>();
+
+            if (_testSuiteInitializationDriver.OverrideStartupTime is DateTime startupTime)
+            {
+                envVariables.Add("SpecFlow_Messages_TestRunStartedTimeOverride", $"{startupTime:O}");
+            }
 
             var processHelper = new ProcessHelper();
             string arguments = GenereateVsTestsArguments();
             ProcessResult processResult;
             try
             {
-                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, vsTestConsoleExePath, arguments);
+                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, vsTestConsoleExePath, arguments, envVariables);
             }
             catch (Exception)
             {
