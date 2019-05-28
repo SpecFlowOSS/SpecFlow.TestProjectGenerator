@@ -35,6 +35,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             var xd = XDocument.Load(projectFilePath);
             var projectElement = xd.Element(XName.Get("Project")) ?? throw new ProjectCreationNotPossibleException($"No 'Project' tag could be found in project file '{projectFilePath}'");
 
+            AdjustForASPNetCore(project, projectElement);
             SetTargetFramework(project, projectElement);
             WriteAssemblyReferences(project, projectElement);
             WriteNuGetPackages(project, projectElement);
@@ -45,6 +46,25 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             WriteProjectFiles(project, projRootPath);
 
             return projectFilePath;
+        }
+
+        private void AdjustForASPNetCore(Project project, XElement projectElement)
+        {
+            if (project.NuGetPackages.Any(n => n.Name == "Microsoft.AspNetCore.App"))
+            {
+                projectElement.Attribute("Sdk").SetValue("Microsoft.NET.Sdk.Web");
+
+                var itemGroup = new XElement("ItemGroup");
+                using (var xw = itemGroup.CreateWriter())
+                {
+                    xw.WriteStartElement("Content");
+                    xw.WriteAttributeString("Remove", "*.cshtml");
+                    xw.WriteEndElement();
+                }
+
+                projectElement.Add(itemGroup);
+            }
+            
         }
 
         private void WriteFileReferences(Project project, XElement projectElement)

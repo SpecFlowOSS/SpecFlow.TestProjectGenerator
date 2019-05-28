@@ -414,7 +414,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public void AddNuGetPackage(string nugetPackage, string nugetVersion = null)
         {
             EnsureProjectExists();
-            _project.AddNuGetPackage(nugetPackage);
+            _project.AddNuGetPackage(nugetPackage, nugetVersion);
         }
     }
 }
