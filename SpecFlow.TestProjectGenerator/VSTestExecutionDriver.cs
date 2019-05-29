@@ -74,9 +74,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             var envVariables = new Dictionary<string, string>();
 
-            if (_testSuiteInitializationDriver.OverrideStartupTime is DateTime startupTime)
+            if (_testSuiteInitializationDriver.OverrideTestSuiteStartupTime is DateTime testRunStartupTime)
             {
-                envVariables.Add("SpecFlow_Messages_TestRunStartedTimeOverride", $"{startupTime:O}");
+                envVariables.Add("SpecFlow_Messages_TestRunStartedTimeOverride", $"{testRunStartupTime:O}");
+            }
+
+            if (_testSuiteInitializationDriver.OverridePickleId is Guid pickleId)
+            {
+                envVariables.Add("SpecFlow_Messages_TestCaseStartedPickleIdOverride", $"{pickleId:D}");
+            }
+
+            if (_testSuiteInitializationDriver.OverrideTestCaseStartedTime is DateTime testCaseStartupTime)
+            {
+                envVariables.Add("SpecFlow_Messages_TestCaseStartedTimeOverride", $"{testCaseStartupTime:O}");
             }
 
             var processHelper = new ProcessHelper();

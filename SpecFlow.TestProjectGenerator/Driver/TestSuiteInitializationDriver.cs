@@ -4,6 +4,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 {
     public class TestSuiteInitializationDriver
     {
-        public DateTime? OverrideStartupTime { get; set; }
+        public DateTime? OverrideTestSuiteStartupTime { get; set; }
+
+        public Guid? OverridePickleId { get; set; }
+
+        public DateTime? OverrideTestCaseStartedTime { get; set; }
     }
 }
