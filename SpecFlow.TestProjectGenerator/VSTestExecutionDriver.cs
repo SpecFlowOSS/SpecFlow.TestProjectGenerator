@@ -79,14 +79,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                 envVariables.Add("SpecFlow_Messages_TestRunStartedTimeOverride", $"{testRunStartupTime:O}");
             }
 
-            if (_testSuiteInitializationDriver.OverridePickleId is Guid pickleId)
+            if (_testSuiteInitializationDriver.OverrideTestCaseStartedPickleId is Guid startedPickleId)
             {
-                envVariables.Add("SpecFlow_Messages_TestCaseStartedPickleIdOverride", $"{pickleId:D}");
+                envVariables.Add("SpecFlow_Messages_TestCaseStartedPickleIdOverride", $"{startedPickleId:D}");
             }
 
             if (_testSuiteInitializationDriver.OverrideTestCaseStartedTime is DateTime testCaseStartupTime)
             {
                 envVariables.Add("SpecFlow_Messages_TestCaseStartedTimeOverride", $"{testCaseStartupTime:O}");
+            }
+
+            if (_testSuiteInitializationDriver.OverrideTestCaseFinishedPickleId is Guid finishedPickleId)
+            {
+                envVariables.Add("SpecFlow_Messages_TestCaseFinishedPickleIdOverride", $"{finishedPickleId:D}");
+            }
+
+            if (_testSuiteInitializationDriver.OverrideTestCaseFinishedTime is DateTime testCaseFinishedTime)
+            {
+                envVariables.Add("SpecFlow_Messages_TestCaseFinishedTimeOverride", $"{testCaseFinishedTime:O}");
             }
 
             var processHelper = new ProcessHelper();
