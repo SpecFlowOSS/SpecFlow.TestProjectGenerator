@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Data
 {
@@ -55,22 +56,34 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
 
         public void AddNuGetPackage(string name, string version = null)
         {
-            _nuGetPackages.Add(new NuGetPackage(name, version, KnownAssemblyNames.Get(name, version)));
+            if (_nuGetPackages.All(n => n.Name != name))
+            {
+                _nuGetPackages.Add(new NuGetPackage(name, version, KnownAssemblyNames.Get(name, version)));
+            }
         }
 
         public void AddNuGetPackage(string name, string version, string allowedVersions)
         {
-            _nuGetPackages.Add(new NuGetPackage(name, version, allowedVersions, KnownAssemblyNames.Get(name, version)));
+            if (_nuGetPackages.All(n => n.Name != name))
+            {
+                _nuGetPackages.Add(new NuGetPackage(name, version, allowedVersions, KnownAssemblyNames.Get(name, version)));
+            }
         }
 
         public void AddNuGetPackage(string name, string version, params NuGetPackageAssembly[] assemblies)
         {
-            _nuGetPackages.Add(new NuGetPackage(name, version, assemblies));
+            if (_nuGetPackages.All(n => n.Name != name))
+            {
+                _nuGetPackages.Add(new NuGetPackage(name, version, assemblies));
+            }
         }
 
         public void AddNuGetPackage(string name, string version, string allowedVersions, params NuGetPackageAssembly[] assemblies)
         {
-            _nuGetPackages.Add(new NuGetPackage(name, version, allowedVersions, assemblies));
+            if (_nuGetPackages.All(n => n.Name != name))
+            {
+                _nuGetPackages.Add(new NuGetPackage(name, version, allowedVersions, assemblies));
+            }
         }
 
         public void AddReference(string name)
