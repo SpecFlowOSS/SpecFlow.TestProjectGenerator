@@ -123,11 +123,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _compileResult.IsSuccessful.Should().BeTrue("the project should have compiled successfully.\r\n\r\n------ Build output ------\r\n{0}", _compileResult.Output);
         }
 
-
         public void CheckSolutionShouldHaseCompileError()
         {
             _compileResult.Should().NotBeNull("the project should have compiled");
             _compileResult.IsSuccessful.Should().BeFalse("There should be a compile error");
+        }
+
+        public bool CheckCompileOutputForString(string str)
+        {
+            return _compileResult.Output.Contains(str);
         }
     }
 
