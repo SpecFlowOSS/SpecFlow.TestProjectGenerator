@@ -28,8 +28,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
 
         public IEnumerable<IMessage> LoadMessageQueue()
         {
-            string pathToCucumberMessagesFile = Path.Combine(_testProjectFolders.ProjectBinOutputPath, "CucumberMessageQueue", "messages");
-            if (!File.Exists(pathToCucumberMessagesFile))
+            if (!TryGetPathCucumberMessagesFile(out string pathToCucumberMessagesFile))
             {
                 yield break;
             }
@@ -43,6 +42,26 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
                     yield return UnpackWrapper(message);
                 }
             }
+        }
+
+        public bool TryGetPathCucumberMessagesFile(out string pathToCucumberMessagesQueue)
+        {
+            string pathInBinFolder = Path.Combine(_testProjectFolders.ProjectBinOutputPath, "CucumberMessageQueue", "messages");
+            if (File.Exists(pathInBinFolder))
+            {
+                pathToCucumberMessagesQueue = pathInBinFolder;
+                return true;
+            }
+
+            string pathInTestResultsFolder = Path.Combine(_testProjectFolders.ProjectFolder, "TestResults", "CucumberMessageQueue", "messages");
+            if (File.Exists(pathInTestResultsFolder))
+            {
+                pathToCucumberMessagesQueue = pathInTestResultsFolder;
+                return true;
+            }
+
+            pathToCucumberMessagesQueue = default;
+            return false;
         }
     }
 }
