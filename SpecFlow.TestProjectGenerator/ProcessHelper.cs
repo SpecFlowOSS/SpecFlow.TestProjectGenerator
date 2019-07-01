@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -28,12 +29,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private static TimeSpan _timeout = TimeSpan.FromMinutes(15);
         private static readonly int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
 
-        public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
+        public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables, params object[] arguments)
         {
-            var parameters = string.Format(argumentsFormat, arguments);
+            string parameters = string.Format(argumentsFormat, arguments);
 
             outputWriter.WriteLine("Starting external program: \"{0}\" {1} in {2}", executablePath, parameters, workingDirectory);
-            var psi = CreateProcessStartInfo(workingDirectory, executablePath, parameters);
+            var psi = CreateProcessStartInfo(workingDirectory, executablePath, parameters, environmentVariables);
 
 
             var process = new Process
@@ -101,9 +102,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), combinedOutput.ToString());
         }
 
-        private ProcessStartInfo CreateProcessStartInfo(string workingDirectory, string executablePath, string parameters)
+        public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
         {
-            return new ProcessStartInfo(executablePath, parameters)
+            return RunProcess(outputWriter, workingDirectory, executablePath, argumentsFormat, new Dictionary<string, string>(), arguments);
+        }
+
+        private ProcessStartInfo CreateProcessStartInfo(string workingDirectory, string executablePath, string parameters, IReadOnlyDictionary<string, string> environmentVariables)
+        {
+            var processStartInfo = new ProcessStartInfo(executablePath, parameters)
             {
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -112,6 +118,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                 WindowStyle = ProcessWindowStyle.Hidden,
                 WorkingDirectory = workingDirectory
             };
+
+            foreach (var env in environmentVariables)
+            {
+                processStartInfo.Environment.Add(env.Key, env.Value);
+            }
+
+            return processStartInfo;
         }
     }
 }

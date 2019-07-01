@@ -192,18 +192,27 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "15.9.0");
 
+                if (_project.ProjectFormat == ProjectFormat.Old)
+                {
+                    _project.AddNuGetPackage("Cucumber.Messages", "1.0.0-beta.5", new NuGetPackageAssembly("Cucumber.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b10c5988214f940c", "net45\\Cucumber.Messages.dll"));
+                    _project.AddNuGetPackage("Google.Protobuf", "3.7.0", new NuGetPackageAssembly("Google.Protobuf, Version=3.7.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604", "net45\\Google.Protobuf.dll"));
+                }
+
                 if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
+                {
                     // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
                     _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
+                }
                 else
+                {
                     _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
+                }
 
                 _project.AddNuGetPackage("BoDi", "1.4.1", new NuGetPackageAssembly("BoDi, Version=1.4.1.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
                 _project.AddNuGetPackage("Gherkin", "6.0.0", new NuGetPackageAssembly("Gherkin, Version=6.0.0.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
                 _project.AddNuGetPackage("Utf8Json", "1.3.7", new NuGetPackageAssembly("Utf8Json, Version=1.3.7.0, Culture=neutral, PublicKeyToken=8a73d3ba7e392e27", "net45\\Utf8Json.dll"));
                 _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.1",
                     new NuGetPackageAssembly("System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51", "portable-net45+win8+wp8+wpa81\\System.Threading.Tasks.Extensions.dll"));
-
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
                 _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
