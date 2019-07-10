@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
 {
@@ -19,6 +20,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public string LogFileContent { get; set; }
         public bool ValidLicense { get; set; }
         public int ExitCode { get; set; }
+
+
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
     }
 
     public class TestResult
