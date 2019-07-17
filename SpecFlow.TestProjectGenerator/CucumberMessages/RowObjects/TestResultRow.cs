@@ -1,4 +1,4 @@
-﻿using Io.Cucumber.Messages;
+﻿using static Io.Cucumber.Messages.TestResult.Types;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages.RowObjects
 {

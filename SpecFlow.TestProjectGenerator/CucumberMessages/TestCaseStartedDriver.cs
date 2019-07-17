@@ -37,5 +37,31 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
                 testCaseStarted.PickleId.Should().Be(expectedPickleId);
             }
         }
+
+        public void TestCaseStartedMessageShouldHaveBeenSentWithPlatformInformation(PlatformRow platformRow)
+        {
+            var messageQueue = _cucumberMessagesDriver.LoadMessageQueue();
+            var testCaseStarted = messageQueue.ToArray().OfType<TestCaseStarted>().First();
+
+            if (platformRow.Cpu is string cpu)
+            {
+                testCaseStarted.Platform.Cpu.Should().Be(cpu);
+            }
+
+            if (platformRow.Os is string os)
+            {
+                testCaseStarted.Platform.Os.Should().Be(os);
+            }
+
+            if (platformRow.Implementation is string implementation)
+            {
+                testCaseStarted.Platform.Implementation.Should().Be(implementation);
+            }
+
+            if (platformRow.Version is string version)
+            {
+                testCaseStarted.Platform.Version.Should().Be(version);
+            }
+        }
     }
 }

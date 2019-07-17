@@ -5,6 +5,8 @@ using FluentAssertions;
 using Io.Cucumber.Messages;
 using TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages.RowObjects;
 
+using static Io.Cucumber.Messages.TestResult.Types;
+
 namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
 {
     public class TestCaseFinishedDriver

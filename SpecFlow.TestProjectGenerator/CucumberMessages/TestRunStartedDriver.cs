@@ -43,11 +43,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             {
                 testRunStarted.Timestamp.ToDateTime().Should().Be(expectedTimeStamp);
             }
-
-            if (testRunStartedRow.CucumberImplementation is string expectedCucumberImplementation)
-            {
-                testRunStarted.CucumberImplementation.Should().Be(expectedCucumberImplementation);
-            }
         }
     }
 }
