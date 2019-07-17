@@ -3,7 +3,5 @@
     public class TestRunStartedRow
     {
         public string Timestamp { get; set; }
-
-        public string CucumberImplementation { get; set; }
     }
 }
