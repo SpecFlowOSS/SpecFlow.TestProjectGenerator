@@ -15,14 +15,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             _testProjectFolders = testProjectFolders;
         }
 
-        public IMessage UnpackWrapper(Wrapper wrapper)
+        public IMessage UnpackEnvelope(Envelope envelope)
         {
-            switch (wrapper.MessageCase)
+            switch (envelope.MessageCase)
             {
-                case Wrapper.MessageOneofCase.TestRunStarted: return wrapper.TestRunStarted;
-                case Wrapper.MessageOneofCase.TestCaseStarted: return wrapper.TestCaseStarted;
-                case Wrapper.MessageOneofCase.TestCaseFinished: return wrapper.TestCaseFinished;
-                default: throw new InvalidOperationException($"(Currently) unsupported message type: {wrapper.MessageCase}");
+                case Envelope.MessageOneofCase.TestRunStarted: return envelope.TestRunStarted;
+                case Envelope.MessageOneofCase.TestCaseStarted: return envelope.TestCaseStarted;
+                case Envelope.MessageOneofCase.TestCaseFinished: return envelope.TestCaseFinished;
+                default: throw new InvalidOperationException($"(Currently) unsupported message type: {envelope.MessageCase}");
             }
         }
 
@@ -37,9 +37,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             {
                 while (fileStream.CanSeek && fileStream.Position < fileStream.Length)
                 {
-                    var messageParser = Wrapper.Parser;
+                    var messageParser = Envelope.Parser;
                     var message = messageParser.ParseDelimitedFrom(fileStream);
-                    yield return UnpackWrapper(message);
+                    yield return UnpackEnvelope(message);
                 }
             }
         }
