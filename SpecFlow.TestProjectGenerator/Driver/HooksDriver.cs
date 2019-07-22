@@ -15,17 +15,28 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _testProjectFolders = testProjectFolders;
         }
 
-        public void CheckIsHookExecuted(string methodName, int timesExecuted)
+        public void CheckIsHookExecuted(string methodName, int expectedTimesExecuted)
+        {
+            int hookExecutionCount = GetHookExecutionCount(methodName);
+            hookExecutionCount.Should().Be(expectedTimesExecuted);
+        }
+
+        public int GetHookExecutionCount(string methodName)
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
             string pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
+            if (!File.Exists(pathToHookLogFile))
+            {
+                return 0;
+            }
+
             string content = File.ReadAllText(pathToHookLogFile);
             content.Should().NotBeNull();
 
             var regex = new Regex($@"-> hook: {methodName}");
 
-            regex.Matches(content).Count.Should().Be(timesExecuted);
+            return regex.Matches(content).Count;
         }
 
         public void CheckIsHookExecutedInOrder(IEnumerable<string> methodNames)
