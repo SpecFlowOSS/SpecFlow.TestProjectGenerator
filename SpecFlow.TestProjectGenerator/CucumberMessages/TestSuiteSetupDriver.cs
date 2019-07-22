@@ -103,7 +103,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             AddFeatureFiles(1);
         }
 
-        public void AddScenarioWithGivenStep(string step)
+        public void AddScenarioWithGivenStep(string step, string tags = "")
         {
             if (!_isProjectCreated)
             {
@@ -115,6 +115,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             var featureBuilder = new StringBuilder();
             featureBuilder.AppendLine($"Feature: {featureTitle}");
 
+            featureBuilder.AppendLine(tags);
             featureBuilder.AppendLine("Scenario: scenario");
             featureBuilder.AppendLine($"Given {step}");
             featureBuilder.AppendLine();
