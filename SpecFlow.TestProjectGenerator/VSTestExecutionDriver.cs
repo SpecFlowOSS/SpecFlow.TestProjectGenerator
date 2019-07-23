@@ -229,11 +229,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private TestExecutionResult CalculateMsTestTestExecutionResult(TestExecutionResult testExecutionResult)
         {
-            testExecutionResult.Pending = testExecutionResult.TestResults
+            testExecutionResult.Ignored = testExecutionResult.TestResults
                                                              .Where(r => r.ErrorMessage != null)
                                                              .Select(r => r.ErrorMessage)
                                                              .Count(m => m.Contains("Assert.Inconclusive failed"));
-            testExecutionResult.Ignored = testExecutionResult.Total - testExecutionResult.Executed - testExecutionResult.Pending;
+            testExecutionResult.Pending = testExecutionResult.Total - testExecutionResult.Executed - testExecutionResult.Ignored;
             
             return testExecutionResult;
         }
@@ -273,7 +273,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             var elements = from testResult in testExecutionResult.TestResults
                            where testResult.Outcome == "NotExecuted"
-                           where testResult.ErrorMessage?.Contains("Ignored scenario") == true
+                           where testResult.ErrorMessage?.Contains("Scenario ignored using @Ignore tag") == true
                                  || testResult.ErrorMessage?.Contains("Ignored feature") == true
                            select testResult;
 
