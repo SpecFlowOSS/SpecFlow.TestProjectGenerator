@@ -301,6 +301,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _project.AddNuGetPackage("xunit.abstractions", "2.0.3",
                 new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
             _project.AddNuGetPackage("xunit.runner.visualstudio", "2.4.0");
+            _project.AddNuGetPackage("Xunit.SkippableFact", "1.3.12", new NuGetPackageAssembly("Xunit.SkippableFact, Version=1.3.0.0, Culture=neutral, PublicKeyToken=b2b52da82b58eb73", "net45\\Xunit.SkippableFact.dll"));
+            _project.AddNuGetPackage("Validation", "2.4.18", new NuGetPackageAssembly("Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7", "net45\\Validation.dll"));
 
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
