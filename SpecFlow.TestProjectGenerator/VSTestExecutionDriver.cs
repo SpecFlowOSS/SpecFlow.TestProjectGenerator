@@ -118,7 +118,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             var trxFiles = FindFilePath(lines, ".trx", BeginnOfTrxFileLine).ToArray();
             var logFiles = FindFilePath(lines, ".log", BeginnOfLogFileLine).ToArray();
 
-           
+
 
             string logFileContent =
                 logFiles.Length == 1
@@ -232,9 +232,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             testExecutionResult.Ignored = testExecutionResult.TestResults
                                                              .Where(r => r.ErrorMessage != null)
                                                              .Select(r => r.ErrorMessage)
-                                                             .Count(m => m.Contains("Assert.Inconclusive failed"));
-            testExecutionResult.Pending = testExecutionResult.Total - testExecutionResult.Executed - testExecutionResult.Ignored;
-            
+                                                             .Count(m => m.Contains("Assert.Inconclusive failed") && !m.Contains("One or more step definitions are not implemented yet"));
+
+
+            testExecutionResult.Pending = testExecutionResult.TestResults
+                                                             .Where(r => r.ErrorMessage != null)
+                                                             .Select(r => r.ErrorMessage)
+                                                             .Count(m => m.Contains("Assert.Inconclusive failed. One or more step definitions are not implemented yet."));
+
             return testExecutionResult;
         }
 
@@ -279,7 +284,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             return elements.Count();
         }
-        
+
         private int GetXUnitPendingCount(string output)
         {
             return Regex.Matches(output, "XUnitPendingStepException").Count / 2 +
@@ -289,11 +294,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private IEnumerable<string> FindFilePath(string[] lines, string ending, string starting)
         {
             return from l in lines
-                let trimmed = l.Trim()
-                let start = trimmed.IndexOf(starting)
-                where trimmed.Contains(starting)
-                where trimmed.EndsWith(ending)
-                select trimmed.Substring(start + starting.Length);
+                   let trimmed = l.Trim()
+                   let start = trimmed.IndexOf(starting)
+                   where trimmed.Contains(starting)
+                   where trimmed.EndsWith(ending)
+                   select trimmed.Substring(start + starting.Length);
         }
 
         private string GenereateVsTestsArguments()
