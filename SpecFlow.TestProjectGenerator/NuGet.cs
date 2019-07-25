@@ -40,7 +40,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         protected virtual string GetPathToNuGetExe()
         {
-            return Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine", "4.5.1", "tools", "NuGet.exe");
+            return Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine", "5.1.0", "tools", "NuGet.exe");
         }
     }
 }
