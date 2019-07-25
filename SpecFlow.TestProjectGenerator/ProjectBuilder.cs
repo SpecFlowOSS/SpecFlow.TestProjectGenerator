@@ -22,12 +22,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         protected readonly CurrentVersionDriver _currentVersionDriver;
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly Folders _folders;
+        private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
         protected readonly TestProjectFolders _testProjectFolders;
         private bool _parallelTestExecution;
         private Project _project;
 
-        public ProjectBuilder(TestProjectFolders testProjectFolders, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory,
-            ConfigurationGeneratorFactory configurationGeneratorFactory, Configuration configuration, CurrentVersionDriver currentVersionDriver, Folders folders)
+        public ProjectBuilder(
+            TestProjectFolders testProjectFolders,
+            FeatureFileGenerator featureFileGenerator,
+            BindingsGeneratorFactory bindingsGeneratorFactory,
+            ConfigurationGeneratorFactory configurationGeneratorFactory,
+            Configuration configuration,
+            CurrentVersionDriver currentVersionDriver,
+            Folders folders,
+            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
         {
             _testProjectFolders = testProjectFolders;
             _featureFileGenerator = featureFileGenerator;
@@ -36,6 +44,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             Configuration = configuration;
             _currentVersionDriver = currentVersionDriver;
             _folders = folders;
+            _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
             var projectGuidString = $"{ProjectGuid:N}".Substring(24);
             ProjectName = $"TestProj_{projectGuidString}";
         }
@@ -412,7 +421,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private string GetProjectCompilePath(Project project)
         {
             // TODO: hardcoded "Debug" value should be replaced by a configuration parameter
-            if (project.ProjectFormat == ProjectFormat.New) return Path.Combine("bin", "Debug", project.TargetFrameworks.ToTargetFrameworkMoniker().Split(';')[0]);
+            if (project.ProjectFormat == ProjectFormat.New)
+            {
+                return Path.Combine("bin", "Debug", _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(project.TargetFrameworks).Split(';')[0]);
+            }
 
             return Path.Combine("bin", "Debug");
         }

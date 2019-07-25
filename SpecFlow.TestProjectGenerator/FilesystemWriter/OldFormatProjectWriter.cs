@@ -9,11 +9,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
     public class OldFormatProjectWriter : XmlFileGeneratorBase, IProjectWriter
     {
         private readonly IOutputWriter _outputWriter;
+        private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
         private readonly ProjectFileWriter _fileWriter = new ProjectFileWriter();
 
-        public OldFormatProjectWriter(IOutputWriter outputWriter)
+        public OldFormatProjectWriter(IOutputWriter outputWriter, TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
         {
             _outputWriter = outputWriter;
+            _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
         }
 
         public virtual string WriteProject(Project project, string path)
@@ -232,7 +234,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
             xw.WriteEndElement();
 
-            var pkgConf = new PackagesConfigGenerator().Generate(project.NuGetPackages, project.TargetFrameworks);
+            var pkgConf = new PackagesConfigGenerator(_targetFrameworkMonikerStringBuilder).Generate(project.NuGetPackages, project.TargetFrameworks);
             project.AddFile(pkgConf);
         }
 

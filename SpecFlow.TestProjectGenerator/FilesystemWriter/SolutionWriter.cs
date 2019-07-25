@@ -15,7 +15,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         public SolutionWriter(IOutputWriter outputWriter)
         {
             _outputWriter = outputWriter;
-            _projectWriterFactory = new ProjectWriterFactory(outputWriter);
+            _projectWriterFactory = new ProjectWriterFactory(outputWriter, new TargetFrameworkMonikerStringBuilder());
             _projectFileWriter = new ProjectFileWriter();
         }
 
