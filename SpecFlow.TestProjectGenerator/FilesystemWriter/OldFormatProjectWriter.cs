@@ -10,12 +10,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
     {
         private readonly IOutputWriter _outputWriter;
         private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
+        private readonly TargetFrameworkVersionStringBuilder _targetFrameworkVersionStringBuilder;
         private readonly ProjectFileWriter _fileWriter = new ProjectFileWriter();
 
-        public OldFormatProjectWriter(IOutputWriter outputWriter, TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
+        public OldFormatProjectWriter(IOutputWriter outputWriter, TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder, TargetFrameworkVersionStringBuilder targetFrameworkVersionStringBuilder)
         {
             _outputWriter = outputWriter;
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
+            _targetFrameworkVersionStringBuilder = targetFrameworkVersionStringBuilder;
         }
 
         public virtual string WriteProject(Project project, string path)
@@ -117,11 +119,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             string targetFramework;
             try
             {
-                targetFramework = project.TargetFrameworks.ToOldNetVersion();
+                targetFramework = _targetFrameworkVersionStringBuilder.BuildTargetFrameworkVersion(project.TargetFrameworks);
             }
             catch (InvalidOperationException exc)
             {
-                throw new ProjectCreationNotPossibleException("Multiple target frameworks don't work with the old csproj format", exc);
+                throw new ProjectCreationNotPossibleException($"The specified target framework is not supported: {project.TargetFrameworks}", exc);
             }
 
             string outputType = project.ProjectType == ProjectType.Exe ? "WinExe" : "Library";

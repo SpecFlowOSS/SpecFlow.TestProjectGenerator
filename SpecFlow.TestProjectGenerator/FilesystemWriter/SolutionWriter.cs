@@ -15,7 +15,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         public SolutionWriter(IOutputWriter outputWriter)
         {
             _outputWriter = outputWriter;
-            _projectWriterFactory = new ProjectWriterFactory(outputWriter, new TargetFrameworkMonikerStringBuilder());
+            _projectWriterFactory = new ProjectWriterFactory(outputWriter, new TargetFrameworkMonikerStringBuilder(), new TargetFrameworkVersionStringBuilder());
             _projectFileWriter = new ProjectFileWriter();
         }
 
@@ -48,7 +48,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             foreach (var project in solution.Projects)
             {
                 var formatProjectWriter = _projectWriterFactory.FromProjectFormat(project.ProjectFormat);
-                var pathToProjectFile = WriteProject(project, outputPath, formatProjectWriter, solutionFilePath);
+                string pathToProjectFile = WriteProject(project, outputPath, formatProjectWriter, solutionFilePath);
                 projectPathMappings.Add(project, pathToProjectFile);
             }
 

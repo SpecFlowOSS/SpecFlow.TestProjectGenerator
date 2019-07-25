@@ -1,25 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
 {
-    public class TargetFrameworkMonikerStringBuilder
+    public class TargetFrameworkVersionStringBuilder
     {
         private readonly IReadOnlyDictionary<TargetFramework, string> _targetFrameworkMonikerMappings = new Dictionary<TargetFramework, string>
         {
-            [TargetFramework.Net35] = "net35",
-            [TargetFramework.Net45] = "net45",
-            [TargetFramework.Net452] = "net452",
-            [TargetFramework.NetStandard20] = "netstandard2.0",
-            [TargetFramework.Netcoreapp20] = "netcoreapp2.0",
-            [TargetFramework.Netcoreapp21] = "netcoreapp2.1",
-            [TargetFramework.Netcoreapp22] = "netcoreapp2.2"
+            [TargetFramework.Net35] = "v3.5",
+            [TargetFramework.Net45] = "v4.5",
+            [TargetFramework.Net452] = "v4.5.2",
         };
 
-        public string BuildTargetFrameworkMoniker(TargetFramework targetFramework)
+        public string BuildTargetFrameworkVersion(TargetFramework targetFramework)
         {
-            var allTargetFrameworkMonikers = GetAllTargetFrameworkMonikers(Enumerable.Empty<string>(), targetFramework);
+            var allTargetFrameworkMonikers = GetAllTargetFrameworkMonikers(Enumerable.Empty<string>(), targetFramework).ToArray();
+            if (allTargetFrameworkMonikers.Length > 1)
+            {
+                throw new InvalidOperationException("The old project format only supports one target framework version.");
+            }
+
+            if (allTargetFrameworkMonikers.Length == 0)
+            {
+                throw new InvalidOperationException("Only .NET Framework target frameworks are supported.");
+            }
+
             return string.Join(";", allTargetFrameworkMonikers);
         }
 
