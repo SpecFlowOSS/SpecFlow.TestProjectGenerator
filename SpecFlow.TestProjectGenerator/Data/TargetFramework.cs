@@ -12,5 +12,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
         Net35 = 0b00_01_00_00,
         Netcoreapp21 = 0b00_10_00_00,
         Netcoreapp22 = 0b01_00_00_00,
+        Netcoreapp30 = 0b10_00_00_00,
     }
 }
