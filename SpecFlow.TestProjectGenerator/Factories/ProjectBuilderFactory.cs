@@ -70,7 +70,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories
         private ProjectBuilder CreateProjectInternal(string projectName, ProgrammingLanguage language)
         {
             var project = CreateProjectBuilder();
-            project.TargetFrameworks = _testRunConfiguration.TargetFramework;
+            project.TargetFramework = _testRunConfiguration.TargetFramework;
             project.Format = _testRunConfiguration.ProjectFormat;
             project.ConfigurationFormat = _testRunConfiguration.ConfigurationFormat;
             project.Language = language;

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using TechTalk.SpecFlow.TestProjectGenerator.Data;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 {
@@ -10,27 +10,23 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         private static readonly NetCoreSdkInfo NetCore21 = new NetCoreSdkInfo("2.1.801");
         private static readonly NetCoreSdkInfo NetCore20 = new NetCoreSdkInfo("2.1.202");
 
-        private readonly IReadOnlyDictionary<string, NetCoreSdkInfo> _sdkMappings = new Dictionary<string, NetCoreSdkInfo>
+        private readonly IReadOnlyDictionary<TargetFramework, NetCoreSdkInfo> _sdkMappings = new Dictionary<TargetFramework, NetCoreSdkInfo>
         {
-            ["netcoreapp3.0"] = NetCore30Preview,
-            ["netcoreapp2.2"] = NetCore22,
-            ["netcoreapp2.1"] = NetCore21,
-            ["netcoreapp2.0"] = NetCore20,
-            ["netstandard2.0"] = NetCore22,
-            ["net35"] = NetCore22,
-            ["net45"] = NetCore22,
-            ["net452"] = NetCore22,
-            ["net471"] = NetCore22
+            [TargetFramework.Netcoreapp30] = NetCore30Preview,
+            [TargetFramework.Netcoreapp22] = NetCore22,
+            [TargetFramework.Netcoreapp21] = NetCore21,
+            [TargetFramework.Netcoreapp20] = NetCore20,
+            [TargetFramework.NetStandard20] = NetCore22
         };
 
-        public NetCoreSdkInfo GetSdkFromTargetFramework(string targetFramework)
+        public NetCoreSdkInfo GetSdkFromTargetFramework(TargetFramework targetFramework)
         {
             if (_sdkMappings.TryGetValue(targetFramework, out var netCoreSdkInfo))
             {
                 return netCoreSdkInfo;
             }
 
-            throw new NotSupportedException($"Target framework {targetFramework} does not have an associated SDK");
+            return null;
         }
     }
 }

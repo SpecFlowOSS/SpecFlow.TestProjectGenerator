@@ -52,7 +52,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public Configuration Configuration { get; }
         public string ProjectName { get; set; }
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
-        public TargetFramework TargetFrameworks { get; set; } = TargetFramework.Net452;
+        public TargetFramework TargetFramework { get; set; } = TargetFramework.Net452;
         public ProjectFormat Format { get; set; } = ProjectFormat.Old;
         public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Config;
 
@@ -185,7 +185,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             if (_project != null) return;
 
-            _project = new Project(ProjectName, ProjectGuid, Language, TargetFrameworks, Format, ProjectType);
+            _project = new Project(ProjectName, ProjectGuid, Language, TargetFramework, Format, ProjectType);
 
             _testProjectFolders.PathToNuGetPackages = _project.ProjectFormat == ProjectFormat.Old ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages") : _folders.GlobalPackages;
 
@@ -365,7 +365,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureRunnerForSpecFlow3()
         {
-            string targetFramework = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFrameworks);
+            string targetFramework = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
             _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
                 new NuGetPackageAssembly($"SpecRun.Runtime.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL",
                     $"{targetFramework}\\SpecRun.Runtime.SpecFlowPlugin.dll"),

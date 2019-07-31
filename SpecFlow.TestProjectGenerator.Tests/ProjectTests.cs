@@ -5,8 +5,6 @@ using Moq;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Extensions;
 using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 
 // ReSharper disable InconsistentNaming
@@ -266,39 +264,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 
             projectFileContent.Should()
                               .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net45</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
-        }
-
-        [Fact]
-        public void CreateEmtpyProjectWithMultipleFrameworksInNewFormat()
-        {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(
-                ProjectFormat.New,
-                ProgrammingLanguage.CSharp,
-                TargetFramework.Net45 | TargetFramework.NetStandard20);
-
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
-
-            projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net45;netstandard2.0</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
-        }
-
-        [Fact]
-        public void MultipleFrameworksInOldFormatNotPossible()
-        {
-            var (solution, _, solutionFolder) = CreateEmptySolutionAndProject(
-                ProjectFormat.Old,
-                ProgrammingLanguage.CSharp,
-                TargetFramework.Net45 | TargetFramework.NetStandard20);
-
-            Action createSolution = () => new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
-
-            createSolution.Should()
-                          .Throw<ProjectCreationNotPossibleException>()
-                          .WithInnerException<InvalidOperationException>()
-                          .WithMessage("Multiple target frameworks don't work with the old csproj format");
-
-
         }
     }
 
