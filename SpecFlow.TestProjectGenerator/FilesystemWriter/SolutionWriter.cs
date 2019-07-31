@@ -14,12 +14,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         private readonly ProjectFileWriter _projectFileWriter;
         private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
         private readonly NetCoreSdkInfoProvider _netCoreSdkInfoProvider;
+        private readonly TargetFrameworkSplitter _targetFrameworkSplitter;
+        private readonly TargetFrameworkVersionStringBuilder _targetFrameworkVersionStringBuilder;
 
         public SolutionWriter(IOutputWriter outputWriter)
         {
             _outputWriter = outputWriter;
-            _targetFrameworkMonikerStringBuilder = new TargetFrameworkMonikerStringBuilder();
-            _projectWriterFactory = new ProjectWriterFactory(outputWriter, _targetFrameworkMonikerStringBuilder, new TargetFrameworkVersionStringBuilder());
+            _targetFrameworkSplitter = new TargetFrameworkSplitter();
+            _targetFrameworkMonikerStringBuilder = new TargetFrameworkMonikerStringBuilder(_targetFrameworkSplitter);
+            _targetFrameworkVersionStringBuilder = new TargetFrameworkVersionStringBuilder(_targetFrameworkSplitter);
+            _projectWriterFactory = new ProjectWriterFactory(outputWriter, _targetFrameworkMonikerStringBuilder, _targetFrameworkVersionStringBuilder);
             _projectFileWriter = new ProjectFileWriter();
             _netCoreSdkInfoProvider = new NetCoreSdkInfoProvider();
         }
@@ -46,14 +50,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 solution.Projects
                         .Select(p => p.TargetFrameworks)
                         .SelectMany(_targetFrameworkMonikerStringBuilder.GetAllTargetFrameworkMonikers)
-                        .First();
-            var sdk = _netCoreSdkInfoProvider.GetSdkFromTargetFramework(maxTargetFrameworkMoniker);
-            var globalJsonBuilder =
-                new GlobalJsonBuilder()
-                .WithSdk(sdk);
+                        .FirstOrDefault();
 
-            var globalJsonFile = globalJsonBuilder.ToProjectFile();
-            _projectFileWriter.Write(globalJsonFile, outputPath);
+            if (maxTargetFrameworkMoniker is string tfm)
+            {
+                var sdk = _netCoreSdkInfoProvider.GetSdkFromTargetFramework(tfm);
+                var globalJsonBuilder = new GlobalJsonBuilder().WithSdk(sdk);
+
+                var globalJsonFile = globalJsonBuilder.ToProjectFile();
+                _projectFileWriter.Write(globalJsonFile, outputPath);
+            }
 
             return solutionFilePath;
         }

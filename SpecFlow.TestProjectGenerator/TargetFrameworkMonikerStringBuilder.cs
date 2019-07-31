@@ -6,6 +6,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class TargetFrameworkMonikerStringBuilder
     {
+        private readonly TargetFrameworkSplitter _targetFrameworkSplitter;
         private readonly IReadOnlyDictionary<TargetFramework, string> _targetFrameworkMonikerMappings = new Dictionary<TargetFramework, string>
         {
             [TargetFramework.Net35] = "net35",
@@ -18,6 +19,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             [TargetFramework.Netcoreapp30] = "netcoreapp3.0"
         };
 
+        public TargetFrameworkMonikerStringBuilder(TargetFrameworkSplitter targetFrameworkSplitter)
+        {
+            _targetFrameworkSplitter = targetFrameworkSplitter;
+        }
+
         public string BuildTargetFrameworkMoniker(TargetFramework targetFramework)
         {
             var allTargetFrameworkMonikers = GetAllTargetFrameworkMonikers(targetFramework);
@@ -26,19 +32,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public IEnumerable<string> GetAllTargetFrameworkMonikers(TargetFramework targetFramework)
         {
-            return GetAllTargetFrameworkMonikers(Enumerable.Empty<string>(), targetFramework);
+            var allTargetFrameworkValues = _targetFrameworkSplitter.GetAllTargetFrameworkValues(targetFramework);
+            return GetAllTargetFrameworkMonikers(Enumerable.Empty<string>(), allTargetFrameworkValues);
         }
 
-        internal IEnumerable<string> GetAllTargetFrameworkMonikers(IEnumerable<string> currentlyCollected, TargetFramework targetFramework)
+        internal IEnumerable<string> GetAllTargetFrameworkMonikers(IEnumerable<string> currentlyCollected, IEnumerable<TargetFramework> targetFrameworks)
         {
-            var singleTargetFramework = _targetFrameworkMonikerMappings.Keys.FirstOrDefault(tf => (targetFramework & tf) == tf);
-            if (singleTargetFramework is 0)
+            if (!targetFrameworks.Any())
             {
                 return currentlyCollected;
             }
 
-            string targetFrameworkMoniker = _targetFrameworkMonikerMappings[singleTargetFramework];
-            return GetAllTargetFrameworkMonikers(currentlyCollected.Append(targetFrameworkMoniker), targetFramework & ~singleTargetFramework);
+            string targetFrameworkMoniker = _targetFrameworkMonikerMappings[targetFrameworks.First()];
+            return GetAllTargetFrameworkMonikers(currentlyCollected.Append(targetFrameworkMoniker), targetFrameworks.Skip(1));
         }
     }
 }

@@ -293,7 +293,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 
             Action createSolution = () => new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
-            createSolution.Should().Throw<ProjectCreationNotPossibleException>().WithMessage("Multiple target frameworks don't work with the old csproj format");
+            createSolution.Should()
+                          .Throw<ProjectCreationNotPossibleException>()
+                          .WithInnerException<InvalidOperationException>()
+                          .WithMessage("Multiple target frameworks don't work with the old csproj format");
 
 
         }
