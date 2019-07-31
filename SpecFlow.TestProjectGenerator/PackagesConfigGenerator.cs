@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
-using TechTalk.SpecFlow.TestProjectGenerator.Extensions;
 using TechTalk.SpecFlow.TestProjectGenerator.Factories;
 using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 
@@ -9,7 +8,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class PackagesConfigGenerator : XmlFileGeneratorBase
     {
+        private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
         private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
+
+        public PackagesConfigGenerator(TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
+        {
+            _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
+        }
 
         public ProjectFile Generate(IEnumerable<NuGetPackage> nuGetPackages, TargetFramework targetFramework)
         {
@@ -20,7 +25,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     xw.WriteStartDocument();
                     xw.WriteStartElement("packages");
 
-                    string tfm = targetFramework == 0 ? null : targetFramework.ToTargetFrameworkMoniker();
+                    string tfm = targetFramework == 0 ? null : _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(targetFramework);
 
                     foreach (var package in nuGetPackages)
                     {

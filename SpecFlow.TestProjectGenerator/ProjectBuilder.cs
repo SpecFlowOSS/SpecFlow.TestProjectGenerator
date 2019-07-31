@@ -4,7 +4,6 @@ using System.IO;
 using TechTalk.SpecFlow.TestProjectGenerator.ConfigurationModel;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Driver;
-using TechTalk.SpecFlow.TestProjectGenerator.Extensions;
 using TechTalk.SpecFlow.TestProjectGenerator.Factories.BindingsGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
@@ -22,12 +21,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         protected readonly CurrentVersionDriver _currentVersionDriver;
         private readonly FeatureFileGenerator _featureFileGenerator;
         private readonly Folders _folders;
+        private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
         protected readonly TestProjectFolders _testProjectFolders;
         private bool _parallelTestExecution;
         private Project _project;
 
-        public ProjectBuilder(TestProjectFolders testProjectFolders, FeatureFileGenerator featureFileGenerator, BindingsGeneratorFactory bindingsGeneratorFactory,
-            ConfigurationGeneratorFactory configurationGeneratorFactory, Configuration configuration, CurrentVersionDriver currentVersionDriver, Folders folders)
+        public ProjectBuilder(
+            TestProjectFolders testProjectFolders,
+            FeatureFileGenerator featureFileGenerator,
+            BindingsGeneratorFactory bindingsGeneratorFactory,
+            ConfigurationGeneratorFactory configurationGeneratorFactory,
+            Configuration configuration,
+            CurrentVersionDriver currentVersionDriver,
+            Folders folders,
+            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
         {
             _testProjectFolders = testProjectFolders;
             _featureFileGenerator = featureFileGenerator;
@@ -36,6 +43,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             Configuration = configuration;
             _currentVersionDriver = currentVersionDriver;
             _folders = folders;
+            _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
             var projectGuidString = $"{ProjectGuid:N}".Substring(24);
             ProjectName = $"TestProj_{projectGuidString}";
         }
@@ -44,7 +52,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public Configuration Configuration { get; }
         public string ProjectName { get; set; }
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
-        public TargetFramework TargetFrameworks { get; set; } = TargetFramework.Net452;
+        public TargetFramework TargetFramework { get; set; } = TargetFramework.Net452;
         public ProjectFormat Format { get; set; } = ProjectFormat.Old;
         public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Config;
 
@@ -177,7 +185,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             if (_project != null) return;
 
-            _project = new Project(ProjectName, ProjectGuid, Language, TargetFrameworks, Format, ProjectType);
+            _project = new Project(ProjectName, ProjectGuid, Language, TargetFramework, Format, ProjectType);
 
             _testProjectFolders.PathToNuGetPackages = _project.ProjectFormat == ProjectFormat.Old ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages") : _folders.GlobalPackages;
 
@@ -357,14 +365,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureRunnerForSpecFlow3()
         {
-            var targetframework = TargetFrameworks != TargetFramework.Netcoreapp20 ? "net45" : "netcoreapp2.0";
+            string targetFramework = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
             _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
                 new NuGetPackageAssembly($"SpecRun.Runtime.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL",
-                    $"{targetframework}\\SpecRun.Runtime.SpecFlowPlugin.dll"),
+                    $"{targetFramework}\\SpecRun.Runtime.SpecFlowPlugin.dll"),
                 new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"{targetframework}\\TechTalk.SpecRun.dll"),
+                    $"{targetFramework}\\TechTalk.SpecRun.dll"),
                 new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"{targetframework}\\TechTalk.SpecRun.Common.dll")
+                    $"{targetFramework}\\TechTalk.SpecRun.Common.dll")
             );
         }
 
@@ -412,7 +420,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private string GetProjectCompilePath(Project project)
         {
             // TODO: hardcoded "Debug" value should be replaced by a configuration parameter
-            if (project.ProjectFormat == ProjectFormat.New) return Path.Combine("bin", "Debug", project.TargetFrameworks.ToTargetFrameworkMoniker().Split(';')[0]);
+            if (project.ProjectFormat == ProjectFormat.New)
+            {
+                return Path.Combine("bin", "Debug", _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(project.TargetFrameworks).Split(';')[0]);
+            }
 
             return Path.Combine("bin", "Debug");
         }

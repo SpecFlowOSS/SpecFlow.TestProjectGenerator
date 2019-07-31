@@ -13,10 +13,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
     public class NewFormatProjectWriter : IProjectWriter
     {
         private readonly IOutputWriter _outputWriter;
+        private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
 
-        public NewFormatProjectWriter(IOutputWriter outputWriter)
+        public NewFormatProjectWriter(IOutputWriter outputWriter, TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
         {
             _outputWriter = outputWriter;
+            _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
         }
 
         public virtual string WriteProject(Project project, string projRootPath)
@@ -182,7 +184,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         {
             var targetFrameworkElement = projectElement.Element("PropertyGroup")?.Element("TargetFramework") ?? throw new ProjectCreationNotPossibleException();
 
-            string newTargetFrameworks = project.TargetFrameworks.ToTargetFrameworkMoniker();
+            string newTargetFrameworks = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(project.TargetFrameworks);
             targetFrameworkElement.SetValue(newTargetFrameworks);
         }
 
