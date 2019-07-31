@@ -20,8 +20,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public string BuildTargetFrameworkMoniker(TargetFramework targetFramework)
         {
-            var allTargetFrameworkMonikers = GetAllTargetFrameworkMonikers(Enumerable.Empty<string>(), targetFramework);
+            var allTargetFrameworkMonikers = GetAllTargetFrameworkMonikers(targetFramework);
             return string.Join(";", allTargetFrameworkMonikers);
+        }
+
+        public IEnumerable<string> GetAllTargetFrameworkMonikers(TargetFramework targetFramework)
+        {
+            return GetAllTargetFrameworkMonikers(Enumerable.Empty<string>(), targetFramework);
         }
 
         internal IEnumerable<string> GetAllTargetFrameworkMonikers(IEnumerable<string> currentlyCollected, TargetFramework targetFramework)
