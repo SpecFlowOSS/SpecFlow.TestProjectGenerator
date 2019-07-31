@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using FluentAssertions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
@@ -67,12 +68,29 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public TestExecutionResult ExecuteTests()
         {
+            var task = ExecuteTestsInternalAsync(async (processHelper, parameters) =>
+                processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, parameters.executablePath, parameters.argumentsFormat, parameters.environmentVariables));
+
+            return task.Result;
+        }
+
+        public async Task<TestExecutionResult> ExecuteTestsAsync()
+        {
+            return await ExecuteTestsInternalAsync(async (processHelper, parameters) =>
+                await processHelper.RunProcessAsync(_outputWriter, _testProjectFolders.ProjectFolder, parameters.executablePath, parameters.argumentsFormat, parameters.environmentVariables));
+        }
+
+        private async Task<TestExecutionResult> ExecuteTestsInternalAsync(Func<ProcessHelper, (string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables), Task<ProcessResult>> runProcessAction)
+        {
             string vsFolder = _visualStudioFinder.Find();
             vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
 
             string vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
 
-            var envVariables = new Dictionary<string, string>();
+            var envVariables = new Dictionary<string, string>
+            {
+                {"DOTNET_CLI_UI_LANGUAGE", "en"}
+            };
 
             if (_testSuiteInitializationDriver.OverrideTestSuiteStartupTime is DateTime testRunStartupTime)
             {
@@ -104,7 +122,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             ProcessResult processResult;
             try
             {
-                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, vsTestConsoleExePath, arguments, envVariables);
+                processResult = await runProcessAction(processHelper, (vsTestConsoleExePath, arguments, envVariables));
             }
             catch (Exception)
             {

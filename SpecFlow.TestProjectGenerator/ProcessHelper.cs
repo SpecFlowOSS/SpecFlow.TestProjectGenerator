@@ -3,33 +3,36 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
+using System.Threading.Tasks;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
 {
-
-    public class ProcessResult
-    {
-        public ProcessResult(int exitCode, string stdOutput, string stdError, string combinedOutput)
-        {
-            ExitCode = exitCode;
-            StdOutput = stdOutput;
-            StdError = stdError;
-            CombinedOutput = combinedOutput;
-        }
-
-        public string StdOutput { get; }
-        public string StdError { get; }
-        public string CombinedOutput { get; }
-        public int ExitCode { get; }
-    }
-
     public class ProcessHelper
     {
-        private static TimeSpan _timeout = TimeSpan.FromMinutes(15);
+        private static readonly TimeSpan _timeout = TimeSpan.FromMinutes(15);
         private static readonly int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
 
-        public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables, params object[] arguments)
+        public delegate Task<TResult> ProcessResultSelector<TResult>(IOutputWriter outputWriter, string executablePath, Process process, AutoResetEvent outputWaitHandle, AutoResetEvent errorWaitHandle,
+            ProcessStartInfo psi, StringBuilder combinedOutput, DateTime before, string parameters, StringBuilder stdOutput, StringBuilder stdError);
+
+        public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
+            params object[] arguments)
+        {
+            var task = RunProcessInternal(outputWriter, workingDirectory, executablePath, argumentsFormat, environmentVariables,
+                async (writer, s, process, @event, handle, psi, output, time, parameters, builder, error) =>
+                    WaitForProcessResult(writer, s, process, @event, handle, psi, output, time, parameters, builder, error), arguments);
+
+            return task.Result;
+        }
+
+        public async Task<ProcessResult> RunProcessAsync(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
+            params object[] arguments)
+        {
+            return await RunProcessInternal(outputWriter, workingDirectory, executablePath, argumentsFormat, environmentVariables, WaitForProcessResultAsync, arguments);
+        }
+
+        private async Task<TResult> RunProcessInternal<TResult>(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
+            ProcessResultSelector<TResult> processResultSelector, params object[] arguments)
         {
             string parameters = string.Format(argumentsFormat, arguments);
 
@@ -84,22 +87,55 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
-                    if (!process.WaitForExit(_timeOutInMilliseconds) || !outputWaitHandle.WaitOne(_timeOutInMilliseconds) ||
-                        !errorWaitHandle.WaitOne(_timeOutInMilliseconds))
-                    {
-
-                        throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Combined Output:" + Environment.NewLine + combinedOutput);
-                    }
-
-                    var after = DateTime.Now;
-                    var diff = after - before;
-                    outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
+                    return await processResultSelector(outputWriter, executablePath, process, outputWaitHandle, errorWaitHandle, psi, combinedOutput, before, parameters, stdOutput, stdError);
                 }
             }
+        }
+
+        private static ProcessResult WaitForProcessResult(IOutputWriter outputWriter, string executablePath, Process process, AutoResetEvent outputWaitHandle, AutoResetEvent errorWaitHandle,
+            ProcessStartInfo psi, StringBuilder combinedOutput, DateTime before, string parameters, StringBuilder stdOutput, StringBuilder stdError)
+        {
+            if (!process.WaitForExit(_timeOutInMilliseconds) || !outputWaitHandle.WaitOne(_timeOutInMilliseconds) ||
+                !errorWaitHandle.WaitOne(_timeOutInMilliseconds))
+            {
+                throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Combined Output:" +
+                                           Environment.NewLine + combinedOutput);
+            }
+
+            var after = DateTime.Now;
+            var diff = after - before;
+            outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
 
             outputWriter.WriteLine(combinedOutput.ToString());
 
             return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), combinedOutput.ToString());
+        }
+
+        private static async Task<ProcessResult> WaitForProcessResultAsync(IOutputWriter outputWriter, string executablePath, Process process, AutoResetEvent outputWaitHandle, AutoResetEvent errorWaitHandle,
+            ProcessStartInfo psi, StringBuilder combinedOutput, DateTime before, string parameters, StringBuilder stdOutput, StringBuilder stdError)
+        {
+            var taskCompletionSource = new TaskCompletionSource<ProcessResult>();
+            var cancellationTokenSource = new CancellationTokenSource(_timeOutInMilliseconds);
+            
+            cancellationTokenSource.Token.Register(() =>
+            {
+                taskCompletionSource.TrySetException(new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine +
+                                                                       "Combined Output:" +
+                                                                       Environment.NewLine + combinedOutput));
+            }, useSynchronizationContext: false);
+
+            process.Exited += (sender, args) =>
+            {
+                var after = DateTime.Now;
+                var diff = after - before;
+                outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
+
+                outputWriter.WriteLine(combinedOutput.ToString());
+
+                taskCompletionSource.TrySetResult(new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), combinedOutput.ToString()));
+            };
+
+            return await taskCompletionSource.Task;
         }
 
         public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
