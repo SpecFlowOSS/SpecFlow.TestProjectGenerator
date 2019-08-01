@@ -36,25 +36,29 @@ Friend Module Log
         File.AppendAllText(LogFileLocation, $""-> hook: {{stepName}}{{Environment.NewLine}}"")
     End Sub
     
-    Friend Shared Async Function LogHookIncludingLockingAsync(
+    Friend Async Function LogHookIncludingLockingAsync(
     <CallerMemberName> ByVal Optional stepName As String = Nothing) As Task
         File.AppendAllText(LogFileLocation, $""->waiting for hook lock: {{stepName}}{{Environment.NewLine}}"")
         Await WaitForLockAsync()
         File.AppendAllText(LogFileLocation, $""-> hook: {{stepName}}{{Environment.NewLine}}"")
     End Function
 
-    Private Shared Async Function WaitForLockAsync() As Task
+    Private Async Function WaitForLockAsync() As Task
         Dim lockFile = LogFileLocation & "".lock""
 
         While True
 
+            Dim errorHappened = False
             Try
                 Using File.Open(lockFile, FileMode.CreateNew)
                 End Using
                 Exit While
             Catch __unusedIOException1__ As IOException
-                Await Task.Delay(1000)
+                errorHappened = True
             End Try
+            If errorHappened Then
+                Await Task.Delay(1000)
+            End If
         End While
 
         File.Delete(lockFile)
