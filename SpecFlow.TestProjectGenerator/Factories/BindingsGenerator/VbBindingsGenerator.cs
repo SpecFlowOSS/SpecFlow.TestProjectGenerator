@@ -24,6 +24,7 @@ End Class";
 Imports System
 Imports System.IO
 Imports System.Runtime.CompilerServices
+Imports System.Threading.Tasks
 
 Friend Module Log
     Private Const LogFileLocation As String = ""{pathToLogFile}""
