@@ -21,6 +21,13 @@ using TechTalk.SpecFlow;
 [Binding]
 public class {0}
 {{
+    private readonly ScenarioContext _scenarioContext;
+
+    public {0}(ScenarioContext scenarioContext)
+    {{
+        _scenarioContext = scenarioContext;
+    }}
+
     {1}
 }}";
 
