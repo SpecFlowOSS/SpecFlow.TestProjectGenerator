@@ -13,14 +13,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories.BindingsGenerator
         private const string BindingsClassTemplate = @"
 Imports TechTalk.SpecFlow
 
-Private ReadOnly _scenarioContext As ScenarioContext
-
-Public Sub New(ByVal scenarioContext As ScenarioContext)
-    _scenarioContext = scenarioContext
-End Sub
-
 <Binding> _
 Public Class {0}
+    Private ReadOnly _scenarioContext As ScenarioContext
+
+    Public Sub New(ByVal scenarioContext As ScenarioContext)
+        _scenarioContext = scenarioContext
+    End Sub
+
     {1}
 End Class";
 
