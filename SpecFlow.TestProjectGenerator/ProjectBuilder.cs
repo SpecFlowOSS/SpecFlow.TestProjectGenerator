@@ -301,21 +301,36 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureXUnit()
         {
-            _project.AddNuGetPackage("xunit.core", "2.4.0");
-            _project.AddNuGetPackage("xunit.extensibility.core", "2.4.0", new NuGetPackageAssembly("xunit.core, Version=2.4.0.4049, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.core.dll"));
-            _project.AddNuGetPackage("xunit.extensibility.execution", "2.4.0",
-                new NuGetPackageAssembly("xunit.execution.desktop, Version=2.4.0.4049, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
-            _project.AddNuGetPackage("xunit.assert", "2.4.0", new NuGetPackageAssembly("xunit.assert, Version=2.4.0.4049, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
-            _project.AddNuGetPackage("xunit.abstractions", "2.0.3",
-                new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
-            _project.AddNuGetPackage("xunit.runner.visualstudio", "2.4.0");
-            _project.AddNuGetPackage("Xunit.SkippableFact", "1.3.12", new NuGetPackageAssembly("Xunit.SkippableFact, Version=1.3.0.0, Culture=neutral, PublicKeyToken=b2b52da82b58eb73", "net45\\Xunit.SkippableFact.dll"));
-            _project.AddNuGetPackage("Validation", "2.4.18", new NuGetPackageAssembly("Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7", "net45\\Validation.dll"));
+
+            if (_project.ProjectFormat == ProjectFormat.New)
+            {
+                _project.AddNuGetPackage("xunit", "2.4.1");
+            }
+            else
+            {
+                _project.AddNuGetPackage("xunit.core", "2.4.1");
+                _project.AddNuGetPackage("xunit.extensibility.core", "2.4.1",
+                    new NuGetPackageAssembly("xunit.core, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.core.dll"));
+                _project.AddNuGetPackage("xunit.extensibility.execution", "2.4.1",
+                    new NuGetPackageAssembly("xunit.execution.desktop, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
+                _project.AddNuGetPackage("xunit.assert", "2.4.1",
+                    new NuGetPackageAssembly("xunit.assert, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
+                _project.AddNuGetPackage("xunit.abstractions", "2.0.3",
+                    new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
+            }
+
+            _project.AddNuGetPackage("xunit.runner.visualstudio", "2.4.1");
+            _project.AddNuGetPackage("Xunit.SkippableFact", "1.3.12", new NuGetPackageAssembly("Xunit.SkippableFact, Version=1.3.0.0, Culture=neutral, PublicKeyToken=b2b52da82b58eb73", "net452\\Xunit.SkippableFact.dll"));
+
+            if (_project.ProjectFormat == ProjectFormat.Old)
+            {
+                _project.AddNuGetPackage("Validation", "2.4.18", new NuGetPackageAssembly("Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7", "net45\\Validation.dll"));
+            }
 
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
                 _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.SpecFlowNuGetVersion,
-                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
+                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net452\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
                 Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.xUnit", SpecFlowPluginType.Runtime));
             }
         }
@@ -406,9 +421,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private string GetSpecFlowPublicAssemblyName(string assemblyName)
         {
 #if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
-            return $"{assemblyName}, Version={_currentVersionDriver.SpecFlowVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
+            return $"{Path.GetFileNameWithoutExtension(assemblyName)}, Version={_currentVersionDriver.SpecFlowVersion}, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
 #else
-            return assemblyName;
+            return GetFileNameWithoutExtension(assemblyName);
 #endif
         }
 
