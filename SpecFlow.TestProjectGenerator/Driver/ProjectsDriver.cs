@@ -122,5 +122,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         {
             _solutionDriver.DefaultProject.AddNuGetPackage(nugetPackage, nugetVersion);
         }
+
+        public void AddFailingStepBinding(string scenarioBlock, string stepRegex)
+        {
+            AddStepBinding(scenarioBlock, stepRegex, "throw new System.Exception(\"simulated failure\");", "Throw New System.Exception(\"simulated failure\")");
+        }
     }
 }

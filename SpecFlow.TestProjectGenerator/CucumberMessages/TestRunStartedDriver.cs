@@ -44,5 +44,28 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
                 testRunStarted.Timestamp.ToDateTime().Should().Be(expectedTimeStamp);
             }
         }
+
+        public void TestRunFinishedMessageShouldHaveBeenSent(TestRunFinishedRow testRunFinishedRow)
+        {
+            var messageQueue = _cucumberMessagesDriver.LoadMessageQueue();
+            var testRunFinished = messageQueue.ToArray()
+                .Should()
+                .Contain(m => m is TestRunFinished)
+                .Which.Should()
+                .BeOfType<TestRunFinished>()
+                .Which;
+
+            if (testRunFinishedRow.Timestamp is string expectedTimeStampString
+                && DateTime.TryParse(expectedTimeStampString, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var expectedTimeStamp))
+            {
+                testRunFinished.Timestamp.ToDateTime().Should().Be(expectedTimeStamp);
+            }
+
+            if (testRunFinishedRow.Success is string expectedSuccessString
+                && Boolean.TryParse(expectedSuccessString, out var expectedSuccess))
+            {
+                testRunFinished.Success.Should().Be(expectedSuccess);
+            }
+        }
     }
 }

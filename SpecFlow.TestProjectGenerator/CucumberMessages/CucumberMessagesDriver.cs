@@ -22,6 +22,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
                 case Envelope.MessageOneofCase.TestRunStarted: return envelope.TestRunStarted;
                 case Envelope.MessageOneofCase.TestCaseStarted: return envelope.TestCaseStarted;
                 case Envelope.MessageOneofCase.TestCaseFinished: return envelope.TestCaseFinished;
+                case Envelope.MessageOneofCase.TestRunFinished: return envelope.TestRunFinished;
                 default: throw new InvalidOperationException($"(Currently) unsupported message type: {envelope.MessageCase}");
             }
         }
