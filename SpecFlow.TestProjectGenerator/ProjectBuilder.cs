@@ -52,9 +52,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public Configuration Configuration { get; }
         public string ProjectName { get; set; }
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
-        public TargetFramework TargetFramework { get; set; } = TargetFramework.Net452;
-        public ProjectFormat Format { get; set; } = ProjectFormat.Old;
-        public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Config;
+        public TargetFramework TargetFramework { get; set; } = TargetFramework.Netcoreapp20;
+        public ProjectFormat Format { get; set; } = ProjectFormat.New;
+        public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Json;
 
         public bool IsSpecFlowFeatureProject { get; set; } = true;
 

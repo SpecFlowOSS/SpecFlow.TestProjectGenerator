@@ -67,10 +67,18 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public TestExecutionResult ExecuteTests()
         {
-            string vsFolder = _visualStudioFinder.Find();
-            vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
+            string vsTestConsoleExePath;
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                vsTestConsoleExePath = "/usr/share/dotnet/dotnet";
+            }
+            else
+            {
+                string vsFolder = _visualStudioFinder.Find();
+                vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
 
-            string vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
+                vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
+            }
 
             var envVariables = new Dictionary<string, string>();
 
@@ -100,7 +108,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             var processHelper = new ProcessHelper();
-            string arguments = GenereateVsTestsArguments();
+            string arguments = (Environment.OSVersion.Platform == PlatformID.Unix ? "vstest " : "") + GenereateVsTestsArguments();
             ProcessResult processResult;
             try
             {

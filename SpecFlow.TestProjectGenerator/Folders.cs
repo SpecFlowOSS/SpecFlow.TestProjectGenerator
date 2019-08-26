@@ -63,7 +63,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             set => _packageFolder = value;
         }
 
-        public string GlobalPackages => Path.Combine(Environment.ExpandEnvironmentVariables("%USERPROFILE%"), ".nuget", "packages");
+        public string GlobalPackages => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
 
         public string SpecFlow
         {

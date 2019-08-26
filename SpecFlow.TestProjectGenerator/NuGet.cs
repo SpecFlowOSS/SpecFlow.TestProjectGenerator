@@ -29,7 +29,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
 
             var nugetRestore = new ProcessHelper();
-            var processResult = nugetRestore.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, processPath, commandLineArgs);
+            ProcessResult processResult;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                 processResult = nugetRestore.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, processPath, commandLineArgs);
+            }
+            else
+            {
+                processResult = nugetRestore.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "/usr/bin/mono", processPath + " " + commandLineArgs);
+            }
+
 
             if (processResult.ExitCode > 0)
             {
@@ -40,7 +49,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         protected virtual string GetPathToNuGetExe()
         {
-            return Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine", "5.1.0", "tools", "NuGet.exe");
+            return Path.Combine(_folders.GlobalPackages, "NuGet.CommandLine".ToLower(), "5.1.0", "tools", "NuGet.exe");
         }
     }
 }
