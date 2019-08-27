@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
 {
@@ -30,7 +31,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             var nugetRestore = new ProcessHelper();
             ProcessResult processResult;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                  processResult = nugetRestore.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, processPath, commandLineArgs);
             }

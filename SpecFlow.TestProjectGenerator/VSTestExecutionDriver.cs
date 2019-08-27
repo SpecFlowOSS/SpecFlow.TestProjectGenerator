@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -68,7 +69,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public TestExecutionResult ExecuteTests()
         {
             string vsTestConsoleExePath;
-            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 vsTestConsoleExePath = "/usr/share/dotnet/dotnet";
             }
@@ -108,7 +109,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             var processHelper = new ProcessHelper();
-            string arguments = (Environment.OSVersion.Platform == PlatformID.Unix ? "vstest " : "") + GenereateVsTestsArguments();
+            string arguments = (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "vstest " : "") + GenereateVsTestsArguments();
             ProcessResult processResult;
             try
             {

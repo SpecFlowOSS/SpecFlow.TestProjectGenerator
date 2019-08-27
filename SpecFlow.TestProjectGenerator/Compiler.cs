@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using TechTalk.SpecFlow.TestProjectGenerator.Driver;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
@@ -34,7 +35,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private CompileResult CompileWithMSBuild()
         {
             string msBuildPath="";
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 msBuildPath = _visualStudioFinder.FindMSBuild();
             }
@@ -47,7 +48,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             var processHelper = new ProcessHelper();
             var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, msBuildPath, 
-                $"{(Environment.OSVersion.Platform == PlatformID.Unix ? "/usr/share/dotnet/dotnet msbuild" : "")} -restore -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"");
+                $"{(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "/usr/share/dotnet/dotnet msbuild" : "")} -restore -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"");
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);
         }
