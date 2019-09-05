@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
 {
@@ -20,6 +21,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
             {
                 _projectPath = projectPath;
                 return this;
+            }
+
+            protected override string GetWorkingDirectory()
+            {
+                return Path.GetDirectoryName(_solutionPath);
             }
 
             protected override string BuildArguments()

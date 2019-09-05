@@ -31,6 +31,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 throw new ArgumentNullException(nameof(solution));
             }
 
+
+            var targetFramework = solution.Projects
+                .Select(p => p.TargetFrameworks)
+                .FirstOrDefault();
+            var sdk = _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
+
+            if (targetFramework != 0 && sdk != null)
+            {
+                var globalJsonBuilder = new GlobalJsonBuilder().WithSdk(sdk);
+
+                var globalJsonFile = globalJsonBuilder.ToProjectFile();
+                _projectFileWriter.Write(globalJsonFile, outputPath);
+            }
+
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
             createSolutionCommand.Execute((innerException) => new ProjectCreationNotPossibleException("Could not create solution.", innerException));
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
@@ -40,19 +54,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             if (solution.NugetConfig != null)
             {
                 _projectFileWriter.Write(solution.NugetConfig, outputPath);
-            }
-
-            var targetFramework = solution.Projects
-                                          .Select(p => p.TargetFrameworks)
-                                          .FirstOrDefault();
-
-            var sdk = _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
-            if (targetFramework != 0 && sdk != null)
-            {
-                var globalJsonBuilder = new GlobalJsonBuilder().WithSdk(sdk);
-
-                var globalJsonFile = globalJsonBuilder.ToProjectFile();
-                _projectFileWriter.Write(globalJsonFile, outputPath);
             }
 
             return solutionFilePath;

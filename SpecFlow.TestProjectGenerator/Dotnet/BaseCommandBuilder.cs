@@ -12,8 +12,10 @@
 
         public CommandBuilder Build()
         {
-            return new CommandBuilder(_outputWriter, ExecutablePath, BuildArguments());
+            return new CommandBuilder(_outputWriter, ExecutablePath, BuildArguments(), GetWorkingDirectory());
         }
+
+        protected abstract string GetWorkingDirectory();
 
         protected abstract string BuildArguments();
 

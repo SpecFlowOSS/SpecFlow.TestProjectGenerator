@@ -28,6 +28,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 throw new ArgumentNullException(nameof(project));
             }
 
+
             CreateProjectFile(project, projRootPath);
 
             string projFileName = $"{project.Name}.{project.ProgrammingLanguage.ToProjectFileExtension()}";
