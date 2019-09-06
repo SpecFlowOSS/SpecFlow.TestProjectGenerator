@@ -26,11 +26,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
         public string WriteToFileSystem(Solution solution, string outputPath)
         {
+            if (!Directory.Exists(outputPath))
+            {
+                Directory.CreateDirectory(outputPath);
+            }
+
             if (solution is null)
             {
                 throw new ArgumentNullException(nameof(solution));
             }
-
 
             var targetFramework = solution.Projects
                 .Select(p => p.TargetFrameworks)
