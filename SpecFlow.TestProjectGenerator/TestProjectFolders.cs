@@ -24,11 +24,17 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 return _pathToSolutionFile;
             }
-            set { _pathToSolutionFile = value; }
+            set
+            {
+                _pathToSolutionFile = value;
+                IsPathToSolutionFileSet = true;
+            }
         }
 
         public string SolutionFileName => Path.GetFileName(PathToSolutionFile);
 
         public string PathToNuGetPackages { get; set; }
+
+        public bool IsPathToSolutionFileSet { get; private set; }
     }
 }
