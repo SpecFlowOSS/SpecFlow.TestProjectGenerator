@@ -38,11 +38,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _outputWriter = outputWriter;
             NuGetSources = new List<NuGetSource>
             {
-                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder),
-                new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json"),
-                new NuGetSource("SpecFlow Unstable", "https://www.myget.org/F/specflow-unstable/api/v3/index.json"),
-                new NuGetSource("Cucumber Messages CI", "https://www.myget.org/F/cucumber-messages/api/v3/index.json")
+                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)
             };
+
+            if (testRunConfiguration.UnitTestProvider == UnitTestProvider.SpecRun)
+            {
+                NuGetSources.Add(new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json"));
+                NuGetSources.Add(new NuGetSource("SpecFlow Unstable", "https://www.myget.org/F/specflow-unstable/api/v3/index.json"));
+            }
+
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
