@@ -389,11 +389,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             string targetFramework = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
             _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
                 new NuGetPackageAssembly($"SpecRun.Runtime.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, processorArchitecture=MSIL",
-                    $"{targetFramework}\\SpecRun.Runtime.SpecFlowPlugin.dll"),
+                    $"net45\\SpecRun.Runtime.SpecFlowPlugin.dll"),
                 new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"{targetFramework}\\TechTalk.SpecRun.dll"),
+                    $"net45\\TechTalk.SpecRun.dll"),
                 new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"{targetFramework}\\TechTalk.SpecRun.Common.dll")
+                    $"net45\\TechTalk.SpecRun.Common.dll")
             );
         }
 
