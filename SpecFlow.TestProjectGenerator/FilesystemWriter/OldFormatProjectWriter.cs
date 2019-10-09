@@ -11,7 +11,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         private readonly IOutputWriter _outputWriter;
         private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
         private readonly TargetFrameworkVersionStringBuilder _targetFrameworkVersionStringBuilder;
-        private readonly ProjectFileWriter _fileWriter = new ProjectFileWriter();
+        private readonly FileWriter _fileWriter = new FileWriter();
 
         public OldFormatProjectWriter(IOutputWriter outputWriter, TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder, TargetFrameworkVersionStringBuilder targetFrameworkVersionStringBuilder)
         {

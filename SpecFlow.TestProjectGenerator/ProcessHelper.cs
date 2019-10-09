@@ -84,10 +84,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
-                    if (!process.WaitForExit(_timeOutInMilliseconds) || !outputWaitHandle.WaitOne(_timeOutInMilliseconds) ||
-                        !errorWaitHandle.WaitOne(_timeOutInMilliseconds))
+                    if (!process.WaitForExit(_timeOutInMilliseconds))
                     {
-
                         throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Combined Output:" + Environment.NewLine + combinedOutput);
                     }
 

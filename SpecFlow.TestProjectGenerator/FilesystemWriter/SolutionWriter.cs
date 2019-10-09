@@ -11,7 +11,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
     {
         private readonly IOutputWriter _outputWriter;
         private readonly ProjectWriterFactory _projectWriterFactory;
-        private readonly ProjectFileWriter _projectFileWriter;
+        private readonly FileWriter _fileWriter;
         private readonly NetCoreSdkInfoProvider _netCoreSdkInfoProvider;
 
         public SolutionWriter(IOutputWriter outputWriter)
@@ -20,7 +20,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             var targetFrameworkMonikerStringBuilder = new TargetFrameworkMonikerStringBuilder();
             var targetFrameworkVersionStringBuilder = new TargetFrameworkVersionStringBuilder();
             _projectWriterFactory = new ProjectWriterFactory(outputWriter, targetFrameworkMonikerStringBuilder, targetFrameworkVersionStringBuilder);
-            _projectFileWriter = new ProjectFileWriter();
+            _fileWriter = new FileWriter();
             _netCoreSdkInfoProvider = new NetCoreSdkInfoProvider();
         }
 
@@ -46,7 +46,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 var globalJsonBuilder = new GlobalJsonBuilder().WithSdk(sdk);
 
                 var globalJsonFile = globalJsonBuilder.ToProjectFile();
-                _projectFileWriter.Write(globalJsonFile, outputPath);
+                _fileWriter.Write(globalJsonFile, outputPath);
             }
 
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
@@ -57,7 +57,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
             if (solution.NugetConfig != null)
             {
-                _projectFileWriter.Write(solution.NugetConfig, outputPath);
+                _fileWriter.Write(solution.NugetConfig, outputPath);
+            }
+
+            foreach (var file in solution.Files)
+            {
+                _fileWriter.Write(file, outputPath);
             }
 
             return solutionFilePath;

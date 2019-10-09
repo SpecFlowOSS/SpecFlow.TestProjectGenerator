@@ -174,7 +174,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
         private void WriteProjectFiles(Project project, string projRootPath)
         {
-            var fileWriter = new ProjectFileWriter();
+            var fileWriter = new FileWriter();
             foreach (var file in project.Files)
             {
                 fileWriter.Write(file, projRootPath);

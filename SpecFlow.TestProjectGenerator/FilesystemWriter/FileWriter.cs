@@ -5,9 +5,9 @@ using TechTalk.SpecFlow.TestProjectGenerator.Helpers;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 {
-    public class ProjectFileWriter
+    public class FileWriter
     {
-        public void Write(ProjectFile projectFile, string projectRootPath)
+        public void Write(SolutionFile projectFile, string projectRootPath)
         {
             if (projectFile is null)
             {

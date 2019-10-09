@@ -18,6 +18,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
 
         public ProjectFile NugetConfig { get; set; }
 
+        public List<SolutionFile> Files { get; } = new List<SolutionFile>();
+
         public void AddProject(Project project)
         {
             _projects.Add(project ?? throw new ArgumentNullException(nameof(project)));

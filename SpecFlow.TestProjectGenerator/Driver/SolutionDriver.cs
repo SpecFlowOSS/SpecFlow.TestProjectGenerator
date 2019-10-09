@@ -74,6 +74,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
         }
 
+        
         public void AddProject(ProjectBuilder project)
         {
             if (_defaultProject == null)
@@ -82,6 +83,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
 
             _projects.Add(project.ProjectName, project);
+        }
+
+        public void AddFile(string name, string content)
+        {
+            _solution.Files.Add(new SolutionFile(name, content));
         }
 
         public void CompileSolution(BuildTool buildTool)
@@ -118,6 +124,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
             var solutionWriter = new SolutionWriter(_outputWriter);
             solutionWriter.WriteToFileSystem(_solution, _testProjectFolders.PathToSolutionDirectory);
+            
 
 
             _isWrittenOnDisk = true;
