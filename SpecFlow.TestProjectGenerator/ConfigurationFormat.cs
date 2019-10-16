@@ -3,6 +3,7 @@
     public enum ConfigurationFormat
     {
         Config,
-        Json
+        Json,
+        None
     }
 }
