@@ -4,14 +4,6 @@ using TechTalk.SpecFlow.TestProjectGenerator.Data;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 {
-    public class CucumberMessagesConfigurationDriver
-    {
-        public void SetEnabled(ProjectBuilder project, bool? isEnabled)
-        {
-            project.Configuration.CucumberMessagesSection.Enabled = isEnabled;
-        }
-    }
-
     public class ConfigurationDriver
     {
         private readonly SolutionDriver _solutionDriver;
