@@ -12,12 +12,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
     {
         private readonly ProjectsDriver _projectsDriver;
         private readonly TestSuiteInitializationDriver _testSuiteInitializationDriver;
+        private readonly JsonConfigurationLoaderDriver _jsonConfigurationLoaderDriver;
         private bool _isProjectCreated;
 
-        public TestSuiteSetupDriver(ProjectsDriver projectsDriver, TestSuiteInitializationDriver testSuiteInitializationDriver)
+        public TestSuiteSetupDriver(ProjectsDriver projectsDriver, TestSuiteInitializationDriver testSuiteInitializationDriver, JsonConfigurationLoaderDriver jsonConfigurationLoaderDriver)
         {
             _projectsDriver = projectsDriver;
             _testSuiteInitializationDriver = testSuiteInitializationDriver;
+            _jsonConfigurationLoaderDriver = jsonConfigurationLoaderDriver;
         }
 
         public void AddGenericWhenStepBinding()
@@ -102,6 +104,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             }
 
             AddFeatureFiles(1);
+        }
+
+        public void AddSpecFlowJsonFromString(string specFlowJson)
+        {
+            EnsureAProjectIsCreated();
+            _jsonConfigurationLoaderDriver.AddSpecFlowJson(specFlowJson);
         }
 
         public void AddScenarioWithGivenStep(string step, string tags = "")

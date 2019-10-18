@@ -1,26 +1,35 @@
-﻿using FluentAssertions;
+﻿using System.IO;
+using FluentAssertions;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
 {
     public class CucumberMessagesFileDriver
     {
         private readonly CucumberMessagesDriver _cucumberMessagesDriver;
+        private readonly TestProjectFolders _testProjectFolders;
 
-        public CucumberMessagesFileDriver(CucumberMessagesDriver cucumberMessagesDriver)
+        public CucumberMessagesFileDriver(CucumberMessagesDriver cucumberMessagesDriver, TestProjectFolders testProjectFolders)
         {
             _cucumberMessagesDriver = cucumberMessagesDriver;
+            _testProjectFolders = testProjectFolders;
         }
 
         public void CucumberMessagesFileShouldBe(string expectedFileName)
         {
-            bool couldFindFile = _cucumberMessagesDriver.TryGetPathCucumberMessagesFile(out string actualFileName);
+            var pathsToTest =
+                Path.IsPathRooted(expectedFileName)
+                    ? new[] { expectedFileName }
+                    : new [] { Path.Combine(_testProjectFolders.ProjectBinOutputPath, expectedFileName), Path.Combine(_testProjectFolders.ProjectFolder, expectedFileName)};
+
+            bool couldFindFile = _cucumberMessagesDriver.TryGetPathCucumberMessagesFile(pathsToTest, out string _);
             couldFindFile.Should().BeTrue();
-            actualFileName.Should().Be(expectedFileName);
         }
 
         public void CucumberMessagesFileShouldNotExist()
         {
-            bool couldFindFile = _cucumberMessagesDriver.TryGetPathCucumberMessagesFile(out _);
+            string pathInBinFolder = Path.Combine(_testProjectFolders.ProjectBinOutputPath, "CucumberMessageQueue", "messages");
+            string pathInTestResultsFolder = Path.Combine(_testProjectFolders.ProjectFolder, "TestResults", "CucumberMessageQueue", "messages");
+            bool couldFindFile = _cucumberMessagesDriver.TryGetPathCucumberMessagesFile(new[] { pathInBinFolder, pathInTestResultsFolder }, out _);
             couldFindFile.Should().BeFalse();
         }
     }

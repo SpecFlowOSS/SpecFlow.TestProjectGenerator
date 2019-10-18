@@ -134,7 +134,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             EnsureProjectExists();
             var generator = _configurationGeneratorFactory.FromConfigurationFormat(ConfigurationFormat);
-            _project.AddFile(generator.Generate(Configuration));
+            var generatedConfig = generator.Generate(Configuration);
+
+            if (generatedConfig is ProjectFile _)
+            {
+                _project.AddFile(generatedConfig);
+            }
         }
 
         public Project Build()
