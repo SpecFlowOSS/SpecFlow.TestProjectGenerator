@@ -57,7 +57,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     {
                         if (e.Data == null)
                         {
-                            outputWaitHandle.Set();
+                            if (!outputWaitHandle.SafeWaitHandle.IsClosed)
+                            {
+                                outputWaitHandle.Set();
+                            }
                         }
                         else
                         {
@@ -69,7 +72,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     {
                         if (e.Data == null)
                         {
-                            errorWaitHandle.Set();
+                            if (!errorWaitHandle.SafeWaitHandle.IsClosed)
+                            {
+                                errorWaitHandle.Set();
+                            }
                         }
                         else
                         {
