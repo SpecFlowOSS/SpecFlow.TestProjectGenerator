@@ -16,7 +16,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         public void AddSpecFlowJson(string specFlowJson)
         {
             _configurationDriver.SetConfigurationFormat(ConfigurationFormat.None);
-            _projectsDriver.AddFile("specflow.json", specFlowJson, "None", new Dictionary<string, string> { ["CopyToOutputDirectory"] = "Always" });
+            _projectsDriver.AddFile("specflow.json", specFlowJson);
         }
     }
 }

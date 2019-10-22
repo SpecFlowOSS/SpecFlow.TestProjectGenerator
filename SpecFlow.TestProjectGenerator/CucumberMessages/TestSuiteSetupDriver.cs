@@ -13,13 +13,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
         private readonly ProjectsDriver _projectsDriver;
         private readonly TestSuiteInitializationDriver _testSuiteInitializationDriver;
         private readonly JsonConfigurationLoaderDriver _jsonConfigurationLoaderDriver;
+        private readonly ConfigurationDriver _configurationDriver;
         private bool _isProjectCreated;
 
-        public TestSuiteSetupDriver(ProjectsDriver projectsDriver, TestSuiteInitializationDriver testSuiteInitializationDriver, JsonConfigurationLoaderDriver jsonConfigurationLoaderDriver)
+        public TestSuiteSetupDriver(ProjectsDriver projectsDriver, TestSuiteInitializationDriver testSuiteInitializationDriver, JsonConfigurationLoaderDriver jsonConfigurationLoaderDriver,
+            ConfigurationDriver configurationDriver)
         {
             _projectsDriver = projectsDriver;
             _testSuiteInitializationDriver = testSuiteInitializationDriver;
             _jsonConfigurationLoaderDriver = jsonConfigurationLoaderDriver;
+            _configurationDriver = configurationDriver;
         }
 
         public void AddGenericWhenStepBinding()
@@ -222,6 +225,12 @@ Given a failing step
             }
 
             _isProjectCreated = true;
+        }
+
+        public void AddAppConfigFromString(string appConfigContent)
+        {
+            _configurationDriver.SetConfigurationFormat(ConfigurationFormat.None);
+            _projectsDriver.AddFile("app.config", appConfigContent);
         }
     }
 }
