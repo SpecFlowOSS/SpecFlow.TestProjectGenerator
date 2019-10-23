@@ -87,7 +87,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories
 
         protected virtual ProjectBuilder CreateProjectBuilder()
         {
-            return new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, new Configuration(), _currentVersionDriver, _folders, _targetFrameworkMonikerStringBuilder);
+            var configuration = new Configuration()
+            {
+                CucumberMessagesSection = { Enabled = true }
+            };
+            return new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, configuration, _currentVersionDriver, _folders, _targetFrameworkMonikerStringBuilder);
         }
     }
 }

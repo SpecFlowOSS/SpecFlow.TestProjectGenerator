@@ -75,6 +75,21 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerato
             {
                 WritePlugins(jsonWriter, configuration.Plugins);
             }
+            else
+            {
+                WriteCucumberMessages(jsonWriter, configuration.CucumberMessagesSection);
+            }
+        }
+
+        private void WriteCucumberMessages(JsonWriter jsonWriter, ConfigurationModel.CucumberMessages configurationCucumberMessagesSection)
+        {
+            jsonWriter.WritePropertyName("cucumber-messages");
+            
+            jsonWriter.WriteStartObject();
+            jsonWriter.WritePropertyName("enabled");
+            jsonWriter.WriteValue(configurationCucumberMessagesSection.Enabled);
+
+            jsonWriter.WriteEndObject();
         }
 
         private void WriteUnitTestProvider(JsonWriter jsonWriter, string unitTestProvider)

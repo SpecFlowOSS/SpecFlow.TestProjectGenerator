@@ -27,8 +27,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
 
         public void CucumberMessagesFileShouldNotExist()
         {
-            string pathInBinFolder = Path.Combine(_testProjectFolders.ProjectBinOutputPath, "CucumberMessageQueue", "messages");
-            string pathInTestResultsFolder = Path.Combine(_testProjectFolders.ProjectFolder, "TestResults", "CucumberMessageQueue", "messages");
+            string pathInBinFolder = Path.Combine(_testProjectFolders.ProjectBinOutputPath, "cucumbermessages", "messages");
+            string pathInTestResultsFolder = Path.Combine(_testProjectFolders.ProjectFolder, "TestResults", "cucumbermessages", "messages");
             bool couldFindFile = _cucumberMessagesDriver.TryGetPathCucumberMessagesFile(new[] { pathInBinFolder, pathInTestResultsFolder }, out _);
             couldFindFile.Should().BeFalse();
         }

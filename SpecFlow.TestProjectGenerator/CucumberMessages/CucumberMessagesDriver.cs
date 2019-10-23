@@ -30,8 +30,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
 
         public IEnumerable<IMessage> LoadMessageQueue()
         {
-            string pathInBinFolder = Path.Combine(_testProjectFolders.ProjectBinOutputPath, "CucumberMessageQueue", "messages");
-            string pathInTestResultsFolder = Path.Combine(_testProjectFolders.ProjectFolder, "TestResults", "CucumberMessageQueue", "messages");
+            string pathInBinFolder = Path.Combine(_testProjectFolders.ProjectBinOutputPath, "cucumbermessages", "messages");
+            string pathInTestResultsFolder = Path.Combine(_testProjectFolders.ProjectFolder, "TestResults", "cucumbermessages", "messages");
             if (!TryGetPathCucumberMessagesFile(new[] {pathInBinFolder, pathInTestResultsFolder}, out string pathToCucumberMessagesFile))
             {
                 yield break;
