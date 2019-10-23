@@ -41,69 +41,43 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             {
                 StartInfo = psi,
                 EnableRaisingEvents = true,
-
             };
 
-            StringBuilder combinedOutput = new StringBuilder();
-            StringBuilder stdOutput = new StringBuilder();
             StringBuilder stdError = new StringBuilder();
 
+            
+            process.ErrorDataReceived += (sender, e) => { stdError.Append(e.Data); };
 
-            using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+
+            var before = DateTime.Now;
+            process.Start();
+
+            process.BeginErrorReadLine();
+
+
+            var stdOutput = process.StandardOutput.ReadToEnd();
+            var processResult = process.WaitForExit(_timeOutInMilliseconds);
+
+            
+
+
+            if (!processResult)
             {
-                using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
-                {
-                    process.OutputDataReceived += (sender, e) =>
-                    {
-                        if (e.Data == null)
-                        {
-                            if (!outputWaitHandle.SafeWaitHandle.IsClosed)
-                            {
-                                outputWaitHandle.Set();
-                            }
-                        }
-                        else
-                        {
-                            combinedOutput.AppendLine(e.Data);
-                            stdOutput.AppendLine(e.Data);
-                        }
-                    };
-                    process.ErrorDataReceived += (sender, e) =>
-                    {
-                        if (e.Data == null)
-                        {
-                            if (!errorWaitHandle.SafeWaitHandle.IsClosed)
-                            {
-                                errorWaitHandle.Set();
-                            }
-                        }
-                        else
-                        {
-                            combinedOutput.AppendLine(e.Data);
-                            stdError.AppendLine(e.Data);
-                        }
-                    };
-
-                    var before = DateTime.Now;
-                    process.Start();
-
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-
-                    if (!process.WaitForExit(_timeOutInMilliseconds))
-                    {
-                        throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Combined Output:" + Environment.NewLine + combinedOutput);
-                    }
-
-                    var after = DateTime.Now;
-                    var diff = after - before;
-                    outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
-                }
+                throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Std Output:" + Environment.NewLine + stdOutput);
             }
 
-            outputWriter.WriteLine(combinedOutput.ToString());
+            
+            var after = DateTime.Now;
+            var diff = after - before;
+            outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
 
-            return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), combinedOutput.ToString());
+
+
+
+
+            outputWriter.WriteLine("StdOutput: " + stdOutput);
+
+            return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), stdOutput + stdError);
         }
 
         public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)
