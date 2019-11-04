@@ -95,7 +95,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerato
             {
                 WritePlugins(writer, configuration.Plugins);
             }
-            else
+
+            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 1))
             {
                 WriteCucumberMessages(writer, configuration.CucumberMessagesSection);
             }

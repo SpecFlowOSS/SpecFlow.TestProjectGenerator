@@ -75,7 +75,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerato
             {
                 WritePlugins(jsonWriter, configuration.Plugins);
             }
-            else
+
+            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 1))
             {
                 WriteCucumberMessages(jsonWriter, configuration.CucumberMessagesSection);
             }
