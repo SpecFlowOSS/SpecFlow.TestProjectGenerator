@@ -58,6 +58,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public bool IsSpecFlowFeatureProject { get; set; } = true;
 
+        public bool? IsTreatWarningsAsErrors { get; set; }
+
         public ProjectType ProjectType { get; set; } = ProjectType.Library;
 
         public void AddProjectReference(string projectPath, ProjectBuilder projectToReference)

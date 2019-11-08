@@ -133,8 +133,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             xw.WriteElementString("Configuration", "Debug");
             xw.WriteElementString("Platform", "AnyCPU");
             xw.WriteElementString("AutoGenerateBindingRedirects", "true");
-            
-            
+
+            xw.WriteElementString("AutoGenerateBindingRedirects", "true");
+
+            if (project.IsTreatWarningsAsErrors is bool treatWarningsAsErrors)
+            {
+                xw.WriteElementString("TreatWarningsAsErrors", treatWarningsAsErrors ? "true" : "false");
+            }
+
             xw.WriteElementString("ProjectGuid", project.ProjectGuid.ToString("B"));
             
             if (project.ProgrammingLanguage != ProgrammingLanguage.VB)

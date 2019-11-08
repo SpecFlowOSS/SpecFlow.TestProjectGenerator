@@ -16,48 +16,56 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _outputWriter = outputWriter;
         }
 
-        public CompileResult Run(BuildTool buildTool)
+        public CompileResult Run(BuildTool buildTool, bool? treatWarningsAsErrors)
         {
             switch (buildTool)
             {
                 case BuildTool.MSBuild:
-                    return CompileWithMSBuild();
+                    return CompileWithMSBuild(treatWarningsAsErrors);
                 case BuildTool.DotnetBuild:
-                    return CompileWithDotnetBuild();
+                    return CompileWithDotnetBuild(treatWarningsAsErrors);
                 case BuildTool.DotnetMSBuild:
-                    return CompileWithDotnetMSBuild();
+                    return CompileWithDotnetMSBuild(treatWarningsAsErrors);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(buildTool), buildTool, null);
             }
         }
 
-        private CompileResult CompileWithMSBuild()
+        private CompileResult CompileWithMSBuild(bool? treatWarningsAsErrors)
         {
             string msBuildPath = _visualStudioFinder.FindMSBuild();
             _outputWriter.WriteLine($"Invoke MsBuild from {msBuildPath}");
 
             var processHelper = new ProcessHelper();
-            var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, msBuildPath, $"-restore -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"");
+            var argumentsFormat = $"{GetWarningAsErrorParameter(treatWarningsAsErrors)} -restore -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
+            var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, msBuildPath, argumentsFormat);
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);
         }
 
-        private CompileResult CompileWithDotnetBuild()
+        private string GetWarningAsErrorParameter(bool? treatWarningsAsErrors)
+        {
+            return (treatWarningsAsErrors is true ? "-warnaserror" : "");
+        }
+
+        private CompileResult CompileWithDotnetBuild(bool? treatWarningsAsErrors)
         {
             _outputWriter.WriteLine($"Invoke dotnet build ");
 
             var processHelper = new ProcessHelper();
-            var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", $"build \"{_testProjectFolders.PathToSolutionFile}\"");
+            var argumentsFormat = $"build {GetWarningAsErrorParameter(treatWarningsAsErrors)} \"{_testProjectFolders.PathToSolutionFile}\"";
+            var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", argumentsFormat);
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);
         }
 
-        private CompileResult CompileWithDotnetMSBuild()
+        private CompileResult CompileWithDotnetMSBuild(bool? treatWarningsAsErrors)
         {
             _outputWriter.WriteLine($"Invoke dotnet msbuild ");
 
             var processHelper = new ProcessHelper();
-            var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", $"msbuild /bl \"{_testProjectFolders.PathToSolutionFile}\"");
+            var argumentsFormat = $"msbuild {GetWarningAsErrorParameter(treatWarningsAsErrors)} -bl \"{_testProjectFolders.PathToSolutionFile}\"";
+            var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", argumentsFormat);
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);
         }

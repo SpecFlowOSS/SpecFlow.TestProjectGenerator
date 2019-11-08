@@ -44,11 +44,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             WriteNuGetPackages(project, projectElement);
             WriteFileReferences(project, projectElement);
 
+            SetTreatWarningsAsErrors(project, projectElement);
+
             xd.Save(projectFilePath);
 
             WriteProjectFiles(project, projRootPath);
 
             return projectFilePath;
+        }
+
+        private void SetTreatWarningsAsErrors(Project project, XElement projectElement)
+        {
+            if (project.IsTreatWarningsAsErrors is bool treatWarningsAsErrors)
+            {
+                var propertyGroupElement = projectElement.Element("PropertyGroup") ?? throw new ProjectCreationNotPossibleException();
+                var treatWarningsAsErrorsElement = new XElement("TreatWarningsAsErrors");
+                treatWarningsAsErrorsElement.SetValue(treatWarningsAsErrors);
+                propertyGroupElement.Add(treatWarningsAsErrorsElement);
+            }
         }
 
         private void AdjustForASPNetCore(Project project, XElement projectElement)
