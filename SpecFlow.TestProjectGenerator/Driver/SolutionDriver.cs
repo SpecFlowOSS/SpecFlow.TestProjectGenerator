@@ -90,17 +90,18 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _solution.Files.Add(new SolutionFile(name, content));
         }
 
-        public void CompileSolution(BuildTool buildTool)
+        public void CompileSolution(BuildTool buildTool, bool? treatWarningsAsErrors = null)
         {
             foreach (var project in Projects.Values)
             {
+                project.IsTreatWarningsAsErrors = treatWarningsAsErrors;
                 project.GenerateConfigurationFile();
             }
 
             WriteToDisk();
             _nuGet.Restore();
 
-            _compileResult = _compiler.Run(buildTool);
+            _compileResult = _compiler.Run(buildTool, treatWarningsAsErrors);
         }
 
         public void WriteToDisk()
