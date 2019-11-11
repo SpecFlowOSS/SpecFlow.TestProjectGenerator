@@ -6,11 +6,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerato
     {
         private readonly AppConfigGenerator _appConfigGenerator;
         private readonly JsonConfigGenerator _jsonConfigGenerator;
+        private readonly NoneConfigGenerator _noneConfigGenerator;
 
-        public ConfigurationGeneratorFactory(AppConfigGenerator appConfigGenerator, JsonConfigGenerator jsonConfigGenerator)
+        public ConfigurationGeneratorFactory(AppConfigGenerator appConfigGenerator, JsonConfigGenerator jsonConfigGenerator, NoneConfigGenerator noneConfigGenerator)
         {
-            this._appConfigGenerator = appConfigGenerator;
-            this._jsonConfigGenerator = jsonConfigGenerator;
+            _appConfigGenerator = appConfigGenerator;
+            _jsonConfigGenerator = jsonConfigGenerator;
+            _noneConfigGenerator = noneConfigGenerator;
         }
         public IConfigurationGenerator FromConfigurationFormat(ConfigurationFormat configurationFormat)
         {
@@ -18,6 +20,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerato
             {
                 case ConfigurationFormat.Config: return _appConfigGenerator;
                 case ConfigurationFormat.Json: return _jsonConfigGenerator;
+                case ConfigurationFormat.None: return _noneConfigGenerator;
                 default: throw new ArgumentOutOfRangeException(nameof(configurationFormat));
             }
         }

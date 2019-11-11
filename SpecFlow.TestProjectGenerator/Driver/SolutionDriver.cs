@@ -38,10 +38,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _outputWriter = outputWriter;
             NuGetSources = new List<NuGetSource>
             {
-                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder),
-                new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json"),
-                new NuGetSource("Cucumber Messages CI", "https://www.myget.org/F/cucumber-messages/api/v3/index.json")
+                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)
             };
+
+            if (testRunConfiguration.UnitTestProvider == UnitTestProvider.SpecRun)
+            {
+                NuGetSources.Add(new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json"));
+                NuGetSources.Add(new NuGetSource("SpecFlow Unstable", "https://www.myget.org/F/specflow-unstable/api/v3/index.json"));
+            }
+
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
@@ -69,6 +74,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
         }
 
+        
         public void AddProject(ProjectBuilder project)
         {
             if (_defaultProject == null)
@@ -79,17 +85,23 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _projects.Add(project.ProjectName, project);
         }
 
-        public void CompileSolution(BuildTool buildTool)
+        public void AddFile(string name, string content)
+        {
+            _solution.Files.Add(new SolutionFile(name, content));
+        }
+
+        public void CompileSolution(BuildTool buildTool, bool? treatWarningsAsErrors = null)
         {
             foreach (var project in Projects.Values)
             {
+                project.IsTreatWarningsAsErrors = treatWarningsAsErrors;
                 project.GenerateConfigurationFile();
             }
 
             WriteToDisk();
             _nuGet.Restore();
 
-            _compileResult = _compiler.Run(buildTool);
+            _compileResult = _compiler.Run(buildTool, treatWarningsAsErrors);
         }
 
         public void WriteToDisk()
@@ -113,6 +125,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
             var solutionWriter = new SolutionWriter(_outputWriter);
             solutionWriter.WriteToFileSystem(_solution, _testProjectFolders.PathToSolutionDirectory);
+            
 
 
             _isWrittenOnDisk = true;

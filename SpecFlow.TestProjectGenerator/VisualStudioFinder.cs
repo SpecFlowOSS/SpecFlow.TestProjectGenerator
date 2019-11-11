@@ -30,7 +30,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private string ExecuteVsWhere(string vsWhereParameters)
         {
-            string vsWherePath = Path.Combine(_folders.GlobalPackages, "vswhere", "2.6.7", "tools", "vswhere.exe");
+            string vsWherePath = Path.Combine(_folders.GlobalPackages, "vswhere", "2.7.1", "tools", "vswhere.exe");
 
             if (!File.Exists(vsWherePath))
             {
@@ -41,6 +41,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             var processResult = ph.RunProcess(_outputWriter, ".", vsWherePath, vsWhereParameters);
 
             var lines = processResult.CombinedOutput.Split(new string[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+
+            if (!lines.Any())
+            {
+                throw new Exception($"vswhere didn't return something: {processResult.CombinedOutput}");
+            }
+
             return lines.First();
         }
     }

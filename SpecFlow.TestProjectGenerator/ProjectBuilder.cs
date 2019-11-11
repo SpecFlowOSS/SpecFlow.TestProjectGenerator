@@ -58,6 +58,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public bool IsSpecFlowFeatureProject { get; set; } = true;
 
+        public bool? IsTreatWarningsAsErrors { get; set; }
+
         public ProjectType ProjectType { get; set; } = ProjectType.Library;
 
         public void AddProjectReference(string projectPath, ProjectBuilder projectToReference)
@@ -134,7 +136,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             EnsureProjectExists();
             var generator = _configurationGeneratorFactory.FromConfigurationFormat(ConfigurationFormat);
-            _project.AddFile(generator.Generate(Configuration));
+            var generatedConfig = generator.Generate(Configuration);
+
+            if (generatedConfig is ProjectFile _)
+            {
+                _project.AddFile(generatedConfig);
+            }
         }
 
         public Project Build()
@@ -202,7 +209,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 if (_project.ProjectFormat == ProjectFormat.Old)
                 {
-                    _project.AddNuGetPackage("Cucumber.Messages", "4.0.0", new NuGetPackageAssembly("Cucumber.Messages, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b10c5988214f940c", "net45\\Cucumber.Messages.dll"));
+                    _project.AddNuGetPackage("Cucumber.Messages", "6.0.1", new NuGetPackageAssembly("Cucumber.Messages, Version=6.0.1.0, Culture=neutral, PublicKeyToken=b10c5988214f940c", "net45\\Cucumber.Messages.dll"));
                     _project.AddNuGetPackage("Google.Protobuf", "3.7.0", new NuGetPackageAssembly("Google.Protobuf, Version=3.7.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604", "net45\\Google.Protobuf.dll"));
                 }
 
@@ -213,7 +220,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                 }
                 else
                 {
-                    _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow"), "net45\\TechTalk.SpecFlow.dll"));
+                    _project.AddNuGetPackage("SpecFlow", $"{_currentVersionDriver.SpecFlowNuGetVersion}", new NuGetPackageAssembly($"TechTalk.SpecFlow, Version={_currentVersionDriver.SpecFlowVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
                 }
 
                 _project.AddNuGetPackage("BoDi", "1.4.1", new NuGetPackageAssembly("BoDi, Version=1.4.1.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
@@ -238,14 +245,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                 if (IsSpecFlowFeatureProject)
                 {
                     if (_currentVersionDriver.SpecFlowVersion >= new Version(2, 3, 0))
+                    {
                         _project.AddNuGetPackage("SpecFlow.Tools.MsBuild.Generation", _currentVersionDriver.SpecFlowNuGetVersion);
+                    }
                     else
+                    {
                         _project.AddMSBuildImport($"..\\packages\\SpecFlow.{_currentVersionDriver.SpecFlowVersion}\\tools\\TechTalk.SpecFlow.targets");
+                    }
 
                     if (_project.ProjectFormat == ProjectFormat.Old && _currentVersionDriver.SpecFlowVersion < new Version(3, 0, 0))
+                    {
                         AddMSBuildTarget("AfterUpdateFeatureFilesInProject", @"<ItemGroup>	
                                                                           <Compile Include=""@(SpecFlowGeneratedFiles)"" />	
                                                                        </ItemGroup>");
+                    }
                 }
 
                 switch (Configuration.UnitTestProvider)
@@ -369,10 +382,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private void ConfigureRunnerForSpecFlow2()
         {
             _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
-                new NuGetPackageAssembly($"SpecRun.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.SpecFlowPlugin.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                new NuGetPackageAssembly($"SpecRun.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.SpecFlowPlugin.dll"),
+                new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
                     "net45\\TechTalk.SpecRun.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
                     "net45\\TechTalk.SpecRun.Common.dll")
             );
             Configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
@@ -382,12 +395,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             string targetFramework = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
             _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
-                new NuGetPackageAssembly($"SpecRun.Runtime.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, processorArchitecture=MSIL",
-                    $"{targetFramework}\\SpecRun.Runtime.SpecFlowPlugin.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"{targetFramework}\\TechTalk.SpecRun.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}.0, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"{targetFramework}\\TechTalk.SpecRun.Common.dll")
+                new NuGetPackageAssembly($"SpecRun.Runtime.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, processorArchitecture=MSIL",
+                    $"net45\\SpecRun.Runtime.SpecFlowPlugin.dll"),
+                new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                    $"net45\\TechTalk.SpecRun.dll"),
+                new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
+                    $"net45\\TechTalk.SpecRun.Common.dll")
             );
         }
 

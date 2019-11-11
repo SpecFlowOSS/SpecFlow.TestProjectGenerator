@@ -96,6 +96,18 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories.ConfigurationGenerato
                 WritePlugins(writer, configuration.Plugins);
             }
 
+            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 1))
+            {
+                WriteCucumberMessages(writer, configuration.CucumberMessagesSection);
+            }
+
+            writer.WriteEndElement();
+        }
+
+        private void WriteCucumberMessages(XmlWriter writer, ConfigurationModel.CucumberMessages configurationCucumberMessagesSection)
+        {
+            writer.WriteStartElement("cucumber-messages");
+            writer.WriteAttributeString("enabled", configurationCucumberMessagesSection.Enabled.ToString());
             writer.WriteEndElement();
         }
 

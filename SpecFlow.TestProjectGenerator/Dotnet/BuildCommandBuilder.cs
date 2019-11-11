@@ -7,6 +7,11 @@
             return new BuildCommandBuilder(outputWriter);
         }
 
+        protected override string GetWorkingDirectory()
+        {
+            return ".";
+        }
+
         protected override string BuildArguments()
         {
             return "build";
