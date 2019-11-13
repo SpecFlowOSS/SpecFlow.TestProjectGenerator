@@ -41,13 +41,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
             else
             {
-                msBuildPath = "sudo";
+                msBuildPath = "/usr/share/dotnet/dotnet";
             }
 
             _outputWriter.WriteLine($"Invoke MsBuild from {msBuildPath}");
 
             var processHelper = new ProcessHelper();
-            var argumentsFormat = $"{(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "/usr/share/dotnet/dotnet msbuild" : "")} {GetWarningAsErrorParameter(treatWarningsAsErrors)} -restore -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
+            var argumentsFormat = $"{(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "build" : "")} {GetWarningAsErrorParameter(treatWarningsAsErrors)} -restore -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
 
             var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, msBuildPath, argumentsFormat);
 
