@@ -69,18 +69,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public TestExecutionResult ExecuteTests()
         {
-            string vsTestConsoleExePath;
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                vsTestConsoleExePath = "/usr/share/dotnet/dotnet";
-            }
-            else
-            {
-                string vsFolder = _visualStudioFinder.Find();
-                vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
-
-                vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
-            }
+            string vsTestConsoleExePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet" : "/usr/share/dotnet/dotnet";
 
             var envVariables = new Dictionary<string, string>();
 
@@ -110,7 +99,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             var processHelper = new ProcessHelper();
-            string arguments = (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "vstest " : "") + GenereateVsTestsArguments();
+            string arguments = $"test {GenereateVsTestsArguments()}";
             ProcessResult processResult;
             try
             {
@@ -118,7 +107,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
             catch (Exception)
             {
-                Console.WriteLine($"running vstest.console.exe failed - {_testProjectFolders.CompiledAssemblyPath} {vsTestConsoleExePath} {arguments}");
+                Console.WriteLine($"running {vsTestConsoleExePath} failed - {_testProjectFolders.CompiledAssemblyPath} {vsTestConsoleExePath} {arguments}");
                 throw;
             }
 
@@ -166,24 +155,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private string GenereateVsTestsArguments()
         {
-            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx";
+            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" --logger trx";
 
             if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
             {
                 if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
                 {
-                    arguments += $" /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
+                    arguments += $" --a \"{_testProjectFolders.PathToNuGetPackages}\"";
                 }
             }
 
             if (Filter.IsNotNullOrEmpty())
             {
-                arguments += $" /TestCaseFilter:{Filter}";
+                arguments += $" --filter \"Filter\"";
             }
 
             if (RunSettingsFile.IsNotNullOrWhiteSpace())
             {
-                arguments += $" /Settings:{RunSettingsFile}";
+                arguments += $" --settings \"{RunSettingsFile}\"";
             }
 
             return arguments;
