@@ -155,7 +155,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private string GenereateVsTestsArguments()
         {
-            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" --logger trx";
+            string arguments = $"\"{_testProjectFolders.ProjectFolder}\" --logger trx";
 
             if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
             {
