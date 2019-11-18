@@ -10,10 +10,18 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
     public class TRXParser
     {
         private readonly TestRunConfiguration _testRunConfiguration;
+        private readonly XNamespace _xmlns = XNamespace.Get("http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
+        private readonly Regex _xunitPendingOrInconclusiveRegex = new Regex("(XUnitPendingStepException|XUnitInconclusiveException)");
+        private readonly XName _unitTestResultElementName;
+        private readonly XName _unitTestResultOutputElementName;
+        private readonly XName _unitTestResultStdOutElementName;
 
         public TRXParser(TestRunConfiguration testRunConfiguration)
         {
             _testRunConfiguration = testRunConfiguration;
+            _unitTestResultElementName = _xmlns + "UnitTestResult";
+            _unitTestResultOutputElementName = _xmlns + "Output";
+            _unitTestResultStdOutElementName = _xmlns + "StdOut";
         }
 
         public TestExecutionResult ParseTRXFile(string trxFile, string output, IEnumerable<string> reportFiles, string logFileContent)
@@ -27,15 +35,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             var testExecutionResult = GetCommonTestExecutionResult(trx, output, reportFiles, logFileContent);
 
-            return CalculateUnitTestProviderSpecificTestExecutionResult(testExecutionResult, testRunConfiguration);
+            return CalculateUnitTestProviderSpecificTestExecutionResult(testExecutionResult, testRunConfiguration, trx);
         }
 
         private TestExecutionResult GetCommonTestExecutionResult(XDocument trx, string output, IEnumerable<string> reportFiles, string logFileContent)
         {
-            var xmlns = XNamespace.Get("http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
-
-            var testRunElement = trx.Descendants(xmlns + "TestRun").Single();
-            var summaryElement = testRunElement.Element(xmlns + "ResultSummary")?.Element(xmlns + "Counters")
+            var testRunElement = trx.Descendants(_xmlns + "TestRun").Single();
+            var summaryElement = testRunElement.Element(_xmlns + "ResultSummary")?.Element(_xmlns + "Counters")
                                  ?? throw new InvalidOperationException("Invalid document; result summary counters element not found.");
 
             var totalAttribute = summaryElement.Attribute("total");
@@ -50,7 +56,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             int.TryParse(failedAttribute?.Value, out int failed);
             int.TryParse(inconclusiveAttribute?.Value, out int inconclusive);
 
-            var testResults = GetTestResults(testRunElement, xmlns);
+            var testResults = GetTestResults(testRunElement, _xmlns);
             string trxOutput = Enumerable.Select<TestResult, string>(testResults, r => r.StdOut).Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c)).ToString();
 
             return new TestExecutionResult
@@ -69,11 +75,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             };
         }
 
-        private TestExecutionResult CalculateUnitTestProviderSpecificTestExecutionResult(TestExecutionResult testExecutionResult, TestRunConfiguration testRunConfiguration)
+        private TestExecutionResult CalculateUnitTestProviderSpecificTestExecutionResult(TestExecutionResult testExecutionResult, TestRunConfiguration testRunConfiguration, XDocument trx)
         {
             switch (testRunConfiguration.UnitTestProvider)
             {
-                case UnitTestProvider.xUnit: return CalculateXUnitTestExecutionResult(testExecutionResult);
+                case UnitTestProvider.xUnit: return CalculateXUnitTestExecutionResult(testExecutionResult, trx);
                 case UnitTestProvider.MSTest: return CalculateMsTestTestExecutionResult(testExecutionResult);
                 case UnitTestProvider.NUnit3: return CalculateNUnitTestExecutionResult(testExecutionResult);
                 case UnitTestProvider.SpecRun: return CalculateSpecRunTestExecutionResult(testExecutionResult);
@@ -120,9 +126,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             return testExecutionResult;
         }
 
-        private TestExecutionResult CalculateXUnitTestExecutionResult(TestExecutionResult testExecutionResult)
+        private TestExecutionResult CalculateXUnitTestExecutionResult(TestExecutionResult testExecutionResult, XDocument trx)
         {
-            testExecutionResult.Pending = GetXUnitPendingCount(testExecutionResult.Output);
+            testExecutionResult.Pending = GetXUnitPendingCount(trx.Descendants(trx + "Results").First());
             testExecutionResult.Failed -= testExecutionResult.Pending;
             testExecutionResult.Ignored = testExecutionResult.Total - testExecutionResult.Executed;
 
@@ -131,11 +137,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private List<TestResult> GetTestResults(XElement testRunElement, XNamespace xmlns)
         {
-            var testResults = from unitTestResultElement in testRunElement.Element(xmlns + "Results")?.Elements(xmlns + "UnitTestResult") ?? Enumerable.Empty<XElement>()
-                let outputElement = unitTestResultElement.Element(xmlns + "Output")
+            var testResults = from unitTestResultElement in testRunElement.Element(xmlns + "Results")?.Elements(_unitTestResultElementName) ?? Enumerable.Empty<XElement>()
+                let outputElement = unitTestResultElement.Element(_unitTestResultOutputElementName)
                 let idAttribute = unitTestResultElement.Attribute("executionId")
                 let outcomeAttribute = unitTestResultElement.Attribute("outcome")
-                let stdOutElement = outputElement?.Element(xmlns + "StdOut")
+                let stdOutElement = outputElement?.Element(_unitTestResultStdOutElementName)
                 let errorInfoElement = outputElement?.Element(xmlns + "ErrorInfo")
                 let errorMessage = errorInfoElement?.Element(xmlns + "Message")
                 where idAttribute != null
@@ -162,10 +168,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             return elements.Count();
         }
 
-        private int GetXUnitPendingCount(string output)
+        public int GetXUnitPendingCount(XElement resultsElement)
         {
-            return Regex.Matches(output, "XUnitPendingStepException").Count / 2 +
-                   Regex.Matches(output, "XUnitInconclusiveException").Count / 2;
+            var pendingOrInconclusiveTests =
+                from unitTestResult in resultsElement.Elements(_unitTestResultElementName)
+                let unitTestOutputElement = unitTestResult.Element(_unitTestResultOutputElementName)?.Element(_unitTestResultStdOutElementName)
+                let unitTestOutput = unitTestOutputElement?.Value ?? ""
+                where _xunitPendingOrInconclusiveRegex.IsMatch(unitTestOutput)
+                select _xunitPendingOrInconclusiveRegex;
+
+            return pendingOrInconclusiveTests.Count();
         }
     }
 }
