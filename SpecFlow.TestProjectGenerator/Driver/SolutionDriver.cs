@@ -19,6 +19,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         private readonly Folders _folders;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly Compiler _compiler;
+        private readonly SolutionWriter _solutionWriter;
+        private readonly NuGetRestorerFactory _nugetRestorerFactory;
         private readonly Solution _solution;
         private readonly Dictionary<string, ProjectBuilder> _projects = new Dictionary<string, ProjectBuilder>();
         private bool _isWrittenOnDisk;
@@ -41,6 +43,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _folders = folders;
             _testProjectFolders = testProjectFolders;
             _compiler = compiler;
+            _solutionWriter = solutionWriter;
+            _nugetRestorerFactory = nugetRestorerFactory;
             NuGetSources = new List<NuGetSource>
             {
                 new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)
@@ -125,10 +129,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
             _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
 
-            var solutionWriter = new SolutionWriter(_outputWriter);
-            solutionWriter.WriteToFileSystem(_solution, _testProjectFolders.PathToSolutionDirectory);
-            
+            _solutionWriter.WriteToFileSystem(_solution, _testProjectFolders.PathToSolutionDirectory);
 
+            foreach (var project in _solution.Projects)
+            {
+                var nugetRestorerForProject = _nugetRestorerFactory.GetNuGetRestorerForProject(project);
+                nugetRestorerForProject.RestoreForProject(project);
+            }
 
             _isWrittenOnDisk = true;
         }

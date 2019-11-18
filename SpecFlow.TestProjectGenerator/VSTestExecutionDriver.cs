@@ -64,7 +64,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public TestExecutionResult ExecuteTests()
         {
-            string vsTestConsoleExePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet" : "/usr/share/dotnet/dotnet";
+            string dotnetTestPath = "dotnet";
 
             var envVariables = new Dictionary<string, string>();
 
@@ -98,11 +98,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             ProcessResult processResult;
             try
             {
-                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, vsTestConsoleExePath, arguments, envVariables);
+                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, dotnetTestPath, arguments, envVariables);
             }
             catch (Exception)
             {
-                Console.WriteLine($"running {vsTestConsoleExePath} failed - {_testProjectFolders.CompiledAssemblyPath} {vsTestConsoleExePath} {arguments}");
+                Console.WriteLine($"running {dotnetTestPath} failed - {_testProjectFolders.CompiledAssemblyPath} {dotnetTestPath} {arguments}");
                 throw;
             }
 

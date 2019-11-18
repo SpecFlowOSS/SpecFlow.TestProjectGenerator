@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
+using TechTalk.SpecFlow.TestProjectGenerator.Data;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
 {
@@ -8,43 +8,50 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
     {
         protected readonly Folders _folders;
         private readonly TestProjectFolders _testProjectFolders;
-        private readonly IOutputWriter _outputWriter;
+        private readonly NetFrameworkExecutableInvoker _netFrameworkExecutableInvoker;
 
-        public NuGet(Folders folders, TestProjectFolders testProjectFolders, IOutputWriter outputWriter)
+        public NuGet(Folders folders, TestProjectFolders testProjectFolders, NetFrameworkExecutableInvoker netFrameworkExecutableInvoker)
         {
             _folders = folders;
             _testProjectFolders = testProjectFolders;
-            _outputWriter = outputWriter;
+            _netFrameworkExecutableInvoker = netFrameworkExecutableInvoker;
         }
 
         public void Restore()
         {
-            var processPath = GetPathToNuGetExe();
+            string commandLineArgs = $"restore {_testProjectFolders.SolutionFileName} -SolutionDirectory . -NoCache";
+            Restore(commandLineArgs);
+        }
 
+        public void RestoreForProject(Project project)
+        {
+            if (project.ProjectFormat != ProjectFormat.Old)
+            {
+                throw new InvalidOperationException("Project format must be classic to use NuGet.exe for restoring packages");
+            }
+
+            string pathToPackagesConfig = Path.Combine(_testProjectFolders.PathToSolutionDirectory, project.Name, "packages.config");
+            string commandLineArgs = $"restore {pathToPackagesConfig} -SolutionDirectory . -NoCache";
+            Restore(commandLineArgs);
+        }
+
+        public void Restore(string parameters)
+        {
+            string processPath = GetPathToNuGetExe();
             if (!File.Exists(processPath))
             {
                 throw new FileNotFoundException("NuGet.exe could not be found! Is the version number correct?", processPath);
             }
 
-            var commandLineArgs = $"restore {_testProjectFolders.SolutionFileName} -SolutionDirectory . -NoCache";
-
-
-            var nugetRestore = new ProcessHelper();
-            ProcessResult processResult;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                 processResult = nugetRestore.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, processPath, commandLineArgs);
-            }
-            else
-            {
-                processResult = nugetRestore.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "/usr/bin/mono", processPath + " " + commandLineArgs);
-            }
-
+            var processResult = _netFrameworkExecutableInvoker.InvokeExecutable(processPath, parameters);
 
             if (processResult.ExitCode > 0)
             {
-                throw new Exception("NuGet restore failed - rebuild solution to generate latest packages " + Environment.NewLine +
-                                    $"{_testProjectFolders.PathToSolutionDirectory} {processPath} {commandLineArgs}" + Environment.NewLine + processResult.CombinedOutput);
+                throw new Exception("NuGet restore failed - rebuild solution to generate latest packages "
+                                    + Environment.NewLine
+                                    + $"{_testProjectFolders.PathToSolutionDirectory} {processPath} {parameters}"
+                                    + Environment.NewLine
+                                    + processResult.CombinedOutput);
             }
         }
 
