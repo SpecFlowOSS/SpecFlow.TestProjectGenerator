@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using FluentAssertions;
@@ -14,8 +13,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class VSTestExecutionDriver
     {
-        private readonly VisualStudioFinder _visualStudioFinder;
-        private readonly AppConfigDriver _appConfigDriver;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly IOutputWriter _outputWriter;
         private readonly TestRunConfiguration _testRunConfiguration;
@@ -26,10 +23,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private const string BeginnOfTrxFileLine = "Results File: ";
         private const string BeginnOfLogFileLine = "Log file: ";
 
-        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, IOutputWriter outputWriter, TestRunConfiguration testRunConfiguration, TestSuiteInitializationDriver testSuiteInitializationDriver, TRXParser trxParser)
+        public VSTestExecutionDriver(TestProjectFolders testProjectFolders, IOutputWriter outputWriter, TestRunConfiguration testRunConfiguration, TestSuiteInitializationDriver testSuiteInitializationDriver, TRXParser trxParser)
         {
-            _visualStudioFinder = visualStudioFinder;
-            _appConfigDriver = appConfigDriver;
             _testProjectFolders = testProjectFolders;
             _outputWriter = outputWriter;
             _testRunConfiguration = testRunConfiguration;
@@ -99,7 +94,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             var processHelper = new ProcessHelper();
-            string arguments = $"test {GenereateVsTestsArguments()}";
+            string arguments = $"test {GenerateVsTestsArguments()}";
             ProcessResult processResult;
             try
             {
@@ -153,7 +148,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                    select trimmed.Substring(start + starting.Length);
         }
 
-        private string GenereateVsTestsArguments()
+        private string GenerateVsTestsArguments()
         {
             string arguments = $"\"{_testProjectFolders.ProjectFolder}\" --logger trx";
 
@@ -161,7 +156,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             {
                 if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
                 {
-                    arguments += $" --a \"{_testProjectFolders.PathToNuGetPackages}\"";
+                    arguments += $" -a \"{_testProjectFolders.PathToNuGetPackages}\"";
                 }
             }
 

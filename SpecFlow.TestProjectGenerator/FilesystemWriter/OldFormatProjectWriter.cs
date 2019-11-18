@@ -52,13 +52,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
                 WriteLanguageTargets(xw, project);
 
-                
-
                 WriteNuGetPackageTargetImports(xw, project);
 
                 WriteMSBuildImports(xw, project);
                 WriteMSBuildTargets(xw, project);
-                
 
                 // close project tag
                 xw.WriteEndElement();
@@ -93,7 +90,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
         public void WriteReferences(Project project, string projectFilePath)
         {
-            
         }
 
         private void WriteLanguageTargets(XmlWriter xw, Project project)

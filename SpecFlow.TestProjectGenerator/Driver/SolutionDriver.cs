@@ -17,25 +17,30 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         private readonly TestRunConfiguration _testRunConfiguration;
         private readonly ProjectBuilderFactory _projectBuilderFactory;
         private readonly Folders _folders;
-        private readonly NuGet _nuGet;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly Compiler _compiler;
-        private readonly IOutputWriter _outputWriter;
         private readonly Solution _solution;
         private readonly Dictionary<string, ProjectBuilder> _projects = new Dictionary<string, ProjectBuilder>();
         private bool _isWrittenOnDisk;
         private CompileResult _compileResult;
+        private ProjectBuilder _defaultProject;
 
-        public SolutionDriver(NuGetConfigGenerator nuGetConfigGenerator, TestRunConfiguration testRunConfiguration, ProjectBuilderFactory projectBuilderFactory, Folders folders, NuGet nuGet, TestProjectFolders testProjectFolders, Compiler compiler, IOutputWriter outputWriter)
+        public SolutionDriver(
+            NuGetConfigGenerator nuGetConfigGenerator,
+            TestRunConfiguration testRunConfiguration,
+            ProjectBuilderFactory projectBuilderFactory,
+            Folders folders,
+            TestProjectFolders testProjectFolders,
+            Compiler compiler,
+            SolutionWriter solutionWriter,
+            NuGetRestorerFactory nugetRestorerFactory)
         {
             _nuGetConfigGenerator = nuGetConfigGenerator;
             _testRunConfiguration = testRunConfiguration;
             _projectBuilderFactory = projectBuilderFactory;
             _folders = folders;
-            _nuGet = nuGet;
             _testProjectFolders = testProjectFolders;
             _compiler = compiler;
-            _outputWriter = outputWriter;
             NuGetSources = new List<NuGetSource>
             {
                 new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)
@@ -59,7 +64,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects => _projects;
 
-        private ProjectBuilder _defaultProject;
         public ProjectBuilder DefaultProject
         {
             get
@@ -74,7 +78,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
         }
 
-        
         public void AddProject(ProjectBuilder project)
         {
             if (_defaultProject == null)
@@ -136,7 +139,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _compileResult.IsSuccessful.Should().BeTrue("the project should have compiled successfully.\r\n\r\n------ Build output ------\r\n{0}", _compileResult.Output);
         }
 
-        public void CheckSolutionShouldHaseCompileError()
+        public void CheckSolutionShouldHaveCompileError()
         {
             _compileResult.Should().NotBeNull("the project should have compiled");
             _compileResult.IsSuccessful.Should().BeFalse("There should be a compile error");
@@ -146,12 +149,5 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         {
             return _compileResult.Output.Contains(str);
         }
-    }
-
-    public enum BuildTool
-    {
-        MSBuild,
-        DotnetBuild,
-        DotnetMSBuild
     }
 }

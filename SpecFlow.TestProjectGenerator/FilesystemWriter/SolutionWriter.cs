@@ -36,9 +36,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 throw new ArgumentNullException(nameof(solution));
             }
 
-            var targetFramework = solution.Projects
-                .Select(p => p.TargetFrameworks)
-                .FirstOrDefault();
+            var targetFramework =
+                solution.Projects
+                        .Select(p => p.TargetFrameworks)
+                        .FirstOrDefault();
             var sdk = _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
 
             if (targetFramework != 0 && sdk != null)
