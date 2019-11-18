@@ -15,6 +15,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private readonly XName _unitTestResultElementName;
         private readonly XName _unitTestResultOutputElementName;
         private readonly XName _unitTestResultStdOutElementName;
+        private readonly XName _testRunElementName;
+        private readonly XName _resultsElementName;
 
         public TRXParser(TestRunConfiguration testRunConfiguration)
         {
@@ -22,6 +24,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _unitTestResultElementName = _xmlns + "UnitTestResult";
             _unitTestResultOutputElementName = _xmlns + "Output";
             _unitTestResultStdOutElementName = _xmlns + "StdOut";
+            _testRunElementName = _xmlns + "TestRun";
+            _resultsElementName = _xmlns + "Results";
         }
 
         public TestExecutionResult ParseTRXFile(string trxFile, string output, IEnumerable<string> reportFiles, string logFileContent)
@@ -40,7 +44,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private TestExecutionResult GetCommonTestExecutionResult(XDocument trx, string output, IEnumerable<string> reportFiles, string logFileContent)
         {
-            var testRunElement = trx.Descendants(_xmlns + "TestRun").Single();
+            var testRunElement = trx.Descendants(_testRunElementName).Single();
             var summaryElement = testRunElement.Element(_xmlns + "ResultSummary")?.Element(_xmlns + "Counters")
                                  ?? throw new InvalidOperationException("Invalid document; result summary counters element not found.");
 
@@ -128,7 +132,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private TestExecutionResult CalculateXUnitTestExecutionResult(TestExecutionResult testExecutionResult, XDocument trx)
         {
-            testExecutionResult.Pending = GetXUnitPendingCount(trx.Descendants(trx + "Results").First());
+            testExecutionResult.Pending = GetXUnitPendingCount(trx.Element(_testRunElementName)?.Element(_resultsElementName));
             testExecutionResult.Failed -= testExecutionResult.Pending;
             testExecutionResult.Ignored = testExecutionResult.Total - testExecutionResult.Executed;
 
@@ -172,7 +176,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             var pendingOrInconclusiveTests =
                 from unitTestResult in resultsElement.Elements(_unitTestResultElementName)
-                let unitTestOutputElement = unitTestResult.Element(_unitTestResultOutputElementName)?.Element(_unitTestResultStdOutElementName)
+                let unitTestOutputElement = unitTestResult.Element(_unitTestResultOutputElementName)
                 let unitTestOutput = unitTestOutputElement?.Value ?? ""
                 where _xunitPendingOrInconclusiveRegex.IsMatch(unitTestOutput)
                 select _xunitPendingOrInconclusiveRegex;
