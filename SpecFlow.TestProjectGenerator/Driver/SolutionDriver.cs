@@ -99,7 +99,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
 
             WriteToDisk();
-            _nuGet.Restore();
 
             _compileResult = _compiler.Run(buildTool, treatWarningsAsErrors);
         }
