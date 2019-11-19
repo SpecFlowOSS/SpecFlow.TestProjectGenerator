@@ -150,27 +150,27 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private string GenerateVsTestsArguments()
         {
-            string arguments = $"\"{_testProjectFolders.ProjectFolder}\" --logger trx";
+            var argumentsBuilder = new StringBuilder($"\"{_testProjectFolders.ProjectFolder}\" --no-build --logger trx");
 
             if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
             {
                 if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
                 {
-                    arguments += $" -a \"{_testProjectFolders.PathToNuGetPackages}\"";
+                    argumentsBuilder.Append($" -a \"{_testProjectFolders.PathToNuGetPackages}\"");
                 }
             }
 
             if (Filter.IsNotNullOrEmpty())
             {
-                arguments += $" --filter \"Filter\"";
+                argumentsBuilder.Append($" --filter \"{Filter}\"");
             }
 
             if (RunSettingsFile.IsNotNullOrWhiteSpace())
             {
-                arguments += $" --settings \"{RunSettingsFile}\"";
+                argumentsBuilder.Append($" --settings \"{RunSettingsFile}\"");
             }
 
-            return arguments;
+            return argumentsBuilder.ToString();
         }
     }
 }

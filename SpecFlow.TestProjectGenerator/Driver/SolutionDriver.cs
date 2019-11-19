@@ -82,6 +82,22 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
         }
 
+        public Solution GetSolution()
+        {
+            foreach (var project in Projects.Values)
+            {
+                project.Build();
+            }
+
+            foreach (var project in Projects.Values)
+            {
+                _solution.AddProject(project.Build());
+            }
+
+            _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
+            return _solution;
+        }
+
         public void AddProject(ProjectBuilder project)
         {
             if (_defaultProject == null)
