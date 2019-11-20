@@ -79,6 +79,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _outputWriter.WriteLine($"Invoking dotnet msbuild");
 
             var processHelper = new ProcessHelper();
+
+            // execute dotnet --info
+            processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", "--info");
+
             string argumentsFormat = $"msbuild {GetWarningAsErrorParameter(treatWarningsAsErrors)} -bl \"{_testProjectFolders.PathToSolutionFile}\"";
             var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", argumentsFormat);
 
