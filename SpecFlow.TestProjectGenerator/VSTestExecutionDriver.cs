@@ -127,7 +127,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private string GenerateVsTestsArguments()
         {
-            var argumentsBuilder = new StringBuilder($"\"{_testProjectFolders.PathToSolutionFile}\" --no-restore --logger trx");
+            var argumentsBuilder = new StringBuilder("--logger trx");
 
             if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun) 
             {
@@ -146,6 +146,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             {
                 argumentsBuilder.Append($" --settings \"{RunSettingsFile}\"");
             }
+
+            argumentsBuilder.Append($" \"{_testProjectFolders.PathToSolutionFile}\"");
 
             return argumentsBuilder.ToString();
         }
