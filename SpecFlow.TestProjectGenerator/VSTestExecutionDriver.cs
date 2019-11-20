@@ -127,9 +127,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private string GenerateVsTestsArguments()
         {
-            var argumentsBuilder = new StringBuilder($"\"{_testProjectFolders.ProjectFolder}\" --no-build --logger trx");
+            var argumentsBuilder = new StringBuilder($"\"{_testProjectFolders.PathToSolutionFile}\" --no-restore --logger trx");
 
-            if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
+            if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun) 
             {
                 if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
                 {
