@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-
-namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
+﻿namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 {
     public class CompilationDriver
     {
@@ -8,12 +6,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
         private readonly Compiler _compiler;
         private readonly SolutionWriteToDiskDriver _solutionWriteToDiskDriver;
-        private CompileResult _compileResult;
+        private readonly CompilationResultDriver _compilationResultDriver;
 
-        public CompilationDriver(Compiler compiler, SolutionWriteToDiskDriver solutionWriteToDiskDriver)
+        public CompilationDriver(Compiler compiler, SolutionWriteToDiskDriver solutionWriteToDiskDriver, CompilationResultDriver compilationResultDriver)
         {
             _compiler = compiler;
             _solutionWriteToDiskDriver = solutionWriteToDiskDriver;
+            _compilationResultDriver = compilationResultDriver;
         }
 
         public bool HasTriedToCompile { get; private set; }
@@ -30,25 +29,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
             for (uint time = 0; time < times; time++)
             {
-                _compileResult = _compiler.Run(buildTool, treatWarningsAsErrors);
+                _compilationResultDriver.CompileResult = _compiler.Run(buildTool, treatWarningsAsErrors);
             }
-        }
-
-        public void CheckSolutionShouldHaveCompiled()
-        {
-            _compileResult.Should().NotBeNull("the project should have compiled");
-            _compileResult.IsSuccessful.Should().BeTrue("the project should have compiled successfully.\r\n\r\n------ Build output ------\r\n{0}", _compileResult.Output);
-        }
-
-        public void CheckSolutionShouldHaveCompileError()
-        {
-            _compileResult.Should().NotBeNull("the project should have compiled");
-            _compileResult.IsSuccessful.Should().BeFalse("There should be a compile error");
-        }
-
-        public bool CheckCompileOutputForString(string str)
-        {
-            return _compileResult.Output.Contains(str);
         }
     }
 }
