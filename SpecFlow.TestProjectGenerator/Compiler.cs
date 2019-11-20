@@ -80,6 +80,5 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);
         }
-
     }
 }
