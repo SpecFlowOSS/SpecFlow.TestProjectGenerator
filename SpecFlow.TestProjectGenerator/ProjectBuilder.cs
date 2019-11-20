@@ -205,7 +205,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                 _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
 
 
-                _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "15.9.0");
+                _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "16.4.0");
 
                 if (_project.ProjectFormat == ProjectFormat.Old)
                 {
