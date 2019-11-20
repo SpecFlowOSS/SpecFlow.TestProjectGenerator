@@ -64,7 +64,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _outputWriter.WriteLine("Invoking dotnet build");
 
             var processHelper = new ProcessHelper();
-            string argumentsFormat = $"build {GetWarningAsErrorParameter(treatWarningsAsErrors)} --no-cache -bl -nologo --no-incremental -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
+
+            // execute dotnet --info
+            processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", "--info");
+
+            string argumentsFormat = $"build {GetWarningAsErrorParameter(treatWarningsAsErrors)} --no-cache -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
             var dotnetBuildProcessResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", argumentsFormat);
 
             return new CompileResult(dotnetBuildProcessResult.ExitCode, dotnetBuildProcessResult.CombinedOutput);
