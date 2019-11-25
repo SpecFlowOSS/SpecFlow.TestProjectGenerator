@@ -105,7 +105,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
 
         public void AddTarget(string targetName, string implementation)
         {
-            _msBuildTargets.Add(new MSBuildTarget(targetName, implementation));     
+            _msBuildTargets.Add(new MSBuildTarget(targetName, implementation));
         }
 
         public void AddMSBuildImport(string msbuildTargetFile)
