@@ -28,7 +28,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             foreach (var project in _solutionDriver.Projects.Values)
             {
                 project.IsTreatWarningsAsErrors = treatWarningsAsErrors;
-                project.GenerateConfigurationFile();
+                project.GenerateSpecFlowConfigurationFile();
             }
 
             var solution = _solutionDriver.GetSolution();

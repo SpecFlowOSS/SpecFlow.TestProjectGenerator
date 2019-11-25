@@ -16,36 +16,33 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             outputWriter.WriteLine("Starting external program: \"{0}\" {1} in {2}", executablePath, parameters, workingDirectory);
             var psi = CreateProcessStartInfo(workingDirectory, executablePath, parameters, environmentVariables);
 
-            var process = new Process
+            using (var process = new Process { StartInfo = psi, EnableRaisingEvents = true })
             {
-                StartInfo = psi,
-                EnableRaisingEvents = true,
-            };
+                var stdError = new StringBuilder();
 
-            var stdError = new StringBuilder();
+                process.ErrorDataReceived += (sender, e) => { stdError.Append(e.Data); };
 
-            process.ErrorDataReceived += (sender, e) => { stdError.Append(e.Data); };
+                var before = DateTime.Now;
+                process.Start();
 
-            var before = DateTime.Now;
-            process.Start();
+                process.BeginErrorReadLine();
 
-            process.BeginErrorReadLine();
+                string stdOutput = process.StandardOutput.ReadToEnd();
+                bool processResult = process.WaitForExit(_timeOutInMilliseconds);
 
-            string stdOutput = process.StandardOutput.ReadToEnd();
-            bool processResult = process.WaitForExit(_timeOutInMilliseconds);
+                if (!processResult)
+                {
+                    throw new TimeoutException(
+                        $"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Std Output:" + Environment.NewLine + stdOutput);
+                }
 
-            if (!processResult)
-            {
-                throw new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Std Output:" + Environment.NewLine + stdOutput);
+                var after = DateTime.Now;
+                var diff = after - before;
+                outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
+
+                outputWriter.WriteLine($"StdOutput: {stdOutput}");
+                return new ProcessResult(process.ExitCode, stdOutput, stdError.ToString(), $"{stdOutput}{stdError}");
             }
-
-            var after = DateTime.Now;
-            var diff = after - before;
-            outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
-
-            outputWriter.WriteLine("StdOutput: " + stdOutput);
-
-            return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), stdOutput + stdError);
         }
 
         public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)

@@ -134,8 +134,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _project.AddFile(bindingsGenerator.GenerateBindingClassFile(replacedBindingClass));
         }
 
-        public void GenerateConfigurationFile()
+        public void GenerateSpecFlowConfigurationFile()
         {
+            if (!IsSpecFlowFeatureProject)
+            {
+                return;
+            }
+
             EnsureProjectExists();
             var generator = _configurationGeneratorFactory.FromConfigurationFormat(ConfigurationFormat);
             var generatedConfig = generator.Generate(Configuration);
