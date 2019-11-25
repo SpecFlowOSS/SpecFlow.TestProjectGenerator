@@ -101,7 +101,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         private void AddProjectReference(ProjectBuilder targetProject, string projectNameToReference)
         {
             var projectToReference = _solutionDriver.Projects[projectNameToReference];
-            targetProject.AddProjectReference(Path.Combine(@"..\", projectNameToReference, $"{projectNameToReference}.{projectToReference.Language.ToProjectFileExtension()}"), projectToReference);
+            targetProject.AddProjectReference(Path.Combine(@"..", projectNameToReference, $"{projectNameToReference}.{projectToReference.Language.ToProjectFileExtension()}"), projectToReference);
         }
 
         private void AddBindingClass(ProjectBuilder project, string rawBindingClass)
