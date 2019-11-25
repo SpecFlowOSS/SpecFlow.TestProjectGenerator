@@ -175,8 +175,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public int GetXUnitPendingCount(XElement resultsElement)
         {
             var pendingOrInconclusiveTests =
-                from unitTestResult in resultsElement.Elements(_unitTestResultElementName)
-                let unitTestOutputElement = unitTestResult.Element(_unitTestResultOutputElementName)
+                from unitTestResult in resultsElement?.Elements(_unitTestResultElementName) ?? new XElement[0]
+                let unitTestOutputElement = unitTestResult?.Element(_unitTestResultOutputElementName)
                 let unitTestOutput = unitTestOutputElement?.Value ?? ""
                 where _xunitPendingOrInconclusiveRegex.IsMatch(unitTestOutput)
                 select _xunitPendingOrInconclusiveRegex;
