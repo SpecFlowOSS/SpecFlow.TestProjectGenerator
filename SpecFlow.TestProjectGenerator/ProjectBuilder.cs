@@ -16,6 +16,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public const string NUnit3PackageVersion = "3.11.0";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit3TestAdapterPackageVersion = "3.10.0";
+        private const string XUnitPackageVersion = "2.4.1";
+        private const string MSTestPackageVersion = "2.0.0";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
@@ -314,25 +316,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureXUnit()
         {
-
             if (_project.ProjectFormat == ProjectFormat.New)
             {
-                _project.AddNuGetPackage("xunit", "2.4.1");
+                _project.AddNuGetPackage("xunit", XUnitPackageVersion);
             }
             else
             {
-                _project.AddNuGetPackage("xunit.core", "2.4.1");
-                _project.AddNuGetPackage("xunit.extensibility.core", "2.4.1",
+                _project.AddNuGetPackage("xunit.core", XUnitPackageVersion);
+                _project.AddNuGetPackage("xunit.extensibility.core", XUnitPackageVersion,
                     new NuGetPackageAssembly("xunit.core, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.core.dll"));
-                _project.AddNuGetPackage("xunit.extensibility.execution", "2.4.1",
+                _project.AddNuGetPackage("xunit.extensibility.execution", XUnitPackageVersion,
                     new NuGetPackageAssembly("xunit.execution.desktop, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
-                _project.AddNuGetPackage("xunit.assert", "2.4.1",
+                _project.AddNuGetPackage("xunit.assert", XUnitPackageVersion,
                     new NuGetPackageAssembly("xunit.assert, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
                 _project.AddNuGetPackage("xunit.abstractions", "2.0.3",
                     new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
             }
 
-            _project.AddNuGetPackage("xunit.runner.visualstudio", "2.4.1");
+            _project.AddNuGetPackage("xunit.runner.visualstudio", XUnitPackageVersion);
             _project.AddNuGetPackage("Xunit.SkippableFact", "1.3.12", new NuGetPackageAssembly("Xunit.SkippableFact, Version=1.3.0.0, Culture=neutral, PublicKeyToken=b2b52da82b58eb73", "net452\\Xunit.SkippableFact.dll"));
 
             if (_project.ProjectFormat == ProjectFormat.Old)
@@ -350,10 +351,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureMSTest()
         {
-            _project.AddNuGetPackage("MSTest.TestAdapter", "1.3.2");
+            _project.AddNuGetPackage("MSTest.TestAdapter", MSTestPackageVersion);
             _project.AddNuGetPackage(
                 "MSTest.TestFramework",
-                "1.3.2",
+                MSTestPackageVersion,
                 new NuGetPackageAssembly(
                     "Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL",
                     "net45\\Microsoft.VisualStudio.TestPlatform.TestFramework.dll"),
