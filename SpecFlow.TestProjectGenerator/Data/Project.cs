@@ -113,14 +113,4 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
             _msbuildImports.Add(new MSBuildImport(msbuildTargetFile));
         }
     }
-
-    public class MSBuildImport
-    {
-        public string MsbuildTargetFile { get; }
-
-        public MSBuildImport(string msbuildTargetFile)
-        {
-            MsbuildTargetFile = msbuildTargetFile;
-        }
-    }
 }
