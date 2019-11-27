@@ -83,7 +83,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             // execute dotnet --info
             processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", "--info");
 
-            string argumentsFormat = $"msbuild {GetWarningAsErrorParameter(treatWarningsAsErrors)} -bl \"{_testProjectFolders.PathToSolutionFile}\"";
+            // execute dotnet restore
+            processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", "restore");
+
+            string argumentsFormat = $@"msbuild {GetWarningAsErrorParameter(treatWarningsAsErrors)} -bl -nologo -v:m ""{_testProjectFolders.PathToSolutionFile}""";
             var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", argumentsFormat);
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);
