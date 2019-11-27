@@ -7,6 +7,7 @@
         private readonly Compiler _compiler;
         private readonly SolutionWriteToDiskDriver _solutionWriteToDiskDriver;
         private readonly CompilationResultDriver _compilationResultDriver;
+        private BuildTool? _overridenBuildTool;
 
         public CompilationDriver(Compiler compiler, SolutionWriteToDiskDriver solutionWriteToDiskDriver, CompilationResultDriver compilationResultDriver)
         {
@@ -27,10 +28,17 @@
             HasTriedToCompile = true;
             _solutionWriteToDiskDriver.WriteSolutionToDisk(treatWarningsAsErrors);
 
+            var usedBuildTool = _overridenBuildTool ?? buildTool;
+
             for (uint time = 0; time < times; time++)
             {
-                _compilationResultDriver.CompileResult = _compiler.Run(buildTool, treatWarningsAsErrors);
+                _compilationResultDriver.CompileResult = _compiler.Run(usedBuildTool, treatWarningsAsErrors);
             }
+        }
+
+        public void SetBuildTool(BuildTool buildTool)
+        {
+            _overridenBuildTool = buildTool;
         }
     }
 }
