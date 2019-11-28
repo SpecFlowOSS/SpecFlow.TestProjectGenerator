@@ -16,10 +16,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
 
         public void CucumberMessagesFileShouldBe(string expectedFileName)
         {
+            var expectedFileNameSegments = expectedFileName.Split('/', '\\');
             var pathsToTest =
                 Path.IsPathRooted(expectedFileName)
                     ? new[] { expectedFileName }
-                    : new [] { Path.Combine(_testProjectFolders.ProjectBinOutputPath, expectedFileName), Path.Combine(_testProjectFolders.ProjectFolder, expectedFileName)};
+                    : new []
+                    {
+                        Path.Combine(_testProjectFolders.ProjectBinOutputPath, Path.Combine(expectedFileNameSegments)),
+                        Path.Combine(_testProjectFolders.ProjectFolder, Path.Combine(expectedFileNameSegments))
+                    };
 
             bool couldFindFile = _cucumberMessagesDriver.TryGetPathCucumberMessagesFile(pathsToTest, out string _);
             couldFindFile.Should().BeTrue();

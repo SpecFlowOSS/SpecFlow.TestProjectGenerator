@@ -13,5 +13,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         public Guid? OverrideTestCaseFinishedPickleId { get; set; }
 
         public DateTime? OverrideTestCaseFinishedTime { get; set; }
+
     }
 }

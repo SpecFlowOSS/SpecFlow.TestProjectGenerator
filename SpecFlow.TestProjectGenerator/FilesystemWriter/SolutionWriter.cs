@@ -17,9 +17,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         public SolutionWriter(IOutputWriter outputWriter)
         {
             _outputWriter = outputWriter;
-            var targetFrameworkMonikerStringBuilder = new TargetFrameworkMonikerStringBuilder();
-            var targetFrameworkVersionStringBuilder = new TargetFrameworkVersionStringBuilder();
-            _projectWriterFactory = new ProjectWriterFactory(outputWriter, targetFrameworkMonikerStringBuilder, targetFrameworkVersionStringBuilder);
+            _projectWriterFactory = new ProjectWriterFactory(outputWriter, new TargetFrameworkMonikerStringBuilder(), new TargetFrameworkVersionStringBuilder());
             _fileWriter = new FileWriter();
             _netCoreSdkInfoProvider = new NetCoreSdkInfoProvider();
         }
@@ -36,9 +34,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 throw new ArgumentNullException(nameof(solution));
             }
 
-            var targetFramework = solution.Projects
-                .Select(p => p.TargetFrameworks)
-                .FirstOrDefault();
+            var targetFramework =
+                solution.Projects
+                        .Select(p => p.TargetFrameworks)
+                        .FirstOrDefault();
             var sdk = _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
 
             if (targetFramework != 0 && sdk != null)

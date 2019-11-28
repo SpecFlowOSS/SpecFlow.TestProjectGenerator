@@ -4,8 +4,6 @@ using FluentAssertions;
 using Moq;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
@@ -15,7 +13,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void CreateEmptySolution()
         {
-            var folder = Path.Combine(Path.GetTempPath(), "SpecFlow.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
+            string folder = Path.Combine(Path.GetTempPath(), "SpecFlow.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
 
             var solution = new Solution("SolutionName");
 
@@ -34,7 +32,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 
         public void CreateSolutionWithProject(ProgrammingLanguage programmingLanguage, string expectedEnding)
         {
-            var folder = Path.Combine(Path.GetTempPath(), "SpecFlow.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
+            string folder = Path.Combine(Path.GetTempPath(), "SpecFlow.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
 
             var solution = new Solution("SolutionName");
             var project = new Project("ProjectName", Guid.NewGuid(), programmingLanguage, TargetFramework.Net45, ProjectFormat.New);

@@ -91,6 +91,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories
             {
                 CucumberMessagesSection = { Enabled = true }
             };
+
             return new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, configuration, _currentVersionDriver, _folders, _targetFrameworkMonikerStringBuilder);
         }
     }

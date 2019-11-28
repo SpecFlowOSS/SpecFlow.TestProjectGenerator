@@ -13,31 +13,38 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class VSTestExecutionDriver
     {
-        private readonly VisualStudioFinder _visualStudioFinder;
-        private readonly AppConfigDriver _appConfigDriver;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly IOutputWriter _outputWriter;
         private readonly TestRunConfiguration _testRunConfiguration;
-        private readonly TestSuiteInitializationDriver _testSuiteInitializationDriver;
-        private UriCleaner _uriCleaner;
         private readonly TRXParser _trxParser;
+        private readonly TestSuiteEnvironmentVariableGenerator _testSuiteEnvironmentVariableGenerator;
+        private readonly UriCleaner _uriCleaner;
 
-        private const string BeginnOfTrxFileLine = "Results File: ";
-        private const string BeginnOfLogFileLine = "Log file: ";
+        private const string BeginOfTrxFileLine = "Results File: ";
+        private const string BeginOfLogFileLine = "Log file: ";
+        private const string BeginOfReportFileLine = @"Report file: ";
 
-        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, IOutputWriter outputWriter, TestRunConfiguration testRunConfiguration, TestSuiteInitializationDriver testSuiteInitializationDriver, TRXParser trxParser)
+        public VSTestExecutionDriver(
+            TestProjectFolders testProjectFolders,
+            IOutputWriter outputWriter,
+            TestRunConfiguration testRunConfiguration,
+            TRXParser trxParser,
+            TestSuiteEnvironmentVariableGenerator testSuiteEnvironmentVariableGenerator)
         {
-            _visualStudioFinder = visualStudioFinder;
-            _appConfigDriver = appConfigDriver;
             _testProjectFolders = testProjectFolders;
             _outputWriter = outputWriter;
             _testRunConfiguration = testRunConfiguration;
-            _testSuiteInitializationDriver = testSuiteInitializationDriver;
             _uriCleaner = new UriCleaner();
             _trxParser = trxParser;
+            _testSuiteEnvironmentVariableGenerator = testSuiteEnvironmentVariableGenerator;
         }
 
+        /// <summary>
+        /// Gets the test execution result of the test project.
+        /// </summary>
         public TestExecutionResult LastTestExecutionResult { get; private set; }
+        public IReadOnlyDictionary<string, TestExecutionResult> TestExecutionResultFiles { get; private set; }
+
         public string RunSettingsFile { get; set; }
         public string Filter { get; set; }
 
@@ -68,58 +75,28 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public TestExecutionResult ExecuteTests()
         {
-            string vsFolder = _visualStudioFinder.Find();
-            vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
+            const string dotnetTestPath = "dotnet";
 
-            string vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
-
-            var envVariables = new Dictionary<string, string>();
-
-            if (_testSuiteInitializationDriver.OverrideTestSuiteStartupTime is DateTime testRunStartupTime)
-            {
-                envVariables.Add("SpecFlow_Messages_TestRunStartedTimeOverride", $"{testRunStartupTime:O}");
-            }
-
-            if (_testSuiteInitializationDriver.OverrideTestCaseStartedPickleId is Guid startedPickleId)
-            {
-                envVariables.Add("SpecFlow_Messages_TestCaseStartedPickleIdOverride", $"{startedPickleId:D}");
-            }
-
-            if (_testSuiteInitializationDriver.OverrideTestCaseStartedTime is DateTime testCaseStartupTime)
-            {
-                envVariables.Add("SpecFlow_Messages_TestCaseStartedTimeOverride", $"{testCaseStartupTime:O}");
-            }
-
-            if (_testSuiteInitializationDriver.OverrideTestCaseFinishedPickleId is Guid finishedPickleId)
-            {
-                envVariables.Add("SpecFlow_Messages_TestCaseFinishedPickleIdOverride", $"{finishedPickleId:D}");
-            }
-
-            if (_testSuiteInitializationDriver.OverrideTestCaseFinishedTime is DateTime testCaseFinishedTime)
-            {
-                envVariables.Add("SpecFlow_Messages_TestCaseFinishedTimeOverride", $"{testCaseFinishedTime:O}");
-            }
+            var envVariables = _testSuiteEnvironmentVariableGenerator.GenerateEnvironmentVariables();
 
             var processHelper = new ProcessHelper();
-            string arguments = GenereateVsTestsArguments();
+            string arguments = $"test {GenerateDotnetTestsArguments()}";
             ProcessResult processResult;
             try
             {
-                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, vsTestConsoleExePath, arguments, envVariables);
+                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, dotnetTestPath, arguments, envVariables);
             }
             catch (Exception)
             {
-                Console.WriteLine($"running vstest.console.exe failed - {_testProjectFolders.CompiledAssemblyPath} {vsTestConsoleExePath} {arguments}");
+                Console.WriteLine($"running {dotnetTestPath} failed - {_testProjectFolders.CompiledAssemblyPath} {dotnetTestPath} {arguments}");
                 throw;
             }
 
             string output = processResult.CombinedOutput;
 
             var lines = output.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            var trxFiles = FindFilePath(lines, ".trx", BeginnOfTrxFileLine).ToArray();
-            var logFiles = FindFilePath(lines, ".log", BeginnOfLogFileLine).ToArray();
-
-
+            var trxFilePaths = FindFilePath(lines, ".trx", BeginOfTrxFileLine).ToArray();
+            var logFiles = FindFilePath(lines, ".log", BeginOfLogFileLine).ToArray();
 
             string logFileContent =
                 logFiles.Length == 1
@@ -128,20 +105,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             var reportFiles = GetReportFiles(output);
 
-            trxFiles.Should().HaveCount(1, $"exactly one TRX file should be generated by VsTest;{Environment.NewLine}{string.Join(Environment.NewLine, trxFiles)}");
-            string trxFile = trxFiles.Single();
+            trxFilePaths.Should().HaveCountGreaterOrEqualTo(1, $"at least one TRX file should be generated by the test run; these have been generated:{Environment.NewLine}{string.Join(Environment.NewLine, trxFilePaths)}");
 
-            LastTestExecutionResult = _trxParser.ParseTRXFile(trxFile, output, reportFiles, logFileContent);
+            var trxFiles = from trxFilePath in trxFilePaths
+                              let trx = _trxParser.ParseTRXFile(trxFilePath, output, reportFiles, logFileContent)
+                              select (trxFilePath, trx);
+
+            TestExecutionResultFiles = trxFiles.ToDictionary(trxFile => trxFile.trxFilePath, trxFile => trxFile.trx);
+
+            LastTestExecutionResult = TestExecutionResultFiles.First(f => f.Key.Contains(_testProjectFolders.ProjectFolder)).Value;
+
             return LastTestExecutionResult;
         }
 
         private IEnumerable<string> GetReportFiles(string output)
         {
-            const string reportFileString = @"Report file: ";
-
             return output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-                         .Where(i => i.StartsWith(reportFileString))
-                         .Select(i => i.Substring(reportFileString.Length))
+                         .Where(i => i.StartsWith(BeginOfReportFileLine))
+                         .Select(i => i.Substring(BeginOfReportFileLine.Length))
                          .Select(i => new Uri(i).AbsolutePath);
         }
 
@@ -155,29 +136,57 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                    select trimmed.Substring(start + starting.Length);
         }
 
-        private string GenereateVsTestsArguments()
+        public string GenerateDotnetTestsArguments()
         {
-            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx";
+            var argumentsBuilder = new StringBuilder();
 
-            if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
+            argumentsBuilder.Append(GenerateTrxLoggerParameter());
+            argumentsBuilder.Append($" {GenerateVerbosityParameter("d")}");
+
+            string additionalPackagesFoldersParameters = GenerateAdditionalPackagesFoldersParameters();
+            if (additionalPackagesFoldersParameters is string additionalPackagesFoldersParametersString)
             {
-                if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
-                {
-                    arguments += $" /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
-                }
+                argumentsBuilder.Append($" {additionalPackagesFoldersParametersString}");
             }
 
             if (Filter.IsNotNullOrEmpty())
             {
-                arguments += $" /TestCaseFilter:{Filter}";
+                argumentsBuilder.Append($" --filter \"{Filter}\"");
             }
 
             if (RunSettingsFile.IsNotNullOrWhiteSpace())
             {
-                arguments += $" /Settings:{RunSettingsFile}";
+                argumentsBuilder.Append($" --settings \"{RunSettingsFile}\"");
             }
 
-            return arguments;
+            //string pathToSpecFlowProject = Path.Combine(_testProjectFolders.ProjectFolder, $"{Path.GetFileName(_testProjectFolders.ProjectFolder)}.csproj");
+            //argumentsBuilder.Append($@" ""{pathToSpecFlowProject}""");
+            argumentsBuilder.Append($@" ""{_testProjectFolders.PathToSolutionFile}""");
+
+            return argumentsBuilder.ToString();
+        }
+
+        public string GenerateTrxLoggerParameter()
+        {
+            return "--logger trx";
+        }
+
+        public string GenerateVerbosityParameter(string verbosity)
+        {
+            return $"-v {verbosity}";
+        }
+
+        public string GenerateAdditionalPackagesFoldersParameters()
+        {
+            if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
+            {
+                if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
+                {
+                    return $" -a \"{_testProjectFolders.PathToNuGetPackages}\"";
+                }
+            }
+
+            return null;
         }
     }
 }
