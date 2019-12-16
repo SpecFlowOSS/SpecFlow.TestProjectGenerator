@@ -241,6 +241,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         }
 
         [Fact]
+        public void CreateEmtpyCSharpCore3_1ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>netcoreapp3.1</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
         public void CreateEmtpyFSharpProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp, TargetFramework.Net45);
