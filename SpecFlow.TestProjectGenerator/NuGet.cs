@@ -31,7 +31,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             string pathToPackagesConfig = Path.Combine(_testProjectFolders.PathToSolutionDirectory, project.Name, "packages.config");
-            string commandLineArgs = $"restore {pathToPackagesConfig} -SolutionDirectory . -NoCache";
+            string commandLineArgs = $"restore \"{pathToPackagesConfig}\" -SolutionDirectory . -NoCache";
             Restore(commandLineArgs);
         }
 
