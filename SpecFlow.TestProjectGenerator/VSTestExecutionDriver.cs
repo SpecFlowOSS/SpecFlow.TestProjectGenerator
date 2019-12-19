@@ -141,7 +141,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             var argumentsBuilder = new StringBuilder();
 
             argumentsBuilder.Append(GenerateTrxLoggerParameter());
-            argumentsBuilder.Append($" {GenerateVerbosityParameter("d")}");
+            argumentsBuilder.Append($" {GenerateVerbosityParameter("m")}");
 
             string additionalPackagesFoldersParameters = GenerateAdditionalPackagesFoldersParameters();
             if (additionalPackagesFoldersParameters is string additionalPackagesFoldersParametersString)
