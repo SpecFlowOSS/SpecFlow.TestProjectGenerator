@@ -156,7 +156,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             if (RunSettingsFile.IsNotNullOrWhiteSpace())
             {
-                argumentsBuilder.Append($" --settings \"{RunSettingsFile}\"");
+                var pathToRunSettingsFile = Path.Combine(_testProjectFolders.ProjectFolder, RunSettingsFile);
+                argumentsBuilder.Append($" --settings \"{pathToRunSettingsFile}\"");
             }
 
             //string pathToSpecFlowProject = Path.Combine(_testProjectFolders.ProjectFolder, $"{Path.GetFileName(_testProjectFolders.ProjectFolder)}.csproj");
