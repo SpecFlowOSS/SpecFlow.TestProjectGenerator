@@ -442,7 +442,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 #if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
             return $"{Path.GetFileNameWithoutExtension(assemblyName)}, Version={_currentVersionDriver.SpecFlowVersion}, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
 #else
-            return GetFileNameWithoutExtension(assemblyName);
+            return Path.GetFileNameWithoutExtension(assemblyName);
 #endif
         }
 
