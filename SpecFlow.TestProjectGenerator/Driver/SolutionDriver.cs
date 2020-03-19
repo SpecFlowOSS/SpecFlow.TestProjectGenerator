@@ -80,6 +80,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
 
             _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
+
+            // 3.1.200 SDK version is now uncompatible with specflow.
+            // Work around 
+            // https://github.com/dotnet/sdk/issues/10878 
+            // https://github.com/SpecFlowOSS/SpecFlow/issues/1912
+            _solution.Files.Add(new SolutionFile("global.json", @"
+{
+    ""sdk"": {
+        ""version"": ""3.1.100"" 
+    }
+}
+"));
+
             return _solution;
         }
 
