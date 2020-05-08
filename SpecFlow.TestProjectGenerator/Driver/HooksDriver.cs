@@ -18,7 +18,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         public void CheckIsHookExecuted(string methodName, int expectedTimesExecuted)
         {
             int hookExecutionCount = GetHookExecutionCount(methodName);
-            hookExecutionCount.Should().Be(expectedTimesExecuted);
+            hookExecutionCount.Should().Be(expectedTimesExecuted, $"{methodName} executed that many times");
         }
 
         public int GetHookExecutionCount(string methodName)
