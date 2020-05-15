@@ -60,7 +60,21 @@ namespace SpecFlow.TestProjectGenerator.Cli
 
                 //Create test project
                 var pd = serviceProvider.GetService<ProjectsDriver>();
-                pd.CreateProject("Proj1");
+                var pb = pd.CreateProject("Proj1", "C#");
+
+                pb.AddFeatureFile(@"
+Feature: Simple Feature
+	Scenario: Simple Scenario
+		Given I use a .NET API
+");
+
+                pb.AddStepBinding(@"
+    [Given(""I use a .NET API"")]
+    public void Do()
+    {
+        System.DateTime.Now.ToString();
+    }
+");
 
                 //Remove local NuGet source
                 var sd = serviceProvider.GetService<SolutionDriver>();
