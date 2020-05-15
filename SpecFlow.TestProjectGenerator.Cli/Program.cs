@@ -1,41 +1,68 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Scrutor;
+using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using TechTalk.SpecFlow.TestProjectGenerator;
+using TechTalk.SpecFlow.TestProjectGenerator.Conventions;
+using TechTalk.SpecFlow.TestProjectGenerator.Driver;
 
 namespace SpecFlow.TestProjectGenerator.Cli
 {
-    class Program
+    partial class Program
     {
         static int Main(string[] args)
         {
             // Create a root command with some options
             var rootCommand = new RootCommand
-    {
-        new Option<int>(
-            "--int-option",
-            getDefaultValue: () => 43,
-            description: "An option whose argument is parsed as an int"),
-        new Option<bool>(
-            "--bool-option",
-            "An option whose argument is parsed as a bool"),
-        new Option<FileInfo>(
-            "--file-option",
-            "An option whose argument is parsed as a FileInfo")
-    };
+            {
+                new Option<DirectoryInfo>(
+                    "--out-dir",
+                    "The root directory for the code generation output. By default the current directory is used."),
+                new Option<string>(
+                    "--sln-name",
+                    "The name of the solution (both the directory and sln file) to be generated. By default the solution name is calculated from a new GUID.")
+            };
 
-            rootCommand.Description = "My sample app";
+            rootCommand.Description = "SpecFlow Test Project Generator";
 
             // Note that the parameters of the handler method are matched according to the names of the options
-            rootCommand.Handler = CommandHandler.Create<int, bool, FileInfo>((intOption, boolOption, fileOption) =>
+            rootCommand.Handler = CommandHandler.Create<DirectoryInfo, string>((outDir, slnName) =>
             {
-                Console.WriteLine($"The value for --int-option is: {intOption}");
-                Console.WriteLine($"The value for --bool-option is: {boolOption}");
-                Console.WriteLine($"The value for --file-option is: {fileOption?.FullName ?? "null"}");
+                var services = ConfigureServices();
+
+                services.AddSingleton(s => new SolutionConfiguration
+                {
+                    OutDir = outDir,
+                    SolutionName = slnName
+                });
+
+                var serviceProvider = services.BuildServiceProvider();
+                SolutionWriteToDiskDriver d = serviceProvider.GetService<SolutionWriteToDiskDriver>();
+                d.WriteSolutionToDisk();
             });
 
             // Parse the incoming args and invoke the handler
             return rootCommand.InvokeAsync(args).Result;
+        }
+
+        private static IServiceCollection ConfigureServices()
+        {
+            var services = new ServiceCollection();
+
+            services.AddSingleton<IOutputWriter, OutputWriter>();
+            services.AddSingleton<Folders, FoldersOverride>();
+            services.AddSingleton<SolutionNamingConvention, SolutionNamingConventionOverride>();
+
+            services.Scan(scan => scan
+                .FromAssemblyOf<SolutionWriteToDiskDriver>()
+                    .AddClasses()
+                        .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+                        .AsSelf()
+                        .WithScopedLifetime());
+
+            return services;
         }
     }
 }

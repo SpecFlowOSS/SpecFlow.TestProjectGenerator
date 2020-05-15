@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TechTalk.SpecFlow.TestProjectGenerator.Conventions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Factories;
 
@@ -15,6 +16,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         private readonly TestRunConfiguration _testRunConfiguration;
         private readonly ProjectBuilderFactory _projectBuilderFactory;
         private readonly Folders _folders;
+        private readonly SolutionNamingConvention _solutionNamingConvention;
         private readonly Solution _solution;
         private readonly Dictionary<string, ProjectBuilder> _projects = new Dictionary<string, ProjectBuilder>();
         private ProjectBuilder _defaultProject;
@@ -24,12 +26,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             TestRunConfiguration testRunConfiguration,
             ProjectBuilderFactory projectBuilderFactory,
             Folders folders,
-            TestProjectFolders testProjectFolders)
+            TestProjectFolders testProjectFolders,
+            SolutionNamingConvention solutionNamingConvention)
         {
             _nuGetConfigGenerator = nuGetConfigGenerator;
             _testRunConfiguration = testRunConfiguration;
             _projectBuilderFactory = projectBuilderFactory;
             _folders = folders;
+            _solutionNamingConvention = solutionNamingConvention;
             NuGetSources = new List<NuGetSource>
             {
                 new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)
@@ -49,7 +53,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
         public IList<NuGetSource> NuGetSources { get; }
 
-        public string SolutionName => $"S{SolutionGuid.ToString("N").Substring(24)}";
+        public string SolutionName => _solutionNamingConvention.GetSolutionName(SolutionGuid);
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects => _projects;
 
