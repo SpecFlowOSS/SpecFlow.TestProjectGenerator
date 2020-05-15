@@ -23,13 +23,17 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     "The root directory for the code generation output. By default the current directory is used."),
                 new Option<string>(
                     "--sln-name",
-                    "The name of the solution (both the directory and sln file) to be generated. By default the solution name is calculated from a new GUID.")
+                    "The name of the solution (both the directory and sln file) to be generated. By default the solution name is calculated from a new GUID."),
+                new Option<Version>(
+                    "--specflow-version",
+                    () => new Version("3.1.97"),
+                    "The SpecFlow version referenced in the generated solution")
             };
 
             rootCommand.Description = "SpecFlow Test Project Generator";
 
             // Note that the parameters of the handler method are matched according to the names of the options
-            rootCommand.Handler = CommandHandler.Create<DirectoryInfo, string>((outDir, slnName) =>
+            rootCommand.Handler = CommandHandler.Create<DirectoryInfo, string, Version>((outDir, slnName, specflowVersion) =>
             {
                 var services = ConfigureServices();
 
@@ -50,8 +54,8 @@ namespace SpecFlow.TestProjectGenerator.Cli
 
                 services.AddSingleton(s => new CurrentVersionDriver
                 {
-                    SpecFlowVersion = new Version("3.1.97"),
-                    SpecFlowNuGetVersion = "3.1.97"
+                    SpecFlowVersion = specflowVersion,
+                    SpecFlowNuGetVersion = specflowVersion.ToString()
                 });
 
                 var serviceProvider = services.BuildServiceProvider();
