@@ -55,10 +55,16 @@ namespace SpecFlow.TestProjectGenerator.Cli
                 });
 
                 var serviceProvider = services.BuildServiceProvider();
+
                 SolutionWriteToDiskDriver d = serviceProvider.GetService<SolutionWriteToDiskDriver>();
 
+                //Create test project
                 var pd = serviceProvider.GetService<ProjectsDriver>();
-                pd.CreateProject("Proj1", "C#");
+                pd.CreateProject("Proj1");
+
+                //Remove local NuGet source
+                var sd = serviceProvider.GetService<SolutionDriver>();
+                sd.NuGetSources.Clear();
 
                 d.WriteSolutionToDisk();
             });
