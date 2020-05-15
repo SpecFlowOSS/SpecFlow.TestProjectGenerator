@@ -6,6 +6,7 @@ using System.CommandLine.Invocation;
 using System.IO;
 using TechTalk.SpecFlow.TestProjectGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.Conventions;
+using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Driver;
 
 namespace SpecFlow.TestProjectGenerator.Cli
@@ -38,8 +39,27 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     SolutionName = slnName
                 });
 
+                services.AddSingleton(s => new TestRunConfiguration
+                {
+                    ProgrammingLanguage = ProgrammingLanguage.CSharp,
+                    UnitTestProvider = UnitTestProvider.xUnit,
+                    ConfigurationFormat = ConfigurationFormat.Json,
+                    ProjectFormat = ProjectFormat.New,
+                    TargetFramework = TargetFramework.Netcoreapp31,
+                });
+
+                services.AddSingleton(s => new CurrentVersionDriver
+                {
+                    SpecFlowVersion = new Version("3.1.97"),
+                    SpecFlowNuGetVersion = "3.1.97"
+                });
+
                 var serviceProvider = services.BuildServiceProvider();
                 SolutionWriteToDiskDriver d = serviceProvider.GetService<SolutionWriteToDiskDriver>();
+
+                var pd = serviceProvider.GetService<ProjectsDriver>();
+                pd.CreateProject("Proj1", "C#");
+
                 d.WriteSolutionToDisk();
             });
 
