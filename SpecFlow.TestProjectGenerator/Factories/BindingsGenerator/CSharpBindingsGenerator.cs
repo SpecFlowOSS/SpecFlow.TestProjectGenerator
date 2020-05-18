@@ -70,7 +70,7 @@ internal static class Log
         {{
             action();
         }}
-        catch (Exception ex)
+        catch (Exception)
         {{
             var i = number - 1;
 
