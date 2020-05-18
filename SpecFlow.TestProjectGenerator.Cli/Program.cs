@@ -63,9 +63,6 @@ namespace SpecFlow.TestProjectGenerator.Cli
             rootCommand.Handler = CommandHandler.Create<GenerateSolutionParams>(
                 (generateSolutionParams) =>
                 {
-                    //TODO: refactor to support more params
-                    var specrunNuGetVersion = DefaultSpecRunNuGetVersion;
-
                     var services = ConfigureServices();
 
                     services.AddSingleton(s => new SolutionConfiguration
@@ -87,7 +84,7 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     {
                         SpecFlowVersion = new Version(generateSolutionParams.SpecFlowNuGetVersion.Major, generateSolutionParams.SpecFlowNuGetVersion.Minor, 0),
                         SpecFlowNuGetVersion = generateSolutionParams.SpecFlowNuGetVersion.ToString(),
-                        NuGetVersion = specrunNuGetVersion
+                        NuGetVersion = generateSolutionParams.SpecrunNuGetVersion.ToString()
                     });
 
                     var serviceProvider = services.BuildServiceProvider();

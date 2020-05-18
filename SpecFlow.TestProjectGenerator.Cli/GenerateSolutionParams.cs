@@ -20,5 +20,7 @@ namespace SpecFlow.TestProjectGenerator.Cli
         public ProjectFormat ProjectFormat { get; set; }
 
         public ConfigurationFormat ConfigurationFormat { get; set; }
+
+        public Version SpecrunNuGetVersion { get; set; }
     }
 }
