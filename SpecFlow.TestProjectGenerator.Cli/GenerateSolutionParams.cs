@@ -11,7 +11,7 @@ namespace SpecFlow.TestProjectGenerator.Cli
 
         public string SlnName { get; set; }
 
-        public Version SpecFlowNuGetVersion { get; set; }
+        public string SpecFlowNuGetVersion { get; set; }
 
         public UnitTestProvider UnitTestProvider { get; set; }
 
@@ -21,6 +21,6 @@ namespace SpecFlow.TestProjectGenerator.Cli
 
         public ConfigurationFormat ConfigurationFormat { get; set; }
 
-        public Version SpecrunNuGetVersion { get; set; }
+        public string SpecrunNuGetVersion { get; set; }
     }
 }

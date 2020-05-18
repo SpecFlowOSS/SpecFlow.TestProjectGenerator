@@ -4,6 +4,7 @@ using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using System.Text.RegularExpressions;
 using TechTalk.SpecFlow.TestProjectGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.Conventions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
@@ -31,9 +32,9 @@ namespace SpecFlow.TestProjectGenerator.Cli
                 new Option<string>(
                     "--sln-name",
                     "The name of the generated solution (directory and sln file). Default: random string."),
-                new Option<Version>(
+                new Option<string>(
                     "--specflow-nuget-version",
-                    () => new Version(DefaultSpecFlowNuGetVersion),
+                    () => DefaultSpecFlowNuGetVersion,
                     $"The SpecFlow NuGet version referenced in the generated project. Default: '{DefaultSpecFlowNuGetVersion}'."),
                 new Option<UnitTestProvider>(
                     "--unit-test-provider",
@@ -51,9 +52,9 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     "--configuration-format",
                     () => DefaultConfigurationFormat,
                     $"The format of the generated SpecFlow configuration file. Default: '{DefaultConfigurationFormat}'."),
-                new Option<Version>(
+                new Option<string>(
                     "--specrun-nuget-version",
-                    () => new Version(DefaultSpecRunNuGetVersion),
+                    () => DefaultSpecRunNuGetVersion,
                     $"The SpecRun NuGet version referenced in the generated project (if SpecRun is used as unit test provider). Default: '{DefaultSpecRunNuGetVersion}'."),
             };
 
@@ -80,10 +81,15 @@ namespace SpecFlow.TestProjectGenerator.Cli
                         TargetFramework = generateSolutionParams.TargetFramework,
                     });
 
+                    Func<string, Version> getRunnerSpecFlowVersion = (string specflowNuGetVersion) =>
+                    {
+                        var m = new Regex("^(\\d+)\\.(\\d+)").Match(specflowNuGetVersion);
+                        return new Version(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value), 0);
+                    };
                     services.AddSingleton(s => new CurrentVersionDriver
                     {
-                        SpecFlowVersion = new Version(generateSolutionParams.SpecFlowNuGetVersion.Major, generateSolutionParams.SpecFlowNuGetVersion.Minor, 0),
                         SpecFlowNuGetVersion = generateSolutionParams.SpecFlowNuGetVersion.ToString(),
+                        SpecFlowVersion = getRunnerSpecFlowVersion(generateSolutionParams.SpecFlowNuGetVersion),
                         NuGetVersion = generateSolutionParams.SpecrunNuGetVersion.ToString()
                     });
 
