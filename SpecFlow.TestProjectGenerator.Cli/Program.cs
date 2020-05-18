@@ -13,11 +13,12 @@ namespace SpecFlow.TestProjectGenerator.Cli
 {
     partial class Program
     {
-        private const string DefaultSpecFlowVersion = "3.1.97";
-        private const UnitTestProvider DefaultUnitTestProvider = UnitTestProvider.xUnit;
+        private const string DefaultSpecFlowNuGetVersion = "3.1.97";
+        private const UnitTestProvider DefaultUnitTestProvider = UnitTestProvider.SpecRun;
         private const TargetFramework DefaultTargetFramework = TargetFramework.Netcoreapp31;
         private const ProjectFormat DefaultProjectFormat = ProjectFormat.New;
         private const ConfigurationFormat DefaultConfigurationFormat = ConfigurationFormat.Json;
+        private const string DefaultSpecRunNuGetVersion = "3.2.31";
 
         static int Main(string[] args)
         {
@@ -31,9 +32,9 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     "--sln-name",
                     "The name of the generated solution (directory and sln file). Default: random string."),
                 new Option<Version>(
-                    "--specflow-version",
-                    () => new Version(DefaultSpecFlowVersion),
-                    $"The SpecFlow version referenced in the generated project. Default: '{DefaultSpecFlowVersion}'."),
+                    "--specflow-nuget-version",
+                    () => new Version(DefaultSpecFlowNuGetVersion),
+                    $"The SpecFlow NuGet version referenced in the generated project. Default: '{DefaultSpecFlowNuGetVersion}'."),
                 new Option<UnitTestProvider>(
                     "--unit-test-provider",
                     () => DefaultUnitTestProvider,
@@ -49,16 +50,22 @@ namespace SpecFlow.TestProjectGenerator.Cli
                 new Option<ConfigurationFormat>(
                     "--configuration-format",
                     () => DefaultConfigurationFormat,
-                    $"The format of the generated SpecFlow configuration file. Default: '{DefaultConfigurationFormat}'.")
-
+                    $"The format of the generated SpecFlow configuration file. Default: '{DefaultConfigurationFormat}'."),
+                new Option<Version>(
+                    "--specrun-nuget-version",
+                    () => new Version(DefaultSpecRunNuGetVersion),
+                    $"The SpecRun NuGet version referenced in the generated project (if SpecRun is used as unit test provider). Default: '{DefaultSpecRunNuGetVersion}'."),
             };
 
             rootCommand.Description = "SpecFlow Test Project Generator";
 
             // Note that the parameters of the handler method are matched according to the names of the options
             rootCommand.Handler = CommandHandler.Create<DirectoryInfo, string, Version, UnitTestProvider, TargetFramework, ProjectFormat, ConfigurationFormat>(
-                (outDir, slnName, specflowVersion, unitTestProvider, targetFramework, projectFormat, configurationFormat) =>
-            {
+                (outDir, slnName, specflowNuGetVersion, unitTestProvider, targetFramework, projectFormat, configurationFormat) =>
+                {
+                    //TODO: refactor to support more params
+                    var specrunNuGetVersion = DefaultSpecRunNuGetVersion;
+
                 var services = ConfigureServices();
 
                 services.AddSingleton(s => new SolutionConfiguration
@@ -78,8 +85,9 @@ namespace SpecFlow.TestProjectGenerator.Cli
 
                 services.AddSingleton(s => new CurrentVersionDriver
                 {
-                    SpecFlowVersion = specflowVersion,
-                    SpecFlowNuGetVersion = specflowVersion.ToString()
+                    SpecFlowVersion = new Version(specflowNuGetVersion.Major, specflowNuGetVersion.Minor, 0),
+                    SpecFlowNuGetVersion = specflowNuGetVersion.ToString(),
+                    NuGetVersion = specrunNuGetVersion
                 });
 
                 var serviceProvider = services.BuildServiceProvider();
