@@ -60,51 +60,51 @@ namespace SpecFlow.TestProjectGenerator.Cli
             rootCommand.Description = "SpecFlow Test Project Generator";
 
             // Note that the parameters of the handler method are matched according to the names of the options
-            rootCommand.Handler = CommandHandler.Create<DirectoryInfo, string, Version, UnitTestProvider, TargetFramework, ProjectFormat, ConfigurationFormat>(
-                (outDir, slnName, specflowNuGetVersion, unitTestProvider, targetFramework, projectFormat, configurationFormat) =>
+            rootCommand.Handler = CommandHandler.Create<GenerateSolutionParams>(
+                (generateSolutionParams) =>
                 {
                     //TODO: refactor to support more params
                     var specrunNuGetVersion = DefaultSpecRunNuGetVersion;
 
-                var services = ConfigureServices();
+                    var services = ConfigureServices();
 
-                services.AddSingleton(s => new SolutionConfiguration
-                {
-                    OutDir = outDir,
-                    SolutionName = slnName
-                });
+                    services.AddSingleton(s => new SolutionConfiguration
+                    {
+                        OutDir = generateSolutionParams.OutDir,
+                        SolutionName = generateSolutionParams.SlnName
+                    });
 
-                services.AddSingleton(s => new TestRunConfiguration
-                {
-                    ProgrammingLanguage = ProgrammingLanguage.CSharp,
-                    UnitTestProvider = unitTestProvider,
-                    ConfigurationFormat = configurationFormat,
-                    ProjectFormat = projectFormat,
-                    TargetFramework = targetFramework,
-                });
+                    services.AddSingleton(s => new TestRunConfiguration
+                    {
+                        ProgrammingLanguage = ProgrammingLanguage.CSharp,
+                        UnitTestProvider = generateSolutionParams.UnitTestProvider,
+                        ConfigurationFormat = generateSolutionParams.ConfigurationFormat,
+                        ProjectFormat = generateSolutionParams.ProjectFormat,
+                        TargetFramework = generateSolutionParams.TargetFramework,
+                    });
 
-                services.AddSingleton(s => new CurrentVersionDriver
-                {
-                    SpecFlowVersion = new Version(specflowNuGetVersion.Major, specflowNuGetVersion.Minor, 0),
-                    SpecFlowNuGetVersion = specflowNuGetVersion.ToString(),
-                    NuGetVersion = specrunNuGetVersion
-                });
+                    services.AddSingleton(s => new CurrentVersionDriver
+                    {
+                        SpecFlowVersion = new Version(generateSolutionParams.SpecFlowNuGetVersion.Major, generateSolutionParams.SpecFlowNuGetVersion.Minor, 0),
+                        SpecFlowNuGetVersion = generateSolutionParams.SpecFlowNuGetVersion.ToString(),
+                        NuGetVersion = specrunNuGetVersion
+                    });
 
-                var serviceProvider = services.BuildServiceProvider();
+                    var serviceProvider = services.BuildServiceProvider();
 
-                SolutionWriteToDiskDriver d = serviceProvider.GetService<SolutionWriteToDiskDriver>();
+                    SolutionWriteToDiskDriver d = serviceProvider.GetService<SolutionWriteToDiskDriver>();
 
-                //Create test project
-                var pd = serviceProvider.GetService<ProjectsDriver>();
-                var pb = pd.CreateProject("Proj1", "C#");
+                    //Create test project
+                    var pd = serviceProvider.GetService<ProjectsDriver>();
+                    var pb = pd.CreateProject("Proj1", "C#");
 
-                pb.AddFeatureFile(@"
+                    pb.AddFeatureFile(@"
 Feature: Simple Feature
 	Scenario: Simple Scenario
 		Given I use a .NET API
 ");
 
-                pb.AddStepBinding(@"
+                    pb.AddStepBinding(@"
     [Given(""I use a .NET API"")]
     public void Do()
     {
@@ -112,12 +112,12 @@ Feature: Simple Feature
     }
 ");
 
-                //Remove local NuGet source
-                var sd = serviceProvider.GetService<SolutionDriver>();
-                sd.NuGetSources.Clear();
+                    //Remove local NuGet source
+                    var sd = serviceProvider.GetService<SolutionDriver>();
+                    sd.NuGetSources.Clear();
 
-                d.WriteSolutionToDisk();
-            });
+                    d.WriteSolutionToDisk();
+                });
 
             // Parse the incoming args and invoke the handler
             return rootCommand.InvokeAsync(args).Result;
