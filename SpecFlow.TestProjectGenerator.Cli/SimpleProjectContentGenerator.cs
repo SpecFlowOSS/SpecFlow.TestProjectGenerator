@@ -2,7 +2,8 @@
 
 namespace SpecFlow.TestProjectGenerator.Cli
 {
-    public class ProjectContentGenerator
+    public class SimpleProjectContentGenerator
+        : IProjectContentGenerator
     {
         public void Generate(ProjectBuilder pb)
         {

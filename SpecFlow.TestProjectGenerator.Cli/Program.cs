@@ -60,6 +60,10 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     "--specrun-nuget-version",
                     () => DefaultSpecRunNuGetVersion,
                     $"The SpecRun NuGet version referenced in the generated project (if SpecRun is used as unit test provider). Default: '{DefaultSpecRunNuGetVersion}'."),
+                new Option<int>(
+                    "--feature-count",
+                    () => 1,
+                    $"Number of feature files to generate. Default: 1"),
             };
 
             rootCommand.Description = "SpecFlow Test Project Generator";
@@ -97,6 +101,7 @@ namespace SpecFlow.TestProjectGenerator.Cli
                         NuGetVersion = generateSolutionParams.SpecrunNuGetVersion.ToString()
                     });
 
+                    services.AddSingleton<GenerateSolutionParams>(s => generateSolutionParams);
 
                     var serviceProvider = services.BuildServiceProvider();
 
@@ -107,7 +112,7 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     var pb = pd.CreateProject("Proj1", "C#");
 
 
-                    var projectContentGenerator = serviceProvider.GetService<ProjectContentGenerator>();
+                    var projectContentGenerator = serviceProvider.GetService<IProjectContentGenerator>();
 
                     projectContentGenerator.Generate(pb);
 
@@ -133,7 +138,7 @@ namespace SpecFlow.TestProjectGenerator.Cli
             services.AddSingleton<Folders, FoldersOverride>();
             services.AddSingleton<SolutionNamingConvention, SolutionNamingConventionOverride>();
 
-            services.AddSingleton<ProjectContentGenerator>();
+            services.AddSingleton<IProjectContentGenerator, ComplexProjectContentGenerator>();
 
             services.Scan(scan => scan
                 .FromAssemblyOf<SolutionWriteToDiskDriver>()
