@@ -106,19 +106,10 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     var pd = serviceProvider.GetService<ProjectsDriver>();
                     var pb = pd.CreateProject("Proj1", "C#");
 
-                    pb.AddFeatureFile(@"
-Feature: Simple Feature
-	Scenario: Simple Scenario
-		Given I use a .NET API
-");
 
-                    pb.AddStepBinding(@"
-    [Given(""I use a .NET API"")]
-    public void Do()
-    {
-        System.DateTime.Now.ToString();
-    }
-");
+                    var projectContentGenerator = serviceProvider.GetService<ProjectContentGenerator>();
+
+                    projectContentGenerator.Generate(pb);
 
                     var sd = serviceProvider.GetService<SolutionDriver>();
 
@@ -141,6 +132,8 @@ Feature: Simple Feature
             services.AddSingleton<IOutputWriter, OutputWriter>();
             services.AddSingleton<Folders, FoldersOverride>();
             services.AddSingleton<SolutionNamingConvention, SolutionNamingConventionOverride>();
+
+            services.AddSingleton<ProjectContentGenerator>();
 
             services.Scan(scan => scan
                 .FromAssemblyOf<SolutionWriteToDiskDriver>()
