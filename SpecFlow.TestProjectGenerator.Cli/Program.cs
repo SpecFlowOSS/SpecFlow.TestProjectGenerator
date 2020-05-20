@@ -9,6 +9,7 @@ using TechTalk.SpecFlow.TestProjectGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.Conventions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Driver;
+using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter;
 
 namespace SpecFlow.TestProjectGenerator.Cli
 {
@@ -44,6 +45,9 @@ namespace SpecFlow.TestProjectGenerator.Cli
                     "--target-framework",
                     () => DefaultTargetFramework,
                     $"The target framework of the generated project. Default: '{DefaultTargetFramework}'."),
+                new Option<string>(
+                    "--sdk-version",
+                    $"The sdk version used in the global.json of the generated project. Default: based on a default mapping from the target framework."),
                 new Option<ProjectFormat>(
                     "--project-format",
                     () => DefaultProjectFormat,
@@ -93,6 +97,7 @@ namespace SpecFlow.TestProjectGenerator.Cli
                         NuGetVersion = generateSolutionParams.SpecrunNuGetVersion.ToString()
                     });
 
+
                     var serviceProvider = services.BuildServiceProvider();
 
                     SolutionWriteToDiskDriver d = serviceProvider.GetService<SolutionWriteToDiskDriver>();
@@ -115,9 +120,12 @@ Feature: Simple Feature
     }
 ");
 
-                    //Remove local NuGet source
                     var sd = serviceProvider.GetService<SolutionDriver>();
+
+                    //Remove local NuGet source
                     sd.NuGetSources.Clear();
+
+                    sd.SdkVersion = generateSolutionParams.SdkVersion;
 
                     d.WriteSolutionToDisk();
                 });

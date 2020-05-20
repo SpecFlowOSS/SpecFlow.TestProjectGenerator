@@ -17,6 +17,8 @@ namespace SpecFlow.TestProjectGenerator.Cli
 
         public TargetFramework TargetFramework { get; set; }
 
+        public string SdkVersion { get; set; }
+
         public ProjectFormat ProjectFormat { get; set; }
 
         public ConfigurationFormat ConfigurationFormat { get; set; }

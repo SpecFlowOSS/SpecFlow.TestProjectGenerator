@@ -101,5 +101,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         {
             _solution.Files.Add(new SolutionFile(name, content));
         }
+
+        public string SdkVersion
+        {
+            get => _solution.SdkVersion;
+            set => _solution.SdkVersion = value;
+        }
     }
 }
