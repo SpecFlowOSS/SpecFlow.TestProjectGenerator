@@ -11,6 +11,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             [TargetFramework.Net35] = "v3.5",
             [TargetFramework.Net45] = "v4.5",
             [TargetFramework.Net452] = "v4.5.2",
+            [TargetFramework.Net461] = "v4.6.1",
         };
 
         public string BuildTargetFrameworkVersion(TargetFramework targetFramework)
