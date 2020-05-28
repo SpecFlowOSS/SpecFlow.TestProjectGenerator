@@ -42,7 +42,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
 
-            project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", $"{TargetFrameworkMoniker}\\TechTalk.SpecFlow.dll"));
+            project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net461\\TechTalk.SpecFlow.dll"));
 
 
             new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
@@ -60,7 +60,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
 
-            project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", $"{TargetFrameworkMoniker}\\TechTalk.SpecFlow.dll"));
+            project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net461\\TechTalk.SpecFlow.dll"));
 
 
             new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
@@ -69,7 +69,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 
 
             projectFileContent.Should().Contain("<Import Project=\"..\\packages\\SpecFlow.2.3.1\\build\\SpecFlow.targets\" Condition=\"Exists(\'..\\packages\\SpecFlow.2.3.1\\build\\SpecFlow.targets\')\" />");
-            projectFileContent.Should().Match($"*<Reference Include=\"TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL\">*<HintPath>..\\packages\\SpecFlow.2.3.1\\lib\\{TargetFrameworkMoniker}\\TechTalk.SpecFlow.dll</HintPath>*</Reference>*");
+            projectFileContent.Should().Match("*<Reference Include=\"TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL\">*<HintPath>..\\packages\\SpecFlow.2.3.1\\lib\\net461\\TechTalk.SpecFlow.dll</HintPath>*</Reference>*");
         }
 
 
@@ -247,24 +247,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Contain($"<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
         public void CreateEmtpyCSharpCore3_1ProjectInNewFormat()
         {
-            //add tfm
-            var targetFramework = TargetFramework.Netcoreapp31;
-            var targetFrameworkMoniker = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(targetFramework);
-
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, targetFramework);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
 
             new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                .Contain($"<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>{targetFrameworkMoniker}</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>netcoreapp3.1</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
@@ -277,7 +273,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Contain($"<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>\r\n</Project>");
         }
 
         [Fact]
@@ -290,7 +286,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Contain($"<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
     }
 
