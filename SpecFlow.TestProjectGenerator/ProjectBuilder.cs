@@ -46,6 +46,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _currentVersionDriver = currentVersionDriver;
             _folders = folders;
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
+            TargetFrameworkMoniker = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
             var projectGuidString = $"{ProjectGuid:N}".Substring(24);
             ProjectName = $"TestProj_{projectGuidString}";
         }
@@ -54,7 +55,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public Configuration Configuration { get; }
         public string ProjectName { get; set; }
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
-        public TargetFramework TargetFramework { get; set; } = TargetFramework.Netcoreapp20;
+        public TargetFramework TargetFramework { get; set; } = TargetFramework.Netcoreapp31;
+        public string TargetFrameworkMoniker { get; } 
         public ProjectFormat Format { get; set; } = ProjectFormat.New;
         public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Json;
 
@@ -378,35 +380,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private void ConfigureRunner()
         {
             _project.AddNuGetPackage("SpecRun.Runner", _currentVersionDriver.NuGetVersion);
-
-            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
-                ConfigureRunnerForSpecFlow3();
-            else
-                ConfigureRunnerForSpecFlow2();
-        }
-
-        private void ConfigureRunnerForSpecFlow2()
-        {
-            _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
-                new NuGetPackageAssembly($"SpecRun.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.SpecFlowPlugin.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    "net45\\TechTalk.SpecRun.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    "net45\\TechTalk.SpecRun.Common.dll")
-            );
-            Configuration.Plugins.Add(new SpecFlowPlugin("SpecRun"));
+            
+            ConfigureRunnerForSpecFlow3();
         }
 
         private void ConfigureRunnerForSpecFlow3()
         {
-            string targetFramework = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
             _project.AddNuGetPackage($"SpecRun.SpecFlow.{_currentVersionDriver.SpecFlowVersionDash}", _currentVersionDriver.NuGetVersion,
                 new NuGetPackageAssembly($"SpecRun.Runtime.SpecFlowPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, processorArchitecture=MSIL",
-                    $"net45\\SpecRun.Runtime.SpecFlowPlugin.dll"),
+                    $"{TargetFrameworkMoniker}\\SpecRun.Runtime.SpecFlowPlugin.dll"),
                 new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"net45\\TechTalk.SpecRun.dll"),
+                    $"{TargetFrameworkMoniker}\\TechTalk.SpecRun.dll"),
                 new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"net45\\TechTalk.SpecRun.Common.dll")
+                    $"{TargetFrameworkMoniker}\\TechTalk.SpecRun.Common.dll")
             );
         }
 
