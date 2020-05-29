@@ -46,7 +46,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _currentVersionDriver = currentVersionDriver;
             _folders = folders;
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
-            TargetFrameworkMoniker = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
             var projectGuidString = $"{ProjectGuid:N}".Substring(24);
             ProjectName = $"TestProj_{projectGuidString}";
         }
@@ -56,7 +55,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public string ProjectName { get; set; }
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
         public TargetFramework TargetFramework { get; set; } = TargetFramework.Netcoreapp31;
-        public string TargetFrameworkMoniker { get; } 
+        public string TargetFrameworkMoniker => _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
         public ProjectFormat Format { get; set; } = ProjectFormat.New;
         public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Json;
 
