@@ -224,11 +224,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                 if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
                 {
                     // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
-                    _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net45\\TechTalk.SpecFlow.dll"));
+                    _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net461\\TechTalk.SpecFlow.dll"));
                 }
                 else
                 {
-                    _project.AddNuGetPackage("SpecFlow", $"{_currentVersionDriver.SpecFlowNuGetVersion}", new NuGetPackageAssembly($"TechTalk.SpecFlow, Version={_currentVersionDriver.SpecFlowVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
+                    _project.AddNuGetPackage("SpecFlow", $"{_currentVersionDriver.SpecFlowNuGetVersion}", new NuGetPackageAssembly($"TechTalk.SpecFlow, Version={_currentVersionDriver.SpecFlowVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net461\\TechTalk.SpecFlow.dll"));
                 }
 
                 _project.AddNuGetPackage("BoDi", "1.4.1", new NuGetPackageAssembly("BoDi, Version=1.4.1.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
@@ -315,7 +315,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
                 _project.AddNuGetPackage("SpecFlow.NUnit", _currentVersionDriver.SpecFlowNuGetVersion,
-                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"));
+                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"));
                 Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.NUnit", SpecFlowPluginType.Runtime));
             }
         }
@@ -350,7 +350,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
                 _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.SpecFlowNuGetVersion,
-                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net452\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
+                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
                 Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.xUnit", SpecFlowPluginType.Runtime));
             }
         }
@@ -371,7 +371,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
             {
                 _project.AddNuGetPackage("SpecFlow.MSTest", _currentVersionDriver.SpecFlowNuGetVersion,
-                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"), "net45\\TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"));
+                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"));
                 Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.MSTest", SpecFlowPluginType.Runtime));
             }
         }
