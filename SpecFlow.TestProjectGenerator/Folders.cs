@@ -50,7 +50,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public virtual string NuGetFolder
         {
-            get => !_nugetFolder.IsNullOrWhiteSpace() ? _nugetFolder : Path.GetFullPath(Path.Combine(SourceRoot, "GeneratedNuGetPackages", "Debug"));
+            get => !_nugetFolder.IsNullOrWhiteSpace() ? _nugetFolder :
+#if DEBUG
+                Path.GetFullPath(Path.Combine(SourceRoot, "GeneratedNuGetPackages", "Debug"));
+#else
+                Path.GetFullPath(Path.Combine(SourceRoot, "GeneratedNuGetPackages", "Release"));
+#endif
             set => _nugetFolder = value;
         }
 

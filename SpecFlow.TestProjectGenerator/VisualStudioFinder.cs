@@ -30,11 +30,16 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private string ExecuteVsWhere(string vsWhereParameters)
         {
-            string vsWherePath = Path.Combine(_folders.GlobalPackages, "vswhere", "2.7.1", "tools", "vswhere.exe");
+            var vsWherePath = GetVsWherePath();
 
             if (!File.Exists(vsWherePath))
             {
-                throw new FileNotFoundException("vswhere can not be found! Is the version number correct?", vsWherePath);
+                vsWherePath = Path.Combine(_folders.GlobalPackages, "vswhere", "2.7.1", "tools", "vswhere.exe");
+
+                if (!File.Exists(vsWherePath))
+                {
+                    throw new FileNotFoundException("vswhere can not be found! Is the version number correct?", vsWherePath);
+                }
             }
 
             var ph = new ProcessHelper();
@@ -48,6 +53,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             return lines.First();
+        }
+
+        /// <summary>
+        /// Starting with Visual Studio 15.2 (26418.1 Preview) vswhere.exe is installed in
+        /// %ProgramFiles(x86)%\Microsoft Visual Studio\Installer (use %ProgramFiles% in a 32-bit program prior to Windows 10).
+        /// This is a fixed location that will be maintained.
+        /// Source: https://github.com/Microsoft/vswhere/wiki/Installing
+        /// </summary>
+        private string GetVsWherePath()
+        {
+            var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            var vsWherePath = Path.Combine(programFiles, "Microsoft Visual Studio", "Installer", "vswhere.exe");
+            return vsWherePath;
         }
     }
 }
