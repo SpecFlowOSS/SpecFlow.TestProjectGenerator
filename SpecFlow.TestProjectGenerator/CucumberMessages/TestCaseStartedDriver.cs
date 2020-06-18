@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using FluentAssertions;
@@ -61,6 +62,32 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             if (platformRow.Version is string version)
             {
                 testCaseStarted.Platform.Version.Should().Be(version);
+            }
+        }
+
+        public void TestCaseStartedMessageShouldHaveBeenSentWithPlatformInformationAttributes(IEnumerable<string> expectedAttributes)
+        {
+            var messageQueue = _cucumberMessagesDriver.LoadMessageQueue();
+            var testCaseStarted = messageQueue.ToArray().OfType<TestCaseStarted>().First();
+
+            foreach (var expectedAttribute in expectedAttributes)
+            {
+                switch (expectedAttribute)
+                {
+                    case var name when StringComparer.OrdinalIgnoreCase.Equals(name, nameof(PlatformRow.Cpu)): 
+                        testCaseStarted.Platform.Cpu.Should().NotBeNullOrWhiteSpace();
+                        break;
+                    case var name when StringComparer.OrdinalIgnoreCase.Equals(name, nameof(PlatformRow.Os)): 
+                        testCaseStarted.Platform.Os.Should().NotBeNullOrWhiteSpace();
+                        break;
+                    case var name when StringComparer.OrdinalIgnoreCase.Equals(name, nameof(PlatformRow.Implementation)):
+                        testCaseStarted.Platform.Implementation.Should().NotBeNullOrWhiteSpace();
+                        break;
+                    case var name when StringComparer.OrdinalIgnoreCase.Equals(name, nameof(PlatformRow.Version)):
+                        testCaseStarted.Platform.Version.Should().NotBeNullOrWhiteSpace();
+                        break;
+                    default: throw new ArgumentException($"Platform attribute {expectedAttribute} not supported.");
+                }
             }
         }
     }
