@@ -312,7 +312,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _project.AddNuGetPackage(NUnit3TestAdapterPackageName, NUnit3TestAdapterPackageVersion);
 
 
-            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
+            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0) && IsSpecFlowFeatureProject)
             {
                 _project.AddNuGetPackage("SpecFlow.NUnit", _currentVersionDriver.SpecFlowNuGetVersion,
                     new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"));
@@ -347,7 +347,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                 _project.AddNuGetPackage("Validation", "2.4.18", new NuGetPackageAssembly("Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7", "net45\\Validation.dll"));
             }
 
-            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
+            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0) && IsSpecFlowFeatureProject)
             {
                 _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.SpecFlowNuGetVersion,
                     new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
@@ -368,7 +368,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL",
                     "net45\\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll"));
 
-            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
+            if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0) && IsSpecFlowFeatureProject)
             {
                 _project.AddNuGetPackage("SpecFlow.MSTest", _currentVersionDriver.SpecFlowNuGetVersion,
                     new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"));
@@ -381,9 +381,17 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _project.AddNuGetPackage("SpecRun.Runner", _currentVersionDriver.NuGetVersion);
 
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
-                ConfigureRunnerForSpecFlow3();
+            {
+                if (IsSpecFlowFeatureProject)
+                {
+                    ConfigureRunnerForSpecFlow3();
+                }
+            }
             else
-                ConfigureRunnerForSpecFlow2();
+            {
+                ConfigureRunnerForSpecFlow2(); 
+            }
+                
         }
 
         private void ConfigureRunnerForSpecFlow2()
