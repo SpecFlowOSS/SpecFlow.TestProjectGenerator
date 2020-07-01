@@ -8,7 +8,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         private static readonly NetCoreSdkInfo NetCore31 = new NetCoreSdkInfo("3.1.201");
         private static readonly NetCoreSdkInfo NetCore30 = new NetCoreSdkInfo("3.0.101");
         private static readonly NetCoreSdkInfo NetCore22 = new NetCoreSdkInfo("2.2.402");
-        private static readonly NetCoreSdkInfo NetCore21 = new NetCoreSdkInfo("2.1.802");
+        private static readonly NetCoreSdkInfo NetCore21 = new NetCoreSdkInfo("2.1.807");
         private static readonly NetCoreSdkInfo NetCore20 = new NetCoreSdkInfo("2.1.202");
 
         private readonly IReadOnlyDictionary<TargetFramework, NetCoreSdkInfo> _sdkMappings = new Dictionary<TargetFramework, NetCoreSdkInfo>
