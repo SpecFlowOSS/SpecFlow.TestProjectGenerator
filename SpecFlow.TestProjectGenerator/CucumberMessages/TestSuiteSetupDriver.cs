@@ -52,6 +52,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
                 }
 
                 _projectsDriver.AddFeatureFile(featureBuilder.ToString());
+                AddGenericWhenStepBinding();
             }
 
             _isProjectCreated = true;
