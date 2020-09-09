@@ -9,18 +9,17 @@ using TechTalk.SpecFlow.TestProjectGenerator;
 using TechTalk.SpecFlow.TestProjectGenerator.Conventions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Driver;
-using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter;
 
 namespace SpecFlow.TestProjectGenerator.Cli
 {
     partial class Program
     {
-        private const string DefaultSpecFlowNuGetVersion = "3.1.97";
+        private const string DefaultSpecFlowNuGetVersion = "3.4.3";
         private const UnitTestProvider DefaultUnitTestProvider = UnitTestProvider.SpecRun;
         private const TargetFramework DefaultTargetFramework = TargetFramework.Netcoreapp31;
         private const ProjectFormat DefaultProjectFormat = ProjectFormat.New;
         private const ConfigurationFormat DefaultConfigurationFormat = ConfigurationFormat.Json;
-        private const string DefaultSpecRunNuGetVersion = "3.2.31";
+        private const string DefaultSpecRunNuGetVersion = "3.4.19";
 
         static int Main(string[] args)
         {
