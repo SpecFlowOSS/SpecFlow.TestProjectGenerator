@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Data
 {
@@ -19,6 +20,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
         public ProjectFile NugetConfig { get; set; }
 
         public List<SolutionFile> Files { get; } = new List<SolutionFile>();
+
+        public string SdkVersion { get; set; }
 
         public void AddProject(Project project)
         {

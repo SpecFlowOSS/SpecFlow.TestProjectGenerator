@@ -38,7 +38,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 solution.Projects
                         .Select(p => p.TargetFrameworks)
                         .FirstOrDefault();
-            var sdk = _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
+            
+            var sdk = !string.IsNullOrWhiteSpace(solution.SdkVersion) 
+                ? new NetCoreSdkInfo(solution.SdkVersion) 
+                : _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
 
             if (targetFramework != 0 && sdk != null)
             {
