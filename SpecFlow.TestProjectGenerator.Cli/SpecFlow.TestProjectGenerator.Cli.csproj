@@ -3,10 +3,18 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>specflow-tpg</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>SpecFlow Team</Authors>
+    <Company>Tricentis</Company>
+    <PackageProjectUrl>https://github.com/SpecFlowOSS/SpecFlow.TestProjectGenerator</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SpecFlowOSS/SpecFlow.TestProjectGenerator</RepositoryUrl>
+    <Copyright>Copyright © SpecFlow Team</Copyright>
+    <Description>Command line tool to generate SpecFlow test projects for manual/smoke testing of SpecFlow.</Description>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +29,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SpecFlow.TestProjectGenerator\TechTalk.SpecFlow.TestProjectGenerator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt" Pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
 </Project>
