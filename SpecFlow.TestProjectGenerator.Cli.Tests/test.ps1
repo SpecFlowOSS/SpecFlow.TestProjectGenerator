@@ -22,7 +22,8 @@ Write-Header "Create tool manifest"
 dotnet new tool-manifest
 
 Write-Header "Install TPG tool"
-dotnet tool install --no-cache --add-source ..\..\SpecFlow.TestProjectGenerator.Cli\nupkg\ SpecFlow.TestProjectGenerator.Cli
+#Note: to install pre-release version we need to specify a floating version number: https://github.com/NuGet/Home/wiki/Support-pre-release-packages-with-floating-versions
+dotnet tool install --no-cache --add-source ..\..\SpecFlow.TestProjectGenerator.Cli\nupkg\ SpecFlow.TestProjectGenerator.Cli --version *-*
 
 Write-Header "Run TPG"
 specflow-tpg.exe --sln-name Test
