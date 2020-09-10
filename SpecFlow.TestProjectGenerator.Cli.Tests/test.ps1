@@ -26,7 +26,7 @@ Write-Header "Install TPG tool"
 dotnet tool install --no-cache --add-source ..\..\SpecFlow.TestProjectGenerator.Cli\nupkg\ SpecFlow.TestProjectGenerator.Cli --version *-*
 
 Write-Header "Run TPG"
-specflow-tpg.exe --sln-name Test
+dotnet tool run specflow-tpg --sln-name Test
 
 Write-Header "Run tests in generated project"
 dotnet test Test
