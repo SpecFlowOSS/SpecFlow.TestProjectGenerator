@@ -17,7 +17,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             [TargetFramework.Netcoreapp21] = "netcoreapp2.1",
             [TargetFramework.Netcoreapp22] = "netcoreapp2.2",
             [TargetFramework.Netcoreapp30] = "netcoreapp3.0",
-            [TargetFramework.Netcoreapp31] = "netcoreapp3.1"
+            [TargetFramework.Netcoreapp31] = "netcoreapp3.1",
+            [TargetFramework.Net50] = "net5.0"
         };
 
         public string BuildTargetFrameworkMoniker(TargetFramework targetFramework)

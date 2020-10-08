@@ -11,6 +11,7 @@
         Netcoreapp22,
         Netcoreapp30,
         Netcoreapp31,
-        Net461
+        Net461,
+        Net50
     }
 }
