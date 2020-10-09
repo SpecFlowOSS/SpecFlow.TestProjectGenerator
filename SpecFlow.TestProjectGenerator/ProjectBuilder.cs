@@ -311,7 +311,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureNUnit()
         {
-            _project.AddNuGetPackage(NUnit3PackageName, NUnit3PackageVersion);
+            //NUnit is not supporting .NET 5 in the latest release (3.12.0), so take a pre-release version instead
+            var nUnitPackageVersion = TargetFramework == TargetFramework.Net50 ? "3.13.0-dev-06881" : NUnit3PackageVersion;
+            _project.AddNuGetPackage(NUnit3PackageName, nUnitPackageVersion);
             _project.AddNuGetPackage(NUnit3TestAdapterPackageName, NUnit3TestAdapterPackageVersion);
 
 
