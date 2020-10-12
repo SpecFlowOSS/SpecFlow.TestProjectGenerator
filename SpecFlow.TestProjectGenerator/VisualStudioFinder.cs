@@ -8,7 +8,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
     public class VisualStudioFinder
     {
         private const string VsWhereInstallationPathParameter = @"-latest -products * -requires Microsoft.VisualStudio.PackageGroup.TestTools.Core -property installationPath";
-        private const string VsWhereMsBuildParameter = @"-latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe";
+        private const string VsWhereMsBuildParameter = @"-latest -prerelease -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe";
         private readonly Folders _folders;
         private readonly IOutputWriter _outputWriter;
 
