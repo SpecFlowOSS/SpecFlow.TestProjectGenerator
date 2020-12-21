@@ -13,10 +13,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
     public class NewFormatProjectWriter : IProjectWriter
     {
         private readonly IOutputWriter _outputWriter;
+        private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
 
-        public NewFormatProjectWriter(IOutputWriter outputWriter)
+        public NewFormatProjectWriter(IOutputWriter outputWriter, TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
         {
             _outputWriter = outputWriter;
+            _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
         }
 
         public virtual string WriteProject(Project project, string projRootPath)
@@ -25,6 +27,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             {
                 throw new ArgumentNullException(nameof(project));
             }
+
 
             CreateProjectFile(project, projRootPath);
 
@@ -41,11 +44,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             WriteNuGetPackages(project, projectElement);
             WriteFileReferences(project, projectElement);
 
+            SetTreatWarningsAsErrors(project, projectElement);
+
             xd.Save(projectFilePath);
 
             WriteProjectFiles(project, projRootPath);
 
             return projectFilePath;
+        }
+
+        private void SetTreatWarningsAsErrors(Project project, XElement projectElement)
+        {
+            if (project.IsTreatWarningsAsErrors is bool treatWarningsAsErrors)
+            {
+                var propertyGroupElement = projectElement.Element("PropertyGroup") ?? throw new ProjectCreationNotPossibleException();
+                var treatWarningsAsErrorsElement = new XElement("TreatWarningsAsErrors");
+                treatWarningsAsErrorsElement.SetValue(treatWarningsAsErrors);
+                propertyGroupElement.Add(treatWarningsAsErrorsElement);
+            }
         }
 
         private void AdjustForASPNetCore(Project project, XElement projectElement)
@@ -171,7 +187,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
         private void WriteProjectFiles(Project project, string projRootPath)
         {
-            var fileWriter = new ProjectFileWriter();
+            var fileWriter = new FileWriter();
             foreach (var file in project.Files)
             {
                 fileWriter.Write(file, projRootPath);
@@ -182,7 +198,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         {
             var targetFrameworkElement = projectElement.Element("PropertyGroup")?.Element("TargetFramework") ?? throw new ProjectCreationNotPossibleException();
 
-            string newTargetFrameworks = project.TargetFrameworks.ToTargetFrameworkMoniker();
+            string newTargetFrameworks = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(project.TargetFrameworks);
             targetFrameworkElement.SetValue(newTargetFrameworks);
         }
 

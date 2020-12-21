@@ -24,6 +24,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
                 return this;
             }
 
+            protected override string GetWorkingDirectory()
+            {
+                return Path.GetDirectoryName(_projectFilePath);
+            }
+
             protected override string BuildArguments()
             {
                 var projectDirectoryPath = Path.GetDirectoryName(_projectFilePath);

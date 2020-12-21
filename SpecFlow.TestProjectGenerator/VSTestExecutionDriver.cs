@@ -15,29 +15,39 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class VSTestExecutionDriver
     {
-        private readonly VisualStudioFinder _visualStudioFinder;
-        private readonly AppConfigDriver _appConfigDriver;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly IOutputWriter _outputWriter;
         private readonly TestRunConfiguration _testRunConfiguration;
-        private readonly TestSuiteInitializationDriver _testSuiteInitializationDriver;
-        private UriCleaner _uriCleaner;
+        private readonly TRXParser _trxParser;
+        private readonly TestSuiteEnvironmentVariableGenerator _testSuiteEnvironmentVariableGenerator;
+        private readonly UriCleaner _uriCleaner;
 
-        private const string BeginnOfTrxFileLine = "Results File: ";
-        private const string BeginnOfLogFileLine = "Log file: ";
+        private const string BeginOfTrxFileLine = "Results File: ";
+        private const string BeginOfLogFileLine = "Log file: ";
+        private const string BeginOfReportFileLine = @"Report file: ";
+        private const string DotnetTestPath = "dotnet";
 
-        public VSTestExecutionDriver(VisualStudioFinder visualStudioFinder, AppConfigDriver appConfigDriver, TestProjectFolders testProjectFolders, IOutputWriter outputWriter, TestRunConfiguration testRunConfiguration, TestSuiteInitializationDriver testSuiteInitializationDriver)
+        public VSTestExecutionDriver(
+            TestProjectFolders testProjectFolders,
+            IOutputWriter outputWriter,
+            TestRunConfiguration testRunConfiguration,
+            TRXParser trxParser,
+            TestSuiteEnvironmentVariableGenerator testSuiteEnvironmentVariableGenerator)
         {
-            _visualStudioFinder = visualStudioFinder;
-            _appConfigDriver = appConfigDriver;
             _testProjectFolders = testProjectFolders;
             _outputWriter = outputWriter;
             _testRunConfiguration = testRunConfiguration;
-            _testSuiteInitializationDriver = testSuiteInitializationDriver;
             _uriCleaner = new UriCleaner();
+            _trxParser = trxParser;
+            _testSuiteEnvironmentVariableGenerator = testSuiteEnvironmentVariableGenerator;
         }
 
+        /// <summary>
+        /// Gets the test execution result of the test project.
+        /// </summary>
         public TestExecutionResult LastTestExecutionResult { get; private set; }
+        public IReadOnlyDictionary<string, TestExecutionResult> TestExecutionResultFiles { get; private set; }
+
         public string RunSettingsFile { get; set; }
         public string Filter { get; set; }
 
@@ -69,7 +79,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public TestExecutionResult ExecuteTests()
         {
             var task = ExecuteTestsInternalAsync(async (processHelper, parameters) =>
-                processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectFolder, parameters.executablePath, parameters.argumentsFormat, parameters.environmentVariables));
+                processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
 
             return task.Result;
         }
@@ -77,66 +87,31 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public async Task<TestExecutionResult> ExecuteTestsAsync()
         {
             return await ExecuteTestsInternalAsync(async (processHelper, parameters) =>
-                await processHelper.RunProcessAsync(_outputWriter, _testProjectFolders.ProjectFolder, parameters.executablePath, parameters.argumentsFormat, parameters.environmentVariables));
+                await processHelper.RunProcessAsync(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
         }
 
-        private async Task<TestExecutionResult> ExecuteTestsInternalAsync(Func<ProcessHelper, (string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables), Task<ProcessResult>> runProcessAction)
+        private async Task<TestExecutionResult> ExecuteTestsInternalAsync(Func<ProcessHelper, (string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables), Task<ProcessResult>> runProcessAction)
         {
-            string vsFolder = _visualStudioFinder.Find();
-            vsFolder = Path.Combine(vsFolder, _appConfigDriver.VSTestPath);
-
-            string vsTestConsoleExePath = Path.Combine(AssemblyFolderHelper.GetAssemblyFolder(), Environment.ExpandEnvironmentVariables(vsFolder + @"\vstest.console.exe"));
-
-            var envVariables = new Dictionary<string, string>
-            {
-                {"DOTNET_CLI_UI_LANGUAGE", "en"}
-            };
-
-            if (_testSuiteInitializationDriver.OverrideTestSuiteStartupTime is DateTime testRunStartupTime)
-            {
-                envVariables.Add("SpecFlow_Messages_TestRunStartedTimeOverride", $"{testRunStartupTime:O}");
-            }
-
-            if (_testSuiteInitializationDriver.OverrideTestCaseStartedPickleId is Guid startedPickleId)
-            {
-                envVariables.Add("SpecFlow_Messages_TestCaseStartedPickleIdOverride", $"{startedPickleId:D}");
-            }
-
-            if (_testSuiteInitializationDriver.OverrideTestCaseStartedTime is DateTime testCaseStartupTime)
-            {
-                envVariables.Add("SpecFlow_Messages_TestCaseStartedTimeOverride", $"{testCaseStartupTime:O}");
-            }
-
-            if (_testSuiteInitializationDriver.OverrideTestCaseFinishedPickleId is Guid finishedPickleId)
-            {
-                envVariables.Add("SpecFlow_Messages_TestCaseFinishedPickleIdOverride", $"{finishedPickleId:D}");
-            }
-
-            if (_testSuiteInitializationDriver.OverrideTestCaseFinishedTime is DateTime testCaseFinishedTime)
-            {
-                envVariables.Add("SpecFlow_Messages_TestCaseFinishedTimeOverride", $"{testCaseFinishedTime:O}");
-            }
+            var envVariables = _testSuiteEnvironmentVariableGenerator.GenerateEnvironmentVariables();
 
             var processHelper = new ProcessHelper();
-            string arguments = GenereateVsTestsArguments();
+            string arguments = $"test {GenerateDotnetTestsArguments()}";
             ProcessResult processResult;
             try
             {
-                processResult = await runProcessAction(processHelper, (vsTestConsoleExePath, arguments, envVariables));
+                processResult = await runProcessAction(processHelper, (arguments, envVariables));
             }
             catch (Exception)
             {
-                Console.WriteLine($"running vstest.console.exe failed - {_testProjectFolders.CompiledAssemblyPath} {vsTestConsoleExePath} {arguments}");
+                Console.WriteLine($"running {DotnetTestPath} failed - {_testProjectFolders.CompiledAssemblyPath} {DotnetTestPath} {arguments}");
                 throw;
             }
 
             string output = processResult.CombinedOutput;
 
             var lines = output.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            var trxFiles = FindFilePath(lines, ".trx", BeginnOfTrxFileLine).ToArray();
-            var logFiles = FindFilePath(lines, ".log", BeginnOfLogFileLine).ToArray();
-
-
+            var trxFilePaths = FindFilePath(lines, ".trx", BeginOfTrxFileLine).ToArray();
+            var logFiles = FindFilePath(lines, ".log", BeginOfLogFileLine).ToArray();
 
             string logFileContent =
                 logFiles.Length == 1
@@ -145,168 +120,25 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             var reportFiles = GetReportFiles(output);
 
-            trxFiles.Should().HaveCount(1, $"exactly one TRX file should be generated by VsTest;{Environment.NewLine}{string.Join(Environment.NewLine, trxFiles)}");
-            string trxFile = trxFiles.Single();
+            trxFilePaths.Should().HaveCountGreaterOrEqualTo(1, $"at least one TRX file should be generated by the test run; these have been generated:{Environment.NewLine}{string.Join(Environment.NewLine, trxFilePaths)}");
 
-            var testResultDocument = XDocument.Load(trxFile);
+            var trxFiles = from trxFilePath in trxFilePaths
+                              let trx = _trxParser.ParseTRXFile(trxFilePath, output, reportFiles, logFileContent)
+                              select (trxFilePath, trx);
 
-            LastTestExecutionResult = CalculateTestExecutionResultFromTrx(testResultDocument, _testRunConfiguration, output, reportFiles, logFileContent);
+            TestExecutionResultFiles = trxFiles.ToDictionary(trxFile => trxFile.trxFilePath, trxFile => trxFile.trx);
+
+            LastTestExecutionResult = TestExecutionResultFiles.First(f => f.Key.Contains(_testProjectFolders.ProjectFolder)).Value;
+
             return LastTestExecutionResult;
         }
 
         private IEnumerable<string> GetReportFiles(string output)
         {
-            const string reportFileString = @"Report file: ";
-
             return output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-                         .Where(i => i.StartsWith(reportFileString))
-                         .Select(i => i.Substring(reportFileString.Length))
+                         .Where(i => i.StartsWith(BeginOfReportFileLine))
+                         .Select(i => i.Substring(BeginOfReportFileLine.Length))
                          .Select(i => new Uri(i).AbsolutePath);
-        }
-
-        private TestExecutionResult CalculateTestExecutionResultFromTrx(XDocument trx, TestRunConfiguration testRunConfiguration, string output, IEnumerable<string> reportFiles, string logFileContent)
-        {
-            var testExecutionResult = GetCommonTestExecutionResult(trx, output, reportFiles, logFileContent);
-
-            return CalculateUnitTestProviderSpecificTestExecutionResult(testExecutionResult, testRunConfiguration);
-        }
-
-        private TestExecutionResult GetCommonTestExecutionResult(XDocument trx, string output, IEnumerable<string> reportFiles, string logFileContent)
-        {
-            var xmlns = XNamespace.Get("http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
-
-            var testRunElement = trx.Descendants(xmlns + "TestRun").Single();
-            var summaryElement = testRunElement.Element(xmlns + "ResultSummary")?.Element(xmlns + "Counters")
-                                 ?? throw new InvalidOperationException("Invalid document; result summary counters element not found.");
-
-            var totalAttribute = summaryElement.Attribute("total");
-            var executedAttribute = summaryElement.Attribute("executed");
-            var passedAttribute = summaryElement.Attribute("passed");
-            var failedAttribute = summaryElement.Attribute("failed");
-            var inconclusiveAttribute = summaryElement.Attribute("inconclusive");
-
-            int.TryParse(totalAttribute?.Value, out int total);
-            int.TryParse(executedAttribute?.Value, out int executed);
-            int.TryParse(passedAttribute?.Value, out int passed);
-            int.TryParse(failedAttribute?.Value, out int failed);
-            int.TryParse(inconclusiveAttribute?.Value, out int inconclusive);
-
-            var testResults = GetTestResults(testRunElement, xmlns);
-            string trxOutput = testResults.Select(r => r.StdOut).Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c)).ToString();
-
-            return new TestExecutionResult
-            {
-                ValidLicense = false,
-                TestResults = testResults,
-                Output = output,
-                ReportFiles = reportFiles.ToList(),
-                TrxOutput = trxOutput,
-                LogFileContent = logFileContent,
-                Total = total,
-                Executed = executed,
-                Succeeded = passed,
-                Failed = failed,
-                Pending = inconclusive,
-            };
-        }
-
-        private TestExecutionResult CalculateUnitTestProviderSpecificTestExecutionResult(TestExecutionResult testExecutionResult, TestRunConfiguration testRunConfiguration)
-        {
-            switch (testRunConfiguration.UnitTestProvider)
-            {
-                case UnitTestProvider.xUnit: return CalculateXUnitTestExecutionResult(testExecutionResult);
-                case UnitTestProvider.MSTest: return CalculateMsTestTestExecutionResult(testExecutionResult);
-                case UnitTestProvider.NUnit3: return CalculateNUnitTestExecutionResult(testExecutionResult);
-                case UnitTestProvider.SpecRun: return CalculateSpecRunTestExecutionResult(testExecutionResult);
-                default: throw new NotSupportedException($"The specified unit test provider is not supported: {testRunConfiguration.UnitTestProvider}");
-            }
-        }
-
-        private TestExecutionResult CalculateSpecRunTestExecutionResult(TestExecutionResult testExecutionResult)
-        {
-            bool FilterIgnored(TestResult testResult) => testResult.StdOut.Contains("-> Ignored");
-
-            bool FilterPending(TestResult testResult) => testResult.StdOut.Contains("TechTalk.SpecRun.PendingTestException")
-                                                         || testResult.StdOut.Contains("No matching step definition found for the step.");
-
-            var testResultsWithOutput = testExecutionResult.TestResults.Where(tr => !(tr?.StdOut is null)).ToArray();
-
-            testExecutionResult.Ignored = testResultsWithOutput.Where(FilterIgnored).Count();
-            testExecutionResult.Pending = testResultsWithOutput.Where(FilterPending).Count();
-
-            return testExecutionResult;
-        }
-
-        private TestExecutionResult CalculateNUnitTestExecutionResult(TestExecutionResult testExecutionResult)
-        {
-            testExecutionResult.Ignored = GetNUnitIgnoredCount(testExecutionResult);
-            testExecutionResult.Pending = testExecutionResult.Total - testExecutionResult.Executed - testExecutionResult.Ignored;
-
-            return testExecutionResult;
-        }
-
-        private TestExecutionResult CalculateMsTestTestExecutionResult(TestExecutionResult testExecutionResult)
-        {
-            testExecutionResult.Ignored = testExecutionResult.TestResults
-                                                             .Where(r => r.ErrorMessage != null)
-                                                             .Select(r => r.ErrorMessage)
-                                                             .Count(m => m.Contains("Assert.Inconclusive failed") && !m.Contains("One or more step definitions are not implemented yet"));
-
-
-            testExecutionResult.Pending = testExecutionResult.TestResults
-                                                             .Where(r => r.ErrorMessage != null)
-                                                             .Select(r => r.ErrorMessage)
-                                                             .Count(m => m.Contains("Assert.Inconclusive failed. One or more step definitions are not implemented yet."));
-
-            return testExecutionResult;
-        }
-
-        private TestExecutionResult CalculateXUnitTestExecutionResult(TestExecutionResult testExecutionResult)
-        {
-            testExecutionResult.Pending = GetXUnitPendingCount(testExecutionResult.Output);
-            testExecutionResult.Failed -= testExecutionResult.Pending;
-            testExecutionResult.Ignored = testExecutionResult.Total - testExecutionResult.Executed;
-
-            return testExecutionResult;
-        }
-
-        private List<TestResult> GetTestResults(XElement testRunElement, XNamespace xmlns)
-        {
-            var testResults = from unitTestResultElement in testRunElement.Element(xmlns + "Results")?.Elements(xmlns + "UnitTestResult") ?? Enumerable.Empty<XElement>()
-                              let outputElement = unitTestResultElement.Element(xmlns + "Output")
-                              let idAttribute = unitTestResultElement.Attribute("executionId")
-                              let outcomeAttribute = unitTestResultElement.Attribute("outcome")
-                              let stdOutElement = outputElement?.Element(xmlns + "StdOut")
-                              let errorInfoElement = outputElement?.Element(xmlns + "ErrorInfo")
-                              let errorMessage = errorInfoElement?.Element(xmlns + "Message")
-                              where idAttribute != null
-                              where outcomeAttribute != null
-                              select new TestResult
-                              {
-                                  Id = idAttribute.Value,
-                                  Outcome = outcomeAttribute.Value,
-                                  StdOut = stdOutElement?.Value,
-                                  ErrorMessage = errorMessage?.Value
-                              };
-
-            return testResults.ToList();
-        }
-
-        private int GetNUnitIgnoredCount(TestExecutionResult testExecutionResult)
-        {
-            var elements = from testResult in testExecutionResult.TestResults
-                           where testResult.Outcome == "NotExecuted"
-                           where testResult.ErrorMessage?.Contains("Scenario ignored using @Ignore tag") == true
-                                 || testResult.ErrorMessage?.Contains("Ignored feature") == true
-                           select testResult;
-
-            return elements.Count();
-        }
-
-        private int GetXUnitPendingCount(string output)
-        {
-            return Regex.Matches(output, "XUnitPendingStepException").Count / 2 +
-                   Regex.Matches(output, "XUnitInconclusiveException").Count / 2;
         }
 
         private IEnumerable<string> FindFilePath(string[] lines, string ending, string starting)
@@ -319,29 +151,58 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                    select trimmed.Substring(start + starting.Length);
         }
 
-        private string GenereateVsTestsArguments()
+        public string GenerateDotnetTestsArguments()
         {
-            string arguments = $"\"{_testProjectFolders.CompiledAssemblyPath}\" /logger:trx";
+            var argumentsBuilder = new StringBuilder();
 
-            if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
+            argumentsBuilder.Append(GenerateTrxLoggerParameter());
+            argumentsBuilder.Append($" {GenerateVerbosityParameter("n")}");
+
+            string additionalPackagesFoldersParameters = GenerateAdditionalPackagesFoldersParameters();
+            if (additionalPackagesFoldersParameters is string additionalPackagesFoldersParametersString)
             {
-                if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
-                {
-                    arguments += $" /TestAdapterPath:\"{_testProjectFolders.PathToNuGetPackages}\"";
-                }
+                argumentsBuilder.Append($" {additionalPackagesFoldersParametersString}");
             }
 
             if (Filter.IsNotNullOrEmpty())
             {
-                arguments += $" /TestCaseFilter:{Filter}";
+                argumentsBuilder.Append($" --filter \"{Filter}\"");
             }
 
             if (RunSettingsFile.IsNotNullOrWhiteSpace())
             {
-                arguments += $" /Settings:{RunSettingsFile}";
+                var pathToRunSettingsFile = Path.Combine(_testProjectFolders.ProjectFolder, RunSettingsFile);
+                argumentsBuilder.Append($" --settings \"{pathToRunSettingsFile}\"");
             }
 
-            return arguments;
+            //string pathToSpecFlowProject = Path.Combine(_testProjectFolders.ProjectFolder, $"{Path.GetFileName(_testProjectFolders.ProjectFolder)}.csproj");
+            //argumentsBuilder.Append($@" ""{pathToSpecFlowProject}""");
+            argumentsBuilder.Append($@" ""{_testProjectFolders.PathToSolutionFile}""");
+
+            return argumentsBuilder.ToString();
+        }
+
+        public string GenerateTrxLoggerParameter()
+        {
+            return "--logger trx";
+        }
+
+        public string GenerateVerbosityParameter(string verbosity)
+        {
+            return $"-v {verbosity}";
+        }
+
+        public string GenerateAdditionalPackagesFoldersParameters()
+        {
+            if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
+            {
+                if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
+                {
+                    return $" -a \"{_testProjectFolders.PathToNuGetPackages}\"";
+                }
+            }
+
+            return null;
         }
     }
 }

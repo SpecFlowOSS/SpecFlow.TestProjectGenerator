@@ -15,12 +15,6 @@ Imports TechTalk.SpecFlow
 
 <Binding> _
 Public Class {0}
-    Private ReadOnly _scenarioContext As ScenarioContext
-
-    Public Sub New(ByVal scenarioContext As ScenarioContext)
-        _scenarioContext = scenarioContext
-    End Sub
-
     {1}
 End Class";
 
@@ -30,7 +24,6 @@ End Class";
 Imports System
 Imports System.IO
 Imports System.Runtime.CompilerServices
-Imports System.Threading.Tasks
 
 Friend Module Log
     Private Const LogFileLocation As String = ""{pathToLogFile}""
@@ -43,29 +36,25 @@ Friend Module Log
         File.AppendAllText(LogFileLocation, $""-> hook: {{stepName}}{{Environment.NewLine}}"")
     End Sub
     
-    Friend Async Function LogHookIncludingLockingAsync(
+    Friend Shared Async Function LogHookIncludingLockingAsync(
     <CallerMemberName> ByVal Optional stepName As String = Nothing) As Task
         File.AppendAllText(LogFileLocation, $""->waiting for hook lock: {{stepName}}{{Environment.NewLine}}"")
         Await WaitForLockAsync()
         File.AppendAllText(LogFileLocation, $""-> hook: {{stepName}}{{Environment.NewLine}}"")
     End Function
 
-    Private Async Function WaitForLockAsync() As Task
+    Private Shared Async Function WaitForLockAsync() As Task
         Dim lockFile = LogFileLocation & "".lock""
 
         While True
 
-            Dim errorHappened = False
             Try
                 Using File.Open(lockFile, FileMode.CreateNew)
                 End Using
                 Exit While
             Catch __unusedIOException1__ As IOException
-                errorHappened = True
-            End Try
-            If errorHappened Then
                 Await Task.Delay(1000)
-            End If
+            End Try
         End While
 
         File.Delete(lockFile)

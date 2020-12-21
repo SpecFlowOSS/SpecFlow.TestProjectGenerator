@@ -17,11 +17,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
         private readonly List<MSBuildTarget> _msBuildTargets = new List<MSBuildTarget>();
         private readonly List<MSBuildImport> _msbuildImports = new List<MSBuildImport>();
 
-        public Project(string name, Guid projectGuid, ProgrammingLanguage programmingLanguage, TargetFramework targetFrameworks, ProjectFormat projectFormat, ProjectType projectType = ProjectType.Library)
+        public Project(string name, Guid projectGuid, ProgrammingLanguage programmingLanguage, TargetFramework targetFrameworks, ProjectFormat projectFormat, ProjectType projectType = ProjectType.Library, bool? isTreatWarningsAsErrors = null)
         {
             ProgrammingLanguage = programmingLanguage;
             ProjectFormat = projectFormat;
             ProjectType = projectType;
+            IsTreatWarningsAsErrors = isTreatWarningsAsErrors;
             Name = name;
             ProjectGuid = projectGuid;
             TargetFrameworks = targetFrameworks;
@@ -42,6 +43,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
         public Guid ProjectGuid { get; }
         public TargetFramework TargetFrameworks { get; } //net45, netcoreapp1.1, net471,
         public ProjectType ProjectType { get; }
+        public bool? IsTreatWarningsAsErrors { get; }
 
         public ProgrammingLanguage ProgrammingLanguage { get; }
         public ProjectFormat ProjectFormat { get; }
@@ -103,22 +105,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Data
 
         public void AddTarget(string targetName, string implementation)
         {
-            _msBuildTargets.Add(new MSBuildTarget(targetName, implementation));     
+            _msBuildTargets.Add(new MSBuildTarget(targetName, implementation));
         }
 
         public void AddMSBuildImport(string msbuildTargetFile)
         {
             _msbuildImports.Add(new MSBuildImport(msbuildTargetFile));
-        }
-    }
-
-    public class MSBuildImport
-    {
-        public string MsbuildTargetFile { get; }
-
-        public MSBuildImport(string msbuildTargetFile)
-        {
-            MsbuildTargetFile = msbuildTargetFile;
         }
     }
 }

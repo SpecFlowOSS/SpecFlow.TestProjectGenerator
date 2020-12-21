@@ -10,14 +10,22 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories
     {
         protected readonly FeatureFileGenerator _featureFileGenerator;
         protected readonly Folders _folders;
+        protected readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
         protected readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         protected readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
         protected readonly TestProjectFolders _testProjectFolders;
         protected readonly TestRunConfiguration _testRunConfiguration;
 
-        public ProjectBuilderFactory(TestProjectFolders testProjectFolders, TestRunConfiguration testRunConfiguration, CurrentVersionDriver currentVersionDriver, ConfigurationGeneratorFactory configurationGeneratorFactory, BindingsGeneratorFactory bindingsGeneratorFactory, FeatureFileGenerator featureFileGenerator,
-            Folders folders)
+        public ProjectBuilderFactory(
+            TestProjectFolders testProjectFolders,
+            TestRunConfiguration testRunConfiguration,
+            CurrentVersionDriver currentVersionDriver,
+            ConfigurationGeneratorFactory configurationGeneratorFactory,
+            BindingsGeneratorFactory bindingsGeneratorFactory,
+            FeatureFileGenerator featureFileGenerator,
+            Folders folders,
+            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
         {
             _testProjectFolders = testProjectFolders;
             _testRunConfiguration = testRunConfiguration;
@@ -26,6 +34,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories
             _bindingsGeneratorFactory = bindingsGeneratorFactory;
             _featureFileGenerator = featureFileGenerator;
             _folders = folders;
+            _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
         }
 
         public ProjectBuilder CreateProject(string language)
@@ -61,7 +70,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories
         private ProjectBuilder CreateProjectInternal(string projectName, ProgrammingLanguage language)
         {
             var project = CreateProjectBuilder();
-            project.TargetFrameworks = _testRunConfiguration.TargetFramework;
+            project.TargetFramework = _testRunConfiguration.TargetFramework;
             project.Format = _testRunConfiguration.ProjectFormat;
             project.ConfigurationFormat = _testRunConfiguration.ConfigurationFormat;
             project.Language = language;
@@ -78,7 +87,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories
 
         protected virtual ProjectBuilder CreateProjectBuilder()
         {
-            return new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, new Configuration(), _currentVersionDriver, _folders);
+            var configuration = new Configuration()
+            {
+                CucumberMessagesSection = { Enabled = true }
+            };
+
+            return new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, configuration, _currentVersionDriver, _folders, _targetFrameworkMonikerStringBuilder);
         }
     }
 }

@@ -9,11 +9,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
     public class OldFormatProjectWriter : XmlFileGeneratorBase, IProjectWriter
     {
         private readonly IOutputWriter _outputWriter;
-        private readonly ProjectFileWriter _fileWriter = new ProjectFileWriter();
+        private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
+        private readonly TargetFrameworkVersionStringBuilder _targetFrameworkVersionStringBuilder;
+        private readonly FileWriter _fileWriter = new FileWriter();
 
-        public OldFormatProjectWriter(IOutputWriter outputWriter)
+        public OldFormatProjectWriter(IOutputWriter outputWriter, TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder, TargetFrameworkVersionStringBuilder targetFrameworkVersionStringBuilder)
         {
             _outputWriter = outputWriter;
+            _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
+            _targetFrameworkVersionStringBuilder = targetFrameworkVersionStringBuilder;
         }
 
         public virtual string WriteProject(Project project, string path)
@@ -48,13 +52,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
                 WriteLanguageTargets(xw, project);
 
-                
-
                 WriteNuGetPackageTargetImports(xw, project);
 
                 WriteMSBuildImports(xw, project);
                 WriteMSBuildTargets(xw, project);
-                
 
                 // close project tag
                 xw.WriteEndElement();
@@ -89,7 +90,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
         public void WriteReferences(Project project, string projectFilePath)
         {
-            
         }
 
         private void WriteLanguageTargets(XmlWriter xw, Project project)
@@ -115,11 +115,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             string targetFramework;
             try
             {
-                targetFramework = project.TargetFrameworks.ToOldNetVersion();
+                targetFramework = _targetFrameworkVersionStringBuilder.BuildTargetFrameworkVersion(project.TargetFrameworks);
             }
             catch (InvalidOperationException exc)
             {
-                throw new ProjectCreationNotPossibleException("Multiple target frameworks don't work with the old csproj format", exc);
+                throw new ProjectCreationNotPossibleException($"The specified target framework is not supported: {project.TargetFrameworks}", exc);
             }
 
             string outputType = project.ProjectType == ProjectType.Exe ? "WinExe" : "Library";
@@ -129,8 +129,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             xw.WriteElementString("Configuration", "Debug");
             xw.WriteElementString("Platform", "AnyCPU");
             xw.WriteElementString("AutoGenerateBindingRedirects", "true");
-            
-            
+
+            xw.WriteElementString("AutoGenerateBindingRedirects", "true");
+
+            if (project.IsTreatWarningsAsErrors is bool treatWarningsAsErrors)
+            {
+                xw.WriteElementString("TreatWarningsAsErrors", treatWarningsAsErrors ? "true" : "false");
+            }
+
             xw.WriteElementString("ProjectGuid", project.ProjectGuid.ToString("B"));
             
             if (project.ProgrammingLanguage != ProgrammingLanguage.VB)
@@ -232,7 +238,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
 
             xw.WriteEndElement();
 
-            var pkgConf = new PackagesConfigGenerator().Generate(project.NuGetPackages, project.TargetFrameworks);
+            var pkgConf = new PackagesConfigGenerator(_targetFrameworkMonikerStringBuilder).Generate(project.NuGetPackages, project.TargetFrameworks);
             project.AddFile(pkgConf);
         }
 

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages.InlineObjects;
+using TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages.RowObjects;
 using TechTalk.SpecFlow.TestProjectGenerator.Driver;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
@@ -11,12 +12,17 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
     {
         private readonly ProjectsDriver _projectsDriver;
         private readonly TestSuiteInitializationDriver _testSuiteInitializationDriver;
+        private readonly JsonConfigurationLoaderDriver _jsonConfigurationLoaderDriver;
+        private readonly ConfigurationDriver _configurationDriver;
         private bool _isProjectCreated;
 
-        public TestSuiteSetupDriver(ProjectsDriver projectsDriver, TestSuiteInitializationDriver testSuiteInitializationDriver)
+        public TestSuiteSetupDriver(ProjectsDriver projectsDriver, TestSuiteInitializationDriver testSuiteInitializationDriver, JsonConfigurationLoaderDriver jsonConfigurationLoaderDriver,
+            ConfigurationDriver configurationDriver)
         {
             _projectsDriver = projectsDriver;
             _testSuiteInitializationDriver = testSuiteInitializationDriver;
+            _jsonConfigurationLoaderDriver = jsonConfigurationLoaderDriver;
+            _configurationDriver = configurationDriver;
         }
 
         public void AddGenericWhenStepBinding()
@@ -46,6 +52,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
                 }
 
                 _projectsDriver.AddFeatureFile(featureBuilder.ToString());
+                AddGenericWhenStepBinding();
             }
 
             _isProjectCreated = true;
@@ -82,10 +89,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             _testSuiteInitializationDriver.OverrideTestCaseFinishedPickleId = pickleId;
         }
 
-        public void AddDuplicateStepDefinition()
+        public void AddDuplicateStepDefinition(string scenarioBlock, string stepRegex)
         {
-            _projectsDriver.AddStepBinding("When", "the step pass in .*", "//pass", "'pass");
-            _projectsDriver.AddStepBinding("When", "the step pass in .*", "//pass", "'pass");
+            _projectsDriver.AddStepBinding(scenarioBlock, stepRegex, "//pass", "'pass");
+            _projectsDriver.AddStepBinding(scenarioBlock, stepRegex, "//pass", "'pass");
         }
 
         public void AddNotMatchingStepDefinition()
@@ -101,6 +108,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
             }
 
             AddFeatureFiles(1);
+        }
+
+        public void AddSpecFlowJsonFromString(string specFlowJson)
+        {
+            EnsureAProjectIsCreated();
+            _jsonConfigurationLoaderDriver.AddSpecFlowJson(specFlowJson);
         }
 
         public void AddScenarioWithGivenStep(string step, string tags = "")
@@ -166,6 +179,59 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.CucumberMessages
                 case StepDefinitionRowExecution.Pending: return (@"_scenarioContext.Pending();", @"_scenarioContext.Pending()");
                 default: throw new NotSupportedException($"Not supported {nameof(StepDefinitionRowExecution)}: {execution}");
             }
+        }
+
+        public void AddScenarios(CreateScenarioWithResultRow createScenarioWithResultRows)
+        {
+            if (createScenarioWithResultRows.Successful >= 0)
+            {
+                _projectsDriver.AddStepBinding("Given", "a successful step", "", "");
+
+                for (int i = 0; i < createScenarioWithResultRows.Successful; i++)
+                {
+                    _projectsDriver.AddFeatureFile(
+                        $@"Feature: Feature {Guid.NewGuid()}
+Scenario: Scenario{i}
+Given a successful step
+                ");
+                }
+            }
+
+            if (createScenarioWithResultRows.Ambiguous >= 1)
+            {
+                AddDuplicateStepDefinition("Given", "an ambiguous step");
+
+                for (int i = 0; i < createScenarioWithResultRows.Ambiguous; i++)
+                {
+                    _projectsDriver.AddFeatureFile(
+                        $@"Feature: Feature {Guid.NewGuid()}
+Scenario: Scenario{i}
+Given an ambiguous step
+                ");
+                }
+            }
+
+            if (createScenarioWithResultRows.Failing >= 1)
+            {
+                _projectsDriver.AddFailingStepBinding("Given", "a failing step");
+
+                for (int i = 0; i < createScenarioWithResultRows.Failing; i++)
+                {
+                    _projectsDriver.AddFeatureFile(
+                        $@"Feature: Feature {Guid.NewGuid()}
+Scenario: Scenario{i}
+Given a failing step
+                ");
+                }
+            }
+
+            _isProjectCreated = true;
+        }
+
+        public void AddAppConfigFromString(string appConfigContent)
+        {
+            _configurationDriver.SetConfigurationFormat(ConfigurationFormat.None);
+            _projectsDriver.AddFile("app.config", appConfigContent);
         }
     }
 }

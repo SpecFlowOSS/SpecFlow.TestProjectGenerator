@@ -19,6 +19,11 @@
                 return this;
             }
 
+            protected override string GetWorkingDirectory()
+            {
+                return _rootPath;
+            }
+
             protected override string BuildArguments()
             {
                 string arguments = $"new sln";

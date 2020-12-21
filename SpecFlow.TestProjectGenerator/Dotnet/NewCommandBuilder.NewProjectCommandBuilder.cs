@@ -1,4 +1,6 @@
-﻿namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
+﻿using System.IO;
+
+namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
 {
     public partial class NewCommandBuilder
     {
@@ -36,6 +38,11 @@
             {
                 _language = language;
                 return this;
+            }
+
+            protected override string GetWorkingDirectory()
+            {
+                return Path.GetDirectoryName(_folder);
             }
 
             protected override string BuildArguments()

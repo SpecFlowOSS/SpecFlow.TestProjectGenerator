@@ -42,6 +42,14 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             return projectBuilder;
         }
 
+        public ProjectBuilder CreateSpecFlowProject(string programmingLanguage)
+        {
+            var projectBuilder = _projectBuilderFactory.CreateProject(programmingLanguage);
+            projectBuilder.IsSpecFlowFeatureProject = true;
+            _solutionDriver.AddProject(projectBuilder);
+            return projectBuilder;
+        }
+
         public void AddHookBinding(string eventType, string name, string hookTypeAttributeTagsString, string methodScopeAttributeTagsString = null, string classScopeAttributeTagsString = null, string code = "", int? order = null)
         {
             var hookTypeAttributeTags = hookTypeAttributeTagsString?.Split(',').Select(t => t.Trim()).ToArray();
@@ -95,6 +103,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             AddProjectReference(_solutionDriver.DefaultProject, projectNameToReference);
         }
 
+        public void AddProjectReference(string projectNameToReference, string targetProjectName)
+        {
+            var targetProject = _solutionDriver.Projects[targetProjectName];
+            AddProjectReference(targetProject, projectNameToReference);
+        }
+
         public void AddBindingClass(string rawBindingClass) => AddBindingClass(_solutionDriver.DefaultProject, rawBindingClass);
 
         private void AddStepBinding(ProjectBuilder targetProject, string bindingCode)
@@ -105,7 +119,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         private void AddProjectReference(ProjectBuilder targetProject, string projectNameToReference)
         {
             var projectToReference = _solutionDriver.Projects[projectNameToReference];
-            targetProject.AddProjectReference(Path.Combine(@"..\", projectNameToReference, $"{projectNameToReference}.{projectToReference.Language.ToProjectFileExtension()}"), projectToReference);
+            targetProject.AddProjectReference(Path.Combine(@"..", projectNameToReference, $"{projectNameToReference}.{projectToReference.Language.ToProjectFileExtension()}"), projectToReference);
         }
 
         private void AddBindingClass(ProjectBuilder project, string rawBindingClass)
@@ -131,6 +145,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         public void AddNuGetPackage(string nugetPackage, string nugetVersion)
         {
             _solutionDriver.DefaultProject.AddNuGetPackage(nugetPackage, nugetVersion);
+        }
+
+        public void AddFailingStepBinding(string scenarioBlock, string stepRegex)
+        {
+            AddStepBinding(scenarioBlock, stepRegex, @"throw new System.Exception(""simulated failure"");", @"Throw New System.Exception(""simulated failure"")");
         }
     }
 }

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FluentAssertions;
+using TechTalk.SpecFlow.TestProjectGenerator.Conventions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Factories;
-using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 {
@@ -17,31 +16,35 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
         private readonly TestRunConfiguration _testRunConfiguration;
         private readonly ProjectBuilderFactory _projectBuilderFactory;
         private readonly Folders _folders;
-        private readonly NuGet _nuGet;
-        private readonly TestProjectFolders _testProjectFolders;
-        private readonly Compiler _compiler;
-        private readonly IOutputWriter _outputWriter;
+        private readonly SolutionNamingConvention _solutionNamingConvention;
         private readonly Solution _solution;
         private readonly Dictionary<string, ProjectBuilder> _projects = new Dictionary<string, ProjectBuilder>();
-        private bool _isWrittenOnDisk;
-        private CompileResult _compileResult;
+        private ProjectBuilder _defaultProject;
 
-        public SolutionDriver(NuGetConfigGenerator nuGetConfigGenerator, TestRunConfiguration testRunConfiguration, ProjectBuilderFactory projectBuilderFactory, Folders folders, NuGet nuGet, TestProjectFolders testProjectFolders, Compiler compiler, IOutputWriter outputWriter)
+        public SolutionDriver(
+            NuGetConfigGenerator nuGetConfigGenerator,
+            TestRunConfiguration testRunConfiguration,
+            ProjectBuilderFactory projectBuilderFactory,
+            Folders folders,
+            TestProjectFolders testProjectFolders,
+            SolutionNamingConvention solutionNamingConvention)
         {
             _nuGetConfigGenerator = nuGetConfigGenerator;
             _testRunConfiguration = testRunConfiguration;
             _projectBuilderFactory = projectBuilderFactory;
             _folders = folders;
-            _nuGet = nuGet;
-            _testProjectFolders = testProjectFolders;
-            _compiler = compiler;
-            _outputWriter = outputWriter;
+            _solutionNamingConvention = solutionNamingConvention;
             NuGetSources = new List<NuGetSource>
             {
-                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder),
-                new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json"),
-                new NuGetSource("Cucumber Messages CI", "https://www.myget.org/F/cucumber-messages/api/v3/index.json")
+                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)
             };
+
+            if (testRunConfiguration.UnitTestProvider == UnitTestProvider.SpecRun)
+            {
+                NuGetSources.Add(new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json"));
+                NuGetSources.Add(new NuGetSource("SpecFlow Unstable", "https://www.myget.org/F/specflow-unstable/api/v3/index.json"));
+            }
+
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
@@ -50,11 +53,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
         public IList<NuGetSource> NuGetSources { get; }
 
-        public string SolutionName => $"S{SolutionGuid.ToString("N").Substring(24)}";
+        public string SolutionName => _solutionNamingConvention.GetSolutionName(SolutionGuid);
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects => _projects;
 
-        private ProjectBuilder _defaultProject;
         public ProjectBuilder DefaultProject
         {
             get
@@ -69,36 +71,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
         }
 
-        public void AddProject(ProjectBuilder project)
+        public Solution GetSolution()
         {
-            if (_defaultProject == null)
-            {
-                _defaultProject = project;
-            }
-
-            _projects.Add(project.ProjectName, project);
-        }
-
-        public void CompileSolution(BuildTool buildTool)
-        {
-            foreach (var project in Projects.Values)
-            {
-                project.GenerateConfigurationFile();
-            }
-
-            WriteToDisk();
-            _nuGet.Restore();
-
-            _compileResult = _compiler.Run(buildTool);
-        }
-
-        public void WriteToDisk()
-        {
-            if (_isWrittenOnDisk)
-            {
-                return;
-            }
-
             foreach (var project in Projects.Values)
             {
                 project.Build();
@@ -110,36 +84,28 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             }
 
             _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
-
-            var solutionWriter = new SolutionWriter(_outputWriter);
-            solutionWriter.WriteToFileSystem(_solution, _testProjectFolders.PathToSolutionDirectory);
-
-
-            _isWrittenOnDisk = true;
+            return _solution;
         }
 
-        public void CheckSolutionShouldHaveCompiled()
+        public void AddProject(ProjectBuilder project)
         {
-            _compileResult.Should().NotBeNull("the project should have compiled");
-            _compileResult.IsSuccessful.Should().BeTrue("the project should have compiled successfully.\r\n\r\n------ Build output ------\r\n{0}", _compileResult.Output);
+            if (_defaultProject == null)
+            {
+                _defaultProject = project;
+            }
+
+            _projects.Add(project.ProjectName, project);
         }
 
-        public void CheckSolutionShouldHaseCompileError()
+        public void AddFile(string name, string content)
         {
-            _compileResult.Should().NotBeNull("the project should have compiled");
-            _compileResult.IsSuccessful.Should().BeFalse("There should be a compile error");
+            _solution.Files.Add(new SolutionFile(name, content));
         }
 
-        public bool CheckCompileOutputForString(string str)
+        public string SdkVersion
         {
-            return _compileResult.Output.Contains(str);
+            get => _solution.SdkVersion;
+            set => _solution.SdkVersion = value;
         }
-    }
-
-    public enum BuildTool
-    {
-        MSBuild,
-        DotnetBuild,
-        DotnetMSBuild
     }
 }

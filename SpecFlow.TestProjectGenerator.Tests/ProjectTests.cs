@@ -5,8 +5,6 @@ using Moq;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Extensions;
 using TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi;
-using TechTalk.SpecFlow.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 
 // ReSharper disable InconsistentNaming
@@ -15,7 +13,17 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 {
     public class ProjectTests
     {
-        public (Solution, Project, string) CreateEmptySolutionAndProject(ProjectFormat projectFormat, ProgrammingLanguage programmingLanguage, TargetFramework targetFramework)
+        private const TargetFramework ProjectTargetFramework = TargetFramework.Net461;
+        private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
+        private readonly string TargetFrameworkMoniker;
+
+        public ProjectTests()
+        {
+            _targetFrameworkMonikerStringBuilder = new TargetFrameworkMonikerStringBuilder();
+            TargetFrameworkMoniker = _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(ProjectTargetFramework);
+        }
+
+        public (Solution, Project, string) CreateEmptySolutionAndProject(ProjectFormat projectFormat, ProgrammingLanguage programmingLanguage, TargetFramework targetFramework = ProjectTargetFramework)
         {
             var folder = Path.Combine(Path.GetTempPath(), "SpecFlow.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
 
@@ -31,7 +39,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddNuGetPackageToProjectInNewFormat()
         {
             
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
 
             project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
@@ -49,7 +57,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddNuGetPackageToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
 
             project.AddNuGetPackage("SpecFlow", "2.3.1", new NuGetPackageAssembly("TechTalk.SpecFlow, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\TechTalk.SpecFlow.dll"));
@@ -69,7 +77,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddNuGetPackageWithMSBuildFilesToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
 
             project.AddNuGetPackage(
@@ -91,7 +99,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddReferenceToProjectInNewFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
 
             project.AddReference("System.Configuration");
@@ -109,7 +117,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddReferenceToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
 
             project.AddReference("System.Configuration");
@@ -128,7 +136,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddFileToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
             var projectFile = new ProjectFile("File.cs", "Compile", "//no code");
 
@@ -151,7 +159,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddFileToProjectInNewFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
             var projectFile = new ProjectFile("File.cs", "Compile", "//no code");
 
@@ -174,7 +182,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddFileInFolderToProjectInOldFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
             var projectFile = new ProjectFile(Path.Combine("Folder","File.cs"), "Compile", "//no code");
 
@@ -197,7 +205,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         public void AddFileInFolderToProjectInNewFormat()
         {
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
             var projectFile = new ProjectFile(Path.Combine("Folder", "File.cs"), "Compile", "//no code");
 
@@ -232,70 +240,66 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         [Fact]
         public void CreateEmtpyCSharpProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
             new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net45</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmtpyCSharpCore3_1ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>netcoreapp3.1</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmtpyCSharpNet50ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net50);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net5.0</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
         public void CreateEmtpyFSharpProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp);
 
             new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net45</TargetFramework>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>\r\n</Project>");
         }
 
         [Fact]
         public void CreateEmtpyVbProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB, TargetFramework.Net45);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB);
 
             new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net45</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
-        }
-
-        [Fact]
-        public void CreateEmtpyProjectWithMultipleFrameworksInNewFormat()
-        {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(
-                ProjectFormat.New,
-                ProgrammingLanguage.CSharp,
-                TargetFramework.Net45 | TargetFramework.NetStandard20);
-
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
-
-            projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net45;netstandard2.0</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
-        }
-
-        [Fact]
-        public void MultipleFrameworksInOldFormatNotPossible()
-        {
-            var (solution, _, solutionFolder) = CreateEmptySolutionAndProject(
-                ProjectFormat.Old,
-                ProgrammingLanguage.CSharp,
-                TargetFramework.Net45 | TargetFramework.NetStandard20);
-
-            Action createSolution = () => new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
-
-            createSolution.Should().Throw<ProjectCreationNotPossibleException>().WithMessage("Multiple target frameworks don't work with the old csproj format");
-
-
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
     }
 

@@ -5,10 +5,12 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
     public class CommandBuilder
     {
         private readonly IOutputWriter _outputWriter;
+        private readonly string _workingDirectory;
 
-        public CommandBuilder(IOutputWriter outputWriter, string executablePath, string argumentsFormat)
+        public CommandBuilder(IOutputWriter outputWriter, string executablePath, string argumentsFormat, string workingDirectory)
         {
             _outputWriter = outputWriter;
+            _workingDirectory = workingDirectory;
             ExecutablePath = executablePath;
             ArgumentsFormat = argumentsFormat;
         }
@@ -34,7 +36,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
         {
             var solutionCreateProcessHelper = new ProcessHelper();
 
-            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, ".", ExecutablePath, ArgumentsFormat);
+            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, _workingDirectory, ExecutablePath, ArgumentsFormat);
             if (processResult.ExitCode != 0)
             {
                 var innerException = new Exception(processResult.CombinedOutput);

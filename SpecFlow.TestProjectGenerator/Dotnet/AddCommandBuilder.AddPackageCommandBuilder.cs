@@ -1,4 +1,6 @@
-﻿namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
+﻿using System.IO;
+
+namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
 {
     public partial class AddCommandBuilder
     {
@@ -30,6 +32,11 @@
             {
                 _packageVersion = packageVersion;
                 return this;
+            }
+
+            protected override string GetWorkingDirectory()
+            {
+                return Path.GetDirectoryName(_projectFilePath);
             }
 
             protected override string BuildArguments()
