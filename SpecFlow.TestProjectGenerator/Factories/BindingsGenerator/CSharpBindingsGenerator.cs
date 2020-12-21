@@ -15,6 +15,7 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Linq;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 [Binding]
@@ -27,6 +28,7 @@ public class {0}
         {
             content = AddMissingNamespace(content, "using System;");
             content = AddMissingNamespace(content, "using System.IO;");
+            content = AddMissingNamespace(content, "using System.Threading.Tasks;");
             content = AddMissingNamespace(content, "using TechTalk.SpecFlow;");
 
             string classNameGuidString = $"{Guid.NewGuid():N}".Substring(24);
@@ -59,6 +61,7 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 internal static class Log
 {{
@@ -92,6 +95,13 @@ internal static class Log
         Retry(5, () => WriteToFile($@""-> hook: {{stepName}}{{Environment.NewLine}}""));
     }}
 
+    internal static async Task LogHookIncludingLockingAsync([CallerMemberName] string stepName = null)
+    {{
+        WriteToFile($@""-> waiting for hook lock: {{stepName}}{{Environment.NewLine}}"");
+        await WaitForLockAsync();
+        WriteToFile($@""-> hook: {{stepName}}{{Environment.NewLine}}"");
+    }}
+
     static void WriteToFile(string line)
     {{
         using (FileStream fs = File.Open(LogFileLocation, FileMode.Append, FileAccess.Write, FileShare.None))
@@ -100,6 +110,30 @@ internal static class Log
             fs.Write(bytes, 0, bytes.Length);
             fs.Close();
         }}
+    }}
+
+    static async Task WaitForLockAsync()
+    {{
+        var lockFile = LogFileLocation + "".lock"";
+
+        while (true)
+        {{
+            try
+            {{
+                using (File.Open(lockFile, FileMode.CreateNew))
+                {{
+                }}
+
+                break;
+            }}
+            catch (IOException)
+            {{
+                //wait and retry
+                await Task.Delay(1000);
+            }}
+        }}
+
+        File.Delete(lockFile);
     }}
 }}";
             return new ProjectFile("Log.cs", "Compile", fileContent);
@@ -126,7 +160,7 @@ internal static class Log
                         throw new ArgumentOutOfRangeException(nameof(parameterType), parameterType, null);
                 }
             }
-            
+
             return $@"[{attributeName}(@""{regex}"")] public void {methodName}({parameter}) 
                                 {{
                                     global::Log.LogStep();
@@ -137,7 +171,7 @@ internal static class Log
         protected override string GetLoggingStepDefinitionCode(string methodName, string attributeName, string regex, ParameterType parameterType, string argumentName)
         {
             string parameter = "";
-            
+
             if (argumentName.IsNotNullOrWhiteSpace())
             {
                 switch (parameterType)
@@ -211,6 +245,58 @@ public class {$"HooksClass_{Guid.NewGuid():N}"}
     {{
         {code}
         global::Log.LogHook(); 
+    }}   
+}}
+";
+        }
+
+        protected override string GetAsyncHookIncludingLockingBindingClass(
+            string hookType,
+            string name,
+            string code = "",
+            int? order = null,
+            IList<string> hookTypeAttributeTags = null,
+            IList<string> methodScopeAttributeTags = null,
+            IList<string> classScopeAttributeTags = null)
+        {
+            string ToScopeTags(IList<string> scopeTags) => scopeTags is null || !scopeTags.Any() ? null : $"[{string.Join(", ", scopeTags.Select(t => $@"Scope(Tag=""{t}"")"))}]";
+
+            bool isStatic = IsStaticEvent(hookType);
+
+            string hookTags = hookTypeAttributeTags?.Select(t => $@"""{t}""").JoinToString(", ");
+
+            var hookAttributeConstructorProperties = new[]
+            {
+                hookTypeAttributeTags is null || !hookTypeAttributeTags.Any() ? null : $"tags: new string[] {{{hookTags}}}",
+                order is null ? null : $"Order = {order}"
+            }.Where(p => p.IsNotNullOrWhiteSpace());
+
+            string hookTypeAttributeTagsString = string.Join(", ", hookAttributeConstructorProperties);
+
+            string scopeClassAttributes = ToScopeTags(classScopeAttributeTags);
+            string scopeMethodAttributes = ToScopeTags(methodScopeAttributeTags);
+            string staticKeyword = isStatic ? "static" : string.Empty;
+
+
+            return $@"
+using System;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
+using TechTalk.SpecFlow;
+
+[Binding]
+{scopeClassAttributes}
+public class {$"HooksClass_{Guid.NewGuid():N}"}
+{{
+    [{hookType}({hookTypeAttributeTagsString})]
+    {scopeMethodAttributes}
+    public {staticKeyword} async Task {name}()
+    {{
+        {code}
+        await global::Log.LogHookIncludingLockingAsync(); 
     }}   
 }}
 ";
