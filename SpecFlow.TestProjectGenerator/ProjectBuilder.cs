@@ -13,9 +13,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
     public class ProjectBuilder
     {
         public const string NUnit3PackageName = "NUnit";
-        public const string NUnit3PackageVersion = "3.11.0";
+        public const string NUnit3PackageVersion = "3.13.0";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
-        public const string NUnit3TestAdapterPackageVersion = "3.10.0";
+        public const string NUnit3TestAdapterPackageVersion = "3.17.0";
         private const string XUnitPackageVersion = "2.4.1";
         private const string MSTestPackageVersion = "2.0.0";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
@@ -308,9 +308,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private void ConfigureNUnit()
         {
-            //NUnit is not supporting .NET 5 in the latest release (3.12.0), so take a pre-release version instead
-            var nUnitPackageVersion = TargetFramework == TargetFramework.Net50 ? "3.13.0-dev-06881" : NUnit3PackageVersion;
-            _project.AddNuGetPackage(NUnit3PackageName, nUnitPackageVersion);
+            _project.AddNuGetPackage(NUnit3PackageName, NUnit3PackageVersion);
             _project.AddNuGetPackage(NUnit3TestAdapterPackageName, NUnit3TestAdapterPackageVersion);
 
 
