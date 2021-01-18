@@ -116,17 +116,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private TestExecutionResult CalculateMsTestTestExecutionResult(TestExecutionResult testExecutionResult)
         {
-            testExecutionResult.Ignored = testExecutionResult.TestResults
-                .Where(r => r.ErrorMessage != null)
-                .Select(r => r.ErrorMessage)
-                .Count(m => m.Contains("Assert.Inconclusive failed") && !m.Contains("One or more step definitions are not implemented yet"));
+            bool HasPendingError(TestResult r) => r.ErrorMessage != null && r.ErrorMessage.Contains("Assert.Inconclusive failed. One or more step definitions are not implemented yet.");
 
-
-            testExecutionResult.Pending = testExecutionResult.TestResults
-                .Where(r => r.ErrorMessage != null)
-                .Select(r => r.ErrorMessage)
-                .Count(m => m.Contains("Assert.Inconclusive failed. One or more step definitions are not implemented yet."));
-
+            testExecutionResult.Ignored = testExecutionResult.TestResults.Count(r => r.Outcome == "NotExecuted" && !HasPendingError(r));
+            testExecutionResult.Pending = testExecutionResult.TestResults.Count(r => HasPendingError(r));
+    
             return testExecutionResult;
         }
 
@@ -163,13 +157,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         private int GetNUnitIgnoredCount(TestExecutionResult testExecutionResult)
         {
-            var elements = from testResult in testExecutionResult.TestResults
-                where testResult.Outcome == "NotExecuted"
-                where testResult.ErrorMessage?.Contains("Scenario ignored using @Ignore tag") == true
-                      || testResult.ErrorMessage?.Contains("Ignored feature") == true
-                select testResult;
-
-            return elements.Count();
+            return testExecutionResult.TestResults.Count(
+                r => r.Outcome == "NotExecuted"
+                     && (r.ErrorMessage?.Contains("Ignored scenario") == true
+                         || r.ErrorMessage?.Contains("Ignored feature") == true));
         }
 
         public int GetXUnitPendingCount(XElement resultsElement)
