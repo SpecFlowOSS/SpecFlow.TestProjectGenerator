@@ -219,7 +219,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 if (_project.ProjectFormat == ProjectFormat.Old)
                 {
-                    _project.AddNuGetPackage("Cucumber.Messages", "6.0.1", new NuGetPackageAssembly("Cucumber.Messages, Version=6.0.1.0, Culture=neutral, PublicKeyToken=b10c5988214f940c", "net45\\Cucumber.Messages.dll"));
                     _project.AddNuGetPackage("Google.Protobuf", "3.7.0", new NuGetPackageAssembly("Google.Protobuf, Version=3.7.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604", "net45\\Google.Protobuf.dll"));
                 }
 
