@@ -17,7 +17,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit3TestAdapterPackageVersion = "3.17.0";
         private const string XUnitPackageVersion = "2.4.1";
-        private const string MSTestPackageVersion = "2.0.0";
+        private const string MSTestPackageVersion = "2.1.2";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
@@ -233,6 +233,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 _project.AddNuGetPackage("BoDi", "1.5.0", new NuGetPackageAssembly("BoDi, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
                 _project.AddNuGetPackage("Gherkin", "6.0.0", new NuGetPackageAssembly("Gherkin, Version=6.0.0.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
+                _project.AddNuGetPackage("Utf8Json", "1.3.7", new NuGetPackageAssembly("Utf8Json, Version=1.3.7.0, Culture=neutral, PublicKeyToken=8a73d3ba7e392e27", "net45\\Utf8Json.dll"));
                 _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.1",
                     new NuGetPackageAssembly("System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51", "portable-net45+win8+wp8+wpa81\\System.Threading.Tasks.Extensions.dll"));
 
