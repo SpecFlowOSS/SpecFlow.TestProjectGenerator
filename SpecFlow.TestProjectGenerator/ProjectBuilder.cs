@@ -17,7 +17,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit3TestAdapterPackageVersion = "3.17.0";
         private const string XUnitPackageVersion = "2.4.1";
-        private const string MSTestPackageVersion = "2.0.0";
+        private const string MSTestPackageVersion = "2.1.2";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
