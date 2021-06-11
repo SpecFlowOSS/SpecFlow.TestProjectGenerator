@@ -36,15 +36,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
             _solutionNamingConvention = solutionNamingConvention;
             NuGetSources = new List<NuGetSource>
             {
-                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder)
+                new NuGetSource("LocalSpecFlowDevPackages", _folders.NuGetFolder),
+                new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json"),
+                new NuGetSource("SpecFlow Unstable", "https://www.myget.org/F/specflow-unstable/api/v3/index.json")
             };
-
-            if (testRunConfiguration.UnitTestProvider == UnitTestProvider.SpecRun)
-            {
-                NuGetSources.Add(new NuGetSource("SpecFlow CI", "https://www.myget.org/F/specflow/api/v3/index.json"));
-                NuGetSources.Add(new NuGetSource("SpecFlow Unstable", "https://www.myget.org/F/specflow-unstable/api/v3/index.json"));
-            }
-
+            
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
