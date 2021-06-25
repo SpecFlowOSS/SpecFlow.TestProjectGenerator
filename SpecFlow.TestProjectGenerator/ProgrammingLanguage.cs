@@ -5,6 +5,7 @@
         Other,
         CSharp,
         VB,
-        FSharp
+        FSharp,
+        CSharp10
     }
 }

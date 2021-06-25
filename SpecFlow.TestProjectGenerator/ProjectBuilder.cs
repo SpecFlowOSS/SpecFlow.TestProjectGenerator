@@ -165,6 +165,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             switch (language)
             {
                 case ProgrammingLanguage.CSharp:
+                case ProgrammingLanguage.CSharp10:
                     return csharpcode;
                 case ProgrammingLanguage.VB:
                     return vbnetcode;
@@ -246,6 +247,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                         AddInitialFSharpReferences();
                         break;
                     case ProgrammingLanguage.CSharp:
+                    case ProgrammingLanguage.CSharp10:
                         AddUnitTestProviderSpecificConfig();
                         break;
                 }

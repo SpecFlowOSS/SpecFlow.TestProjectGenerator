@@ -138,7 +138,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public string GenerateDotnetTestsArguments()
         {
-            var argumentsBuilder = new StringBuilder();
+            var argumentsBuilder = new StringBuilder("--no-build ");
 
             argumentsBuilder.Append(GenerateTrxLoggerParameter());
             argumentsBuilder.Append($" {GenerateVerbosityParameter("n")}");

@@ -17,7 +17,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         protected bool _vsAdapterFolderChanged;
         private string _externalNuGetFolder;
 
-        public string TestFolder => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+        public string TestFolder => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
 
         public Folders(AppConfigDriver appConfigDriver)
         {

@@ -10,6 +10,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Extensions
             switch (programmingLanguage)
             {
                 case ProgrammingLanguage.CSharp: return "csproj";
+                case ProgrammingLanguage.CSharp10: return "csproj";
                 case ProgrammingLanguage.FSharp: return "fsproj";
                 case ProgrammingLanguage.VB: return "vbproj";
                 default:
@@ -23,6 +24,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Extensions
             switch (programmingLanguage)
             {
                 case ProgrammingLanguage.CSharp: return "cs";
+                case ProgrammingLanguage.CSharp10: return "cs";
                 case ProgrammingLanguage.FSharp: return "fs";
                 case ProgrammingLanguage.VB: return "vb";
                 default: throw new NotSupportedException("There is no known file extension for the programming language.");

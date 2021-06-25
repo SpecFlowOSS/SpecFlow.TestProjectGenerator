@@ -9,7 +9,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
     {
         public static string GetAssemblyFolder()
         {
-            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            var assemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
             Debug.Assert(assemblyFolder != null);
             return assemblyFolder;
         }
