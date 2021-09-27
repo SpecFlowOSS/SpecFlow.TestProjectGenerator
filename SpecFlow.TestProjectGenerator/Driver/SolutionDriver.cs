@@ -69,14 +69,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Driver
 
         public Solution GetSolution()
         {
-            foreach (var project in Projects.Values)
+            foreach (var projectBuilder in Projects.Values)
             {
-                project.Build();
-            }
-
-            foreach (var project in Projects.Values)
-            {
-                _solution.AddProject(project.Build());
+                Project project = projectBuilder.Build();
+                _solution.AddProject(project);
             }
 
             _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
