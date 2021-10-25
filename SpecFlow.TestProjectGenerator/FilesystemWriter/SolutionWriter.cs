@@ -51,6 +51,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 _fileWriter.Write(globalJsonFile, outputPath);
             }
 
+            AllowNet6ToTestOlderFrameworks(targetFramework);
+
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
             createSolutionCommand.Execute((innerException) => new ProjectCreationNotPossibleException("Could not create solution.", innerException));
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
@@ -68,6 +70,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             }
 
             return solutionFilePath;
+        }
+
+        /// <summary>
+        /// (santa) 2021.10.28 In .Net6 prerelease there is an issue when using 'dotnet' commands from tests
+        /// The environment variable is set to MSBuildSDKsPath=C:\Program Files\dotnet\sdk\6.0.100-rc.1.21463.6\Sdks
+        /// As a result the dotnet restore command fails
+        /// The workaround is to remove this environment variable
+        /// </summary>
+        /// <param name="targetFramework"></param>
+        private static void AllowNet6ToTestOlderFrameworks(TargetFramework targetFramework)
+        {
+            if (targetFramework is TargetFramework.Net461 or TargetFramework.Netcoreapp31 or TargetFramework.Netcoreapp21 or TargetFramework.Net50) 
+                Environment.SetEnvironmentVariable("MSBuildSDKsPath", null);
         }
 
         private void WriteProjects(Solution solution, string outputPath, string solutionFilePath)
