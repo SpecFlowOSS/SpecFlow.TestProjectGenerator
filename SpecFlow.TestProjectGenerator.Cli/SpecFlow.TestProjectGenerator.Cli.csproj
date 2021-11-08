@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>specflow-tpg</ToolCommandName>
@@ -15,7 +15,15 @@
     <Copyright>Copyright © SpecFlow Team</Copyright>
     <Description>Command line tool to generate SpecFlow test projects for manual/smoke testing of SpecFlow.</Description>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\SpecFlow.TestProjectGenerator\resources\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
