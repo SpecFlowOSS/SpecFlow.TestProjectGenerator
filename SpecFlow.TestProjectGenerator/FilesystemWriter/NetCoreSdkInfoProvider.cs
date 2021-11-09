@@ -12,7 +12,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         private static readonly NetCoreSdkInfo NetCore20 = new NetCoreSdkInfo("2.1.202");
         private static readonly NetCoreSdkInfo Net461 = new NetCoreSdkInfo("3.1.201");
         private static readonly NetCoreSdkInfo Net50 = new NetCoreSdkInfo("5.0.102");
-        private static readonly NetCoreSdkInfo Net60 = new NetCoreSdkInfo("6.0.100-preview.5.21302.13");
+        private static readonly NetCoreSdkInfo Net60 = new NetCoreSdkInfo("6.0.100");
 
         private readonly IReadOnlyDictionary<TargetFramework, NetCoreSdkInfo> _sdkMappings = new Dictionary<TargetFramework, NetCoreSdkInfo>
         {

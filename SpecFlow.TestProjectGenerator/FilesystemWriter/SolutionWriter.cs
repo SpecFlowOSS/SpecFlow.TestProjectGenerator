@@ -54,7 +54,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             AllowNet6ToTestOlderFrameworks(targetFramework);
 
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
-            createSolutionCommand.Execute((innerException) => new ProjectCreationNotPossibleException("Could not create solution.", innerException));
+            createSolutionCommand.ExecuteWithRetry(1, TimeSpan.FromSeconds(1),
+                (innerException) => new ProjectCreationNotPossibleException("Could not create solution.", innerException) );
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
 
             WriteProjects(solution, outputPath, solutionFilePath);
