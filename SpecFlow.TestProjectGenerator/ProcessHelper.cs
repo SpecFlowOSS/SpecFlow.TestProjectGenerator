@@ -55,7 +55,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             if (!processResult)
             {
+#if NETCOREAPP3_1_OR_GREATER
                 process.Kill(true);
+#else
+                process.Kill();
+#endif
             }
 
             var waitForOutputs = Timeout-sw.Elapsed;
