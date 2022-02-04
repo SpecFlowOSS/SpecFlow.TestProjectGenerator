@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
 {
@@ -18,18 +20,29 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
         public string ArgumentsFormat { get; }
         public string ExecutablePath { get; }
 
-        public CommandResult Execute()
+        public CommandResult ExecuteWithRetry(int times, TimeSpan interval, Func<Exception, Exception> exceptionFunction)
         {
-            var solutionCreateProcessHelper = new ProcessHelper();
+            var exceptions = new List<Exception>();
 
-            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, ".", ExecutablePath, ArgumentsFormat);
-            if (processResult.ExitCode > 0)
+            while (times-- >= 0)
             {
-                var innerException = new Exception(processResult.CombinedOutput);
-                throw new Exception($"Error while executing {ExecutablePath} {ArgumentsFormat}", innerException);
+                try
+                {
+                    return Execute(exceptionFunction);
+                }
+                catch (Exception e)
+                {
+                    exceptions.Add(e);
+                }
+                Thread.Sleep(interval);
             }
 
-            return new CommandResult(processResult.ExitCode, processResult.CombinedOutput);
+            throw exceptionFunction(new AggregateException(exceptions));
+        }
+
+        public CommandResult Execute()
+        {
+            return Execute(innerException => new Exception($"Error while executing {ExecutablePath} {ArgumentsFormat}", innerException));
         }
 
         public CommandResult Execute(Func<Exception, Exception> exceptionFunction) 
@@ -42,21 +55,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
                 var innerException = new Exception(processResult.CombinedOutput);
 
                 throw exceptionFunction(innerException);
-            }
-
-            return new CommandResult(processResult.ExitCode, processResult.CombinedOutput);
-        }
-
-        public CommandResult Execute(Exception ex)
-        {
-            var solutionCreateProcessHelper = new ProcessHelper();
-
-            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, ".", ExecutablePath, ArgumentsFormat);
-            if (processResult.ExitCode != 0)
-            {
-                var innerException = new Exception(processResult.CombinedOutput);
-                
-                throw ex;
             }
 
             return new CommandResult(processResult.ExitCode, processResult.CombinedOutput);

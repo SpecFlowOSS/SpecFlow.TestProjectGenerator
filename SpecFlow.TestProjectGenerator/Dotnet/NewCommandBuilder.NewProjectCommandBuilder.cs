@@ -52,6 +52,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Dotnet
                     arguments,
                     "-lang",
                     _language == ProgrammingLanguage.CSharp ? "\"C#\"" :
+                    _language == ProgrammingLanguage.CSharp10 ? "\"C#\"" :
                     _language == ProgrammingLanguage.VB ? "VB" :
                     _language == ProgrammingLanguage.FSharp ? "\"F#\"" : string.Empty);
 

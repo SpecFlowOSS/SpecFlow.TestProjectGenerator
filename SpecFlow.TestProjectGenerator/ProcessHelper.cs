@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -8,19 +9,16 @@ using System.Threading.Tasks;
 namespace TechTalk.SpecFlow.TestProjectGenerator
 {
     public class ProcessHelper
-    {
-        private static readonly TimeSpan _timeout = TimeSpan.FromMinutes(15);
-        private static readonly int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
+    { 
+        private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(5);
 
-        public delegate Task<TResult> ProcessResultSelector<TResult>(IOutputWriter outputWriter, string executablePath, Process process,
-            ProcessStartInfo psi, DateTime before, string parameters, StringBuilder stdOutput, StringBuilder stdError);
+        public delegate Task<ProcessResult> ProcessResultSelector(Process process);
 
         public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
             params object[] arguments)
         {
             var task = RunProcessInternal(outputWriter, workingDirectory, executablePath, argumentsFormat, environmentVariables,
-                async (writer, s, process, psi, time, parameters, output, error) =>
-                    WaitForProcessResult(writer, s, process, psi, time, parameters, output, error), arguments);
+                                          async (process) => Execute(process), arguments);
 
             return task.Result;
         }
@@ -28,87 +26,140 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public async Task<ProcessResult> RunProcessAsync(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
             params object[] arguments)
         {
-            return await RunProcessInternal(outputWriter, workingDirectory, executablePath, argumentsFormat, environmentVariables, WaitForProcessResultAsync, arguments);
+            return await RunProcessInternal(outputWriter, workingDirectory, executablePath, argumentsFormat, environmentVariables, ExecuteAsync, arguments);
         }
 
-        private async Task<TResult> RunProcessInternal<TResult>(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
-            ProcessResultSelector<TResult> processResultSelector, params object[] arguments)
+        private async Task<ProcessResult> RunProcessInternal(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
+            ProcessResultSelector processResultSelector, params object[] arguments)
         {
             string parameters = string.Format(argumentsFormat, arguments);
 
             outputWriter.WriteLine("Starting external program: \"{0}\" {1} in {2}", executablePath, parameters, workingDirectory);
             var psi = CreateProcessStartInfo(workingDirectory, executablePath, parameters, environmentVariables);
 
-            using (var process = new Process { StartInfo = psi, EnableRaisingEvents = true })
+            using (var process = new Process { StartInfo = psi })
             {
-                var stdError = new StringBuilder();
-                var stdOutput = new StringBuilder();
+                var result = Execute(process);
+                var message = new StringBuilder();
+                if (!string.IsNullOrEmpty(result.StdOutput)) message.AppendLine("StdOut:").Append(result.StdOutput).AppendLine();
+                if (!string.IsNullOrEmpty(result.StdError)) message.AppendLine("StdError:").Append(result.StdError).AppendLine();
+                outputWriter.WriteLine(message.ToString());
+                message = new StringBuilder($"Process \"{psi.FileName}\" {psi.Arguments} executed in {result.ExecutionTime} with ExitCode:{result.ExitCode}.");
 
-                process.ErrorDataReceived += (sender, e) => { stdError.Append(e.Data); };
-                process.OutputDataReceived += (sender, e) => { stdOutput.Append(e.Data); };
+                if (result.ExecutionTime > Timeout)
+                {
+                    message.Append($"Took longer than {Timeout}.");
+                    throw new TimeoutException(message.ToString());
+                }
 
-                var before = DateTime.Now;
-                process.Start();
-
-                process.BeginErrorReadLine();
-
-                return await processResultSelector(outputWriter, executablePath, process, psi, before, parameters, stdOutput, stdError);
+                outputWriter.WriteLine(message.ToString());
+                return result;
             }
         }
 
-        private static ProcessResult WaitForProcessResult(
-            IOutputWriter outputWriter,
-            string executablePath,
-            Process process,
-            ProcessStartInfo psi,
-            DateTime before,
-            string parameters, 
-            StringBuilder stdOutputStringBuilder, // ignored
-            StringBuilder stdError)
+        private ProcessResult Execute(Process process)
         {
-            var stdOutput = process.StandardOutput.ReadToEnd();
-            bool processResult = process.WaitForExit(_timeOutInMilliseconds);
+            int timeOutInMilliseconds = Convert.ToInt32(Timeout.TotalMilliseconds);
+            var stdError = new StringBuilder();
+            var stdOutput = new StringBuilder();
+            var outputWaiter = new CountdownEvent(2);
+            process.ErrorDataReceived += (_, e) => AppendReceivedData(stdError, e.Data);
+            process.OutputDataReceived += (_, e) => AppendReceivedData(stdOutput, e.Data);
+            var sw = Stopwatch.StartNew();
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            bool processResult = process.WaitForExit(timeOutInMilliseconds);
 
             if (!processResult)
             {
-                throw new TimeoutException(
-                    $"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Std Output:" + Environment.NewLine + stdOutput);
+#if NETCOREAPP3_1_OR_GREATER
+                process.Kill(true);
+#else
+                process.Kill();
+#endif
             }
 
-            var after = DateTime.Now;
-            var diff = after - before;
-            outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
+            var waitForOutputs = Timeout-sw.Elapsed;
+            if (waitForOutputs <= TimeSpan.Zero || waitForOutputs > TimeSpan.FromMinutes(1)) waitForOutputs = TimeSpan.FromMinutes(1);
+            outputWaiter.Wait(waitForOutputs);
 
-            outputWriter.WriteLine($"StdOutput: {stdOutput}");
-            return new ProcessResult(process.ExitCode, stdOutput, stdError.ToString(), $"{stdOutput}{stdError}");
+            sw.Stop();
+
+            return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), $"{stdOutput}{stdError}", sw.Elapsed);
+
+            void AppendReceivedData(StringBuilder builder, string? data)
+            {
+                if (data is not null) //null is a sign to the end of the output
+                {
+                    builder.AppendLine(data);
+                }
+                else
+                {
+                    outputWaiter.Signal();
+                }
+            }
         }
 
-        private static async Task<ProcessResult> WaitForProcessResultAsync(IOutputWriter outputWriter, string executablePath, Process process,
-            ProcessStartInfo psi, DateTime before, string parameters, StringBuilder stdOutput, StringBuilder stdError)
+        private async Task<ProcessResult> ExecuteAsync(Process process)
         {
+            int timeOutInMilliseconds = Convert.ToInt32(Timeout.TotalMilliseconds);
+            var stdError = new StringBuilder();
+            var stdOutput = new StringBuilder();
+            var outputWaiter = new CountdownEvent(2);
+            process.ErrorDataReceived += (_, e) => AppendReceivedData(stdError, e.Data);
+            process.OutputDataReceived += (_, e) => AppendReceivedData(stdOutput, e.Data);
+            var sw = Stopwatch.StartNew();
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
             var taskCompletionSource = new TaskCompletionSource<ProcessResult>();
-            var cancellationTokenSource = new CancellationTokenSource(_timeOutInMilliseconds);
-            
+            var cancellationTokenSource = new CancellationTokenSource(timeOutInMilliseconds);
+
             cancellationTokenSource.Token.Register(() =>
             {
-                taskCompletionSource.TrySetException(
-                    new TimeoutException($"Process {psi.FileName} {psi.Arguments} took longer than {_timeout.TotalMinutes} min to complete." + Environment.NewLine + "Std Output:" + Environment.NewLine + stdOutput));
+#if NETCOREAPP3_1_OR_GREATER
+                process.Kill(true);
+#else
+                process.Kill();
+#endif
+                var waitForOutputs = Timeout - sw.Elapsed;
+                if (waitForOutputs <= TimeSpan.Zero || waitForOutputs > TimeSpan.FromMinutes(1)) waitForOutputs = TimeSpan.FromMinutes(1);
+                outputWaiter.Wait(waitForOutputs);
+
+                sw.Stop();
+
+                taskCompletionSource.TrySetResult(new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), $"{stdOutput}{stdError}", sw.Elapsed));
+
             }, useSynchronizationContext: false);
 
             process.Exited += (sender, args) =>
             {
-                var after = DateTime.Now;
-                var diff = after - before;
-                outputWriter.WriteLine($"'{executablePath} {parameters}' took {diff.TotalMilliseconds}ms");
+                var waitForOutputs = Timeout - sw.Elapsed;
+                if (waitForOutputs <= TimeSpan.Zero || waitForOutputs > TimeSpan.FromMinutes(1)) waitForOutputs = TimeSpan.FromMinutes(1);
+                outputWaiter.Wait(waitForOutputs);
 
-                var output = stdOutput.ToString();
+                sw.Stop();
 
-                outputWriter.WriteLine($"StdOutput: {output}");
-
-                taskCompletionSource.TrySetResult(new ProcessResult(process.ExitCode, output, stdError.ToString(), $"{output}{stdError}"));
+                taskCompletionSource.TrySetResult(new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), $"{stdOutput}{stdError}", sw.Elapsed));
             };
 
             return await taskCompletionSource.Task;
+
+            void AppendReceivedData(StringBuilder builder, string? data)
+            {
+                if (data is not null) //null is a sign to the end of the output
+                {
+                    builder.AppendLine(data);
+                }
+                else
+                {
+                    outputWaiter.Signal();
+                }
+            }
         }
 
         public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, params object[] arguments)

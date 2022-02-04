@@ -47,7 +47,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _outputWriter.WriteLine($"Invoke MsBuild from {msBuildPath}");
 
             var processHelper = new ProcessHelper();
-            string argumentsFormat = $"{GetWarningAsErrorParameter(treatWarningsAsErrors)} -restore -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
+            string argumentsFormat = $"{GetWarningAsErrorParameter(treatWarningsAsErrors)} -restore -binaryLogger:;ProjectImports=None -nodeReuse:false -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
 
             var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, msBuildPath, argumentsFormat);
 
@@ -65,10 +65,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             var processHelper = new ProcessHelper();
 
-            // execute dotnet --info
-            processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", "--info");
-
-            string argumentsFormat = $"build {GetWarningAsErrorParameter(treatWarningsAsErrors)} --no-cache -bl -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
+            string argumentsFormat = $"build {GetWarningAsErrorParameter(treatWarningsAsErrors)} --no-cache -binaryLogger:;ProjectImports=None -nodeReuse:false -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
             var dotnetBuildProcessResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", argumentsFormat);
 
             return new CompileResult(dotnetBuildProcessResult.ExitCode, dotnetBuildProcessResult.CombinedOutput);
@@ -80,13 +77,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
             var processHelper = new ProcessHelper();
 
-            // execute dotnet --info
-            processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", "--info");
-
             // execute dotnet restore
-            processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", "restore");
+            processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", "restore -binaryLogger:;ProjectImports=None -nodeReuse:false -nologo");
 
-            string argumentsFormat = $@"msbuild {GetWarningAsErrorParameter(treatWarningsAsErrors)} -bl -nologo -v:m ""{_testProjectFolders.PathToSolutionFile}""";
+            string argumentsFormat = $@"msbuild {GetWarningAsErrorParameter(treatWarningsAsErrors)} -binaryLogger:;ProjectImports=None -nodeReuse:false -nologo -v:m ""{_testProjectFolders.PathToSolutionFile}""";
             var msBuildProcess = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", argumentsFormat);
 
             return new CompileResult(msBuildProcess.ExitCode, msBuildProcess.CombinedOutput);

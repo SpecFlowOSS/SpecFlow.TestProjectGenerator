@@ -14,7 +14,7 @@
 
         protected override string BuildArguments()
         {
-            return "build";
+            return "build --nologo";
         }
 
         public BuildCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)

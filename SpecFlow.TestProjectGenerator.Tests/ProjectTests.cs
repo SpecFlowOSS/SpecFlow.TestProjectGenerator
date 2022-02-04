@@ -277,6 +277,19 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
         }
 
         [Fact]
+        public void CreateEmtpyCSharpNet60ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net60);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net6.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
         public void CreateEmtpyFSharpProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp);
@@ -284,9 +297,9 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
-
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>\r\n</Project>");
+            projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
+            projectFileContent.Should().Contain("<TargetFramework>net461</TargetFramework>");
+            projectFileContent.Should().Contain("<ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>");
         }
 
         [Fact]

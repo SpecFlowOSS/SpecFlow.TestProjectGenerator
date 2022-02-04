@@ -13,11 +13,13 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
     public class ProjectBuilder
     {
         public const string NUnit3PackageName = "NUnit";
-        public const string NUnit3PackageVersion = "3.11.0";
+        public const string NUnit3PackageVersion = "3.13.1";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
-        public const string NUnit3TestAdapterPackageVersion = "3.10.0";
+        public const string NUnit3TestAdapterPackageVersion = "3.17.0";
         private const string XUnitPackageVersion = "2.4.1";
-        private const string MSTestPackageVersion = "2.0.0";
+        private const string MSTestPackageVersion = "2.1.2";
+        private const string InternalJsonPackageName = "SpecFlow.Internal.Json";
+        private const string InternalJsonVersion = "1.0.8";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
@@ -172,6 +174,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             switch (language)
             {
                 case ProgrammingLanguage.CSharp:
+                case ProgrammingLanguage.CSharp10:
                     return csharpcode;
                 case ProgrammingLanguage.VB:
                     return vbnetcode;
@@ -226,7 +229,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 if (_project.ProjectFormat == ProjectFormat.Old)
                 {
-                    _project.AddNuGetPackage("Cucumber.Messages", "6.0.1", new NuGetPackageAssembly("Cucumber.Messages, Version=6.0.1.0, Culture=neutral, PublicKeyToken=b10c5988214f940c", "net45\\Cucumber.Messages.dll"));
                     _project.AddNuGetPackage("Google.Protobuf", "3.7.0", new NuGetPackageAssembly("Google.Protobuf, Version=3.7.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604", "net45\\Google.Protobuf.dll"));
                 }
 
@@ -240,11 +242,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                     _project.AddNuGetPackage("SpecFlow", $"{_currentVersionDriver.SpecFlowNuGetVersion}", new NuGetPackageAssembly($"TechTalk.SpecFlow, Version={_currentVersionDriver.SpecFlowVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net461\\TechTalk.SpecFlow.dll"));
                 }
 
-                _project.AddNuGetPackage("BoDi", "1.4.1", new NuGetPackageAssembly("BoDi, Version=1.4.1.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
-                _project.AddNuGetPackage("Gherkin", "6.0.0", new NuGetPackageAssembly("Gherkin, Version=6.0.0.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
-                _project.AddNuGetPackage("Utf8Json", "1.3.7", new NuGetPackageAssembly("Utf8Json, Version=1.3.7.0, Culture=neutral, PublicKeyToken=8a73d3ba7e392e27", "net45\\Utf8Json.dll"));
+                _project.AddNuGetPackage("BoDi", "1.5.0", new NuGetPackageAssembly("BoDi, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
+                _project.AddNuGetPackage("Gherkin", "19.0.3", new NuGetPackageAssembly("Gherkin, Version=19.0.3.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
                 _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.1",
-                    new NuGetPackageAssembly("System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51", "portable-net45+win8+wp8+wpa81\\System.Threading.Tasks.Extensions.dll"));
+                                         new NuGetPackageAssembly("System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51", "portable-net45+win8+wp8+wpa81\\System.Threading.Tasks.Extensions.dll"));
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
                 _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
@@ -255,6 +256,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
                         AddInitialFSharpReferences();
                         break;
                     case ProgrammingLanguage.CSharp:
+                    case ProgrammingLanguage.CSharp10:
                         AddUnitTestProviderSpecificConfig();
                         break;
                 }
@@ -312,12 +314,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             _project.AddNuGetPackage("FluentAssertions", "5.3.0");
+            AddInternalJson();
             AddAdditionalStuff();
         }
 
         private void ConfigureNUnit()
         {
-            _project.AddNuGetPackage(NUnit3PackageName, NUnit3PackageVersion);
+            //NUnit is not supporting .NET 5 in the latest release (3.12.0), so take a pre-release version instead
+            var nUnitPackageVersion = TargetFramework == TargetFramework.Net50 ? "3.13.0-dev-06881" : NUnit3PackageVersion;
+            _project.AddNuGetPackage(NUnit3PackageName, nUnitPackageVersion);
             _project.AddNuGetPackage(NUnit3TestAdapterPackageName, NUnit3TestAdapterPackageVersion);
 
 
@@ -489,6 +494,17 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         {
             EnsureProjectExists();
             _project.AddNuGetPackage(nugetPackage, nugetVersion);
+        }
+
+        private void AddInternalJson()
+        {
+            string internalJsonPublicAssemblyName = InternalJsonPackageName;
+            if (_currentVersionDriver.SpecFlowVersion < new Version(3, 0))
+            {
+                internalJsonPublicAssemblyName = $"{internalJsonPublicAssemblyName}, Version={InternalJsonVersion}, Culture=neutral, PublicKeyToken=0778194805d6db41";
+            }
+
+            _project.AddNuGetPackage($"{InternalJsonPackageName}", $"{InternalJsonVersion}", new NuGetPackageAssembly($"{internalJsonPublicAssemblyName}", "net45\\SpecFlow.Internal.Json.dll"));
         }
     }
 }

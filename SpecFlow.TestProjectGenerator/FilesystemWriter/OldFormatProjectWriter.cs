@@ -97,6 +97,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
             switch (project.ProgrammingLanguage)
             {
                 case ProgrammingLanguage.CSharp:
+                case ProgrammingLanguage.CSharp10:
                     WriteMSBuildImport(xw, "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
                     break;
                 case ProgrammingLanguage.FSharp:

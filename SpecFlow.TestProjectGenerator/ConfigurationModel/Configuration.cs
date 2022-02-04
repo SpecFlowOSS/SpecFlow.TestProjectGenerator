@@ -8,8 +8,6 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.ConfigurationModel
 {
     public class Configuration
     {
-        private readonly Lazy<CucumberMessages> _cucumberMessagesSection = new Lazy<CucumberMessages>(() => new CucumberMessages());
-
         public UnitTestProvider UnitTestProvider { get; set; } = UnitTestProvider.xUnit;
         public List<SpecFlowPlugin> Plugins { get; } = new List<SpecFlowPlugin>();
         public List<AppConfigSection> AppConfigSection { get;  } = new List<AppConfigSection> { new AppConfigSection(name: "specFlow", type: "TechTalk.SpecFlow.Configuration.ConfigurationSectionHandler, TechTalk.SpecFlow") };
@@ -19,7 +17,5 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.ConfigurationModel
         public Lazy<Generator> Generator { get; } = new Lazy<Generator>(() => new Generator());
         public Lazy<Runtime> Runtime { get; } = new Lazy<Runtime>(() => new Runtime());
         public List<(string key, string value)> AppSettings { get; set; } = new List<(string key, string value)>();
-
-        public CucumberMessages CucumberMessagesSection => _cucumberMessagesSection.Value;
     }
 }

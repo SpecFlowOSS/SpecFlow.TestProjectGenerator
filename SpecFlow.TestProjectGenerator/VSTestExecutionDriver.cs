@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using FluentAssertions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Driver;
@@ -26,6 +25,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private const string BeginOfLogFileLine = "Log file: ";
         private const string BeginOfReportFileLine = @"Report file: ";
         private const string DotnetTestPath = "dotnet";
+        private static readonly Regex sWhitespace = new Regex(@"\s+");
 
         public VSTestExecutionDriver(
             TestProjectFolders testProjectFolders,
@@ -70,16 +70,22 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public void CheckAnyOutputContainsText(string text)
         {
-            bool trxContainsEntry = LastTestExecutionResult.TrxOutput.Contains(text);
-            bool outputContainsEntry = LastTestExecutionResult.Output.Contains(text);
+            var textWithoutWhitespace = WithoutWhitespace(text);
+            bool trxContainsEntry = WithoutWhitespace(LastTestExecutionResult.TrxOutput).Contains(textWithoutWhitespace);
+            bool outputContainsEntry = WithoutWhitespace(LastTestExecutionResult.Output).Contains(textWithoutWhitespace);
             bool containsAtAll = trxContainsEntry || outputContainsEntry;
-            containsAtAll.Should().BeTrue($"either Trx output or program output should contain '{text}'");
+            containsAtAll.Should().BeTrue($"either Trx output or program output should contain '{text}'. Trx Output is: {LastTestExecutionResult.TrxOutput}");
+        }
+
+        public static string WithoutWhitespace(string input)
+        {
+            return sWhitespace.Replace(input, string.Empty);
         }
 
         public TestExecutionResult ExecuteTests()
         {
             var task = ExecuteTestsInternalAsync(async (processHelper, parameters) =>
-                processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
+                                                     processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
 
             return task.Result;
         }
@@ -87,7 +93,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public async Task<TestExecutionResult> ExecuteTestsAsync()
         {
             return await ExecuteTestsInternalAsync(async (processHelper, parameters) =>
-                await processHelper.RunProcessAsync(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
+                                                       await processHelper.RunProcessAsync(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
         }
 
         private async Task<TestExecutionResult> ExecuteTestsInternalAsync(Func<ProcessHelper, (string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables), Task<ProcessResult>> runProcessAction)
@@ -99,7 +105,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             ProcessResult processResult;
             try
             {
-                processResult = await runProcessAction(processHelper, (arguments, envVariables));
+                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, arguments, envVariables);
             }
             catch (Exception)
             {
@@ -153,7 +159,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public string GenerateDotnetTestsArguments()
         {
-            var argumentsBuilder = new StringBuilder();
+            var argumentsBuilder = new StringBuilder("--no-build ");
 
             argumentsBuilder.Append(GenerateTrxLoggerParameter());
             argumentsBuilder.Append($" {GenerateVerbosityParameter("n")}");

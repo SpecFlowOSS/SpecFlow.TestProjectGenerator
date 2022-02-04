@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net471;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net60;net471</TargetFrameworks>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
