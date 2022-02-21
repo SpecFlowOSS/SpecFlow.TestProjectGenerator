@@ -109,13 +109,6 @@ internal static class Log
         WriteToFile($@""-> hook: {{stepName}}{{Environment.NewLine}}"");
     }}
 
-    internal static async Task LogHookIncludingLockingAsync([CallerMemberName] string stepName = null)
-    {{
-        WriteToFile($@""-> waiting for hook lock: {{stepName}}{{Environment.NewLine}}"");
-        await WaitForLockAsync();
-        WriteToFile($@""-> hook: {{stepName}}{{Environment.NewLine}}"");
-    }}
-
     static void WriteToFile(string line)
     {{
         using (FileStream fs = File.Open(LogFileLocation, FileMode.Append, FileAccess.Write, FileShare.None))
