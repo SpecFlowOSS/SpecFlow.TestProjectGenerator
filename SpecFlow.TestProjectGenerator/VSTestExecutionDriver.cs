@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using FluentAssertions;
 using TechTalk.SpecFlow.TestProjectGenerator.Data;
 using TechTalk.SpecFlow.TestProjectGenerator.Driver;
@@ -23,6 +24,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         private const string BeginOfTrxFileLine = "Results File: ";
         private const string BeginOfLogFileLine = "Log file: ";
         private const string BeginOfReportFileLine = @"Report file: ";
+        private const string DotnetTestPath = "dotnet";
         private static readonly Regex sWhitespace = new Regex(@"\s+");
 
         public VSTestExecutionDriver(
@@ -82,8 +84,20 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
         public TestExecutionResult ExecuteTests()
         {
-            const string dotnetTestPath = "dotnet";
+            var task = ExecuteTestsInternalAsync(async (processHelper, parameters) =>
+                                                     processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
 
+            return task.Result;
+        }
+
+        public async Task<TestExecutionResult> ExecuteTestsAsync()
+        {
+            return await ExecuteTestsInternalAsync(async (processHelper, parameters) =>
+                                                       await processHelper.RunProcessAsync(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
+        }
+
+        private async Task<TestExecutionResult> ExecuteTestsInternalAsync(Func<ProcessHelper, (string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables), Task<ProcessResult>> runProcessAction)
+        {
             var envVariables = _testSuiteEnvironmentVariableGenerator.GenerateEnvironmentVariables();
 
             var processHelper = new ProcessHelper();
@@ -91,11 +105,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             ProcessResult processResult;
             try
             {
-                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, dotnetTestPath, arguments, envVariables);
+                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, arguments, envVariables);
             }
             catch (Exception)
             {
-                Console.WriteLine($"running {dotnetTestPath} failed - {_testProjectFolders.CompiledAssemblyPath} {dotnetTestPath} {arguments}");
+                Console.WriteLine($"running {DotnetTestPath} failed - {_testProjectFolders.CompiledAssemblyPath} {DotnetTestPath} {arguments}");
                 throw;
             }
 

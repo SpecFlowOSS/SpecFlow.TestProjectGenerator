@@ -120,6 +120,15 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             _project.AddFile(bindingsGenerator.GenerateHookBinding(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags));
         }
 
+        public void AddAsyncHookBindingIncludingLocking(string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,
+            IList<string> classScopeAttributeTags = null)
+        {
+            EnsureProjectExists();
+
+            var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
+            _project.AddFile(bindingsGenerator.GenerateAsyncHookBindingIncludingLocking(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags));
+        }
+
         public void AddStepBinding(string bindingCode)
         {
             EnsureProjectExists();
@@ -235,8 +244,8 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 _project.AddNuGetPackage("BoDi", "1.5.0", new NuGetPackageAssembly("BoDi, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
                 _project.AddNuGetPackage("Gherkin", "19.0.3", new NuGetPackageAssembly("Gherkin, Version=19.0.3.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
-                _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.1",
-                                         new NuGetPackageAssembly("System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51", "portable-net45+win8+wp8+wpa81\\System.Threading.Tasks.Extensions.dll"));
+                _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.4", new NuGetPackageAssembly("System.Threading.Tasks.Extensions", "portable-net45+win8+wp8+wpa81\\System.Threading.Tasks.Extensions.dll"));
+                _project.AddNuGetPackage("Microsoft.Bcl.AsyncInterfaces", "6.0.0", new NuGetPackageAssembly("Microsoft.Bcl.AsyncInterfaces", "net461\\Microsoft.Bcl.AsyncInterfaces.dll"));
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
                 _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));

@@ -10,6 +10,10 @@
 
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>CS1998</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.4.2" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />

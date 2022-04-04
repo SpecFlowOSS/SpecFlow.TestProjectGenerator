@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TechTalk.SpecFlow.TestProjectGenerator
 {
@@ -11,7 +12,25 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
     { 
         private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(5);
 
-        public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables, params object[] arguments)
+        public delegate Task<ProcessResult> ProcessResultSelector(Process process);
+
+        public ProcessResult RunProcess(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
+            params object[] arguments)
+        {
+            var task = RunProcessInternal(outputWriter, workingDirectory, executablePath, argumentsFormat, environmentVariables,
+                                          async (process) => Execute(process), arguments);
+
+            return task.Result;
+        }
+
+        public async Task<ProcessResult> RunProcessAsync(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
+            params object[] arguments)
+        {
+            return await RunProcessInternal(outputWriter, workingDirectory, executablePath, argumentsFormat, environmentVariables, ExecuteAsync, arguments);
+        }
+
+        private async Task<ProcessResult> RunProcessInternal(IOutputWriter outputWriter, string workingDirectory, string executablePath, string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables,
+            ProcessResultSelector processResultSelector, params object[] arguments)
         {
             string parameters = string.Format(argumentsFormat, arguments);
 
@@ -69,6 +88,66 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             sw.Stop();
 
             return new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), $"{stdOutput}{stdError}", sw.Elapsed);
+
+            void AppendReceivedData(StringBuilder builder, string? data)
+            {
+                if (data is not null) //null is a sign to the end of the output
+                {
+                    builder.AppendLine(data);
+                }
+                else
+                {
+                    outputWaiter.Signal();
+                }
+            }
+        }
+
+        private async Task<ProcessResult> ExecuteAsync(Process process)
+        {
+            int timeOutInMilliseconds = Convert.ToInt32(Timeout.TotalMilliseconds);
+            var stdError = new StringBuilder();
+            var stdOutput = new StringBuilder();
+            var outputWaiter = new CountdownEvent(2);
+            process.ErrorDataReceived += (_, e) => AppendReceivedData(stdError, e.Data);
+            process.OutputDataReceived += (_, e) => AppendReceivedData(stdOutput, e.Data);
+            var sw = Stopwatch.StartNew();
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            var taskCompletionSource = new TaskCompletionSource<ProcessResult>();
+            var cancellationTokenSource = new CancellationTokenSource(timeOutInMilliseconds);
+
+            cancellationTokenSource.Token.Register(() =>
+            {
+#if NETCOREAPP3_1_OR_GREATER
+                process.Kill(true);
+#else
+                process.Kill();
+#endif
+                var waitForOutputs = Timeout - sw.Elapsed;
+                if (waitForOutputs <= TimeSpan.Zero || waitForOutputs > TimeSpan.FromMinutes(1)) waitForOutputs = TimeSpan.FromMinutes(1);
+                outputWaiter.Wait(waitForOutputs);
+
+                sw.Stop();
+
+                taskCompletionSource.TrySetResult(new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), $"{stdOutput}{stdError}", sw.Elapsed));
+
+            }, useSynchronizationContext: false);
+
+            process.Exited += (sender, args) =>
+            {
+                var waitForOutputs = Timeout - sw.Elapsed;
+                if (waitForOutputs <= TimeSpan.Zero || waitForOutputs > TimeSpan.FromMinutes(1)) waitForOutputs = TimeSpan.FromMinutes(1);
+                outputWaiter.Wait(waitForOutputs);
+
+                sw.Stop();
+
+                taskCompletionSource.TrySetResult(new ProcessResult(process.ExitCode, stdOutput.ToString(), stdError.ToString(), $"{stdOutput}{stdError}", sw.Elapsed));
+            };
+
+            return await taskCompletionSource.Task;
 
             void AppendReceivedData(StringBuilder builder, string? data)
             {
