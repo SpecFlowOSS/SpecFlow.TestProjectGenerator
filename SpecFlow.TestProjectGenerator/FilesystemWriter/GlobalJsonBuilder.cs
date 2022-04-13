@@ -27,6 +27,10 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
                 jsonTextWriter.WriteToken(JsonToken.StartObject);
                 jsonTextWriter.WritePropertyName("version", true);
                 jsonTextWriter.WriteValue(Sdk.Version);
+
+                jsonTextWriter.WritePropertyName("rollForward");
+                jsonTextWriter.WriteValue("latestFeature");
+
                 jsonTextWriter.WriteToken(JsonToken.EndObject);
 
                 jsonTextWriter.WriteToken(JsonToken.EndObject);
