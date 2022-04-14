@@ -2,6 +2,8 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <SpecFlow_EnableStrongNameSigning>true</SpecFlow_EnableStrongNameSigning>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,5 +13,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+  <PropertyGroup Condition=" '$(SpecFlow_EnableStrongNameSigning)' == 'true'">
+    <SpecFlow_KeyFile>$(MSBuildThisFileDirectory)\..\..\specflow.snk</SpecFlow_KeyFile>
+    <SpecFlow_SignAssembly>true</SpecFlow_SignAssembly>
+    <DefineConstants>$(DefineConstants);SPECFLOW_ENABLE_STRONG_NAME_SIGNING</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(SpecFlow_EnableStrongNameSigning)' == 'false'">
+    <SpecFlow_KeyFile></SpecFlow_KeyFile>
+    <SpecFlow_SignAssembly>false</SpecFlow_SignAssembly>
+  </PropertyGroup>
 
 </Project>
