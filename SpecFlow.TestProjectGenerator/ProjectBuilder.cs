@@ -354,7 +354,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             }
 
             _project.AddNuGetPackage("xunit.runner.visualstudio", XUnitPackageVersion);
-            _project.AddNuGetPackage("Xunit.SkippableFact", "1.3.12", new NuGetPackageAssembly("Xunit.SkippableFact, Version=1.3.0.0, Culture=neutral, PublicKeyToken=b2b52da82b58eb73", "net452\\Xunit.SkippableFact.dll"));
+            _project.AddNuGetPackage("Xunit.SkippableFact", "1.4.13", new NuGetPackageAssembly("Xunit.SkippableFact, Version=1.4.0.0, Culture=neutral, PublicKeyToken=b2b52da82b58eb73", "net452\\Xunit.SkippableFact.dll"));
 
             if (_project.ProjectFormat == ProjectFormat.Old)
             {
