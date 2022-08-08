@@ -13,7 +13,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 {
     public class ProjectTests
     {
-        private const TargetFramework ProjectTargetFramework = TargetFramework.Net461;
+        private const TargetFramework ProjectTargetFramework = TargetFramework.Net462;
         private readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
         private readonly string TargetFrameworkMoniker;
 
@@ -247,7 +247,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net462</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
@@ -298,7 +298,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
             projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
-            projectFileContent.Should().Contain("<TargetFramework>net461</TargetFramework>");
+            projectFileContent.Should().Contain("<TargetFramework>net462</TargetFramework>");
             projectFileContent.Should().Contain("<ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>");
         }
 
@@ -312,7 +312,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net461</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net462</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
     }
 

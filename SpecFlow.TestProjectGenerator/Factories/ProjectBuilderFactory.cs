@@ -82,6 +82,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Factories
                 case TargetFramework.Netcoreapp30:
                 case TargetFramework.Netcoreapp31:
                 case TargetFramework.Net461:
+                case TargetFramework.Net462:
                 case TargetFramework.Net50:
                     return ProgrammingLanguage.CSharp;
                 default: return ProgrammingLanguage.CSharp10;

@@ -12,6 +12,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             [TargetFramework.Net45] = "net45",
             [TargetFramework.Net452] = "net452",
             [TargetFramework.Net461] = "net461",
+            [TargetFramework.Net462] = "net462",
             [TargetFramework.NetStandard20] = "netstandard2.0",
             [TargetFramework.Netcoreapp20] = "netcoreapp2.0",
             [TargetFramework.Netcoreapp21] = "netcoreapp2.1",

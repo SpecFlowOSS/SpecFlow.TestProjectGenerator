@@ -82,7 +82,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.FilesystemWriter
         /// <param name="targetFramework"></param>
         private static void AllowNet6ToTestOlderFrameworks(TargetFramework targetFramework)
         {
-            if (targetFramework is TargetFramework.Net461 or TargetFramework.Netcoreapp31 or TargetFramework.Netcoreapp21 or TargetFramework.Net50) 
+            if (targetFramework is TargetFramework.Net461 or TargetFramework.Netcoreapp31 or TargetFramework.Netcoreapp21 or TargetFramework.Net50 or TargetFramework.Net462) 
                 Environment.SetEnvironmentVariable("MSBuildSDKsPath", null);
         }
 

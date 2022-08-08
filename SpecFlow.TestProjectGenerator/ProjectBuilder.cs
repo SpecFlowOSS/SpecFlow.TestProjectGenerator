@@ -16,7 +16,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
         public const string NUnit3PackageVersion = "3.13.1";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit3TestAdapterPackageVersion = "3.17.0";
-        private const string XUnitPackageVersion = "2.4.1";
+        private const string XUnitPackageVersion = "2.4.2";
         private const string MSTestPackageVersion = "2.1.2";
         private const string InternalJsonPackageName = "SpecFlow.Internal.Json";
         private const string InternalJsonVersion = "1.0.8";
@@ -229,25 +229,24 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
 
                 if (_project.ProjectFormat == ProjectFormat.Old)
                 {
-                    _project.AddNuGetPackage("Google.Protobuf", "3.7.0", new NuGetPackageAssembly("Google.Protobuf, Version=3.7.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604", "net45\\Google.Protobuf.dll"));
-                    _project.AddNuGetPackage("System.Runtime.CompilerServices.Unsafe", "6.0.0", new NuGetPackageAssembly("System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "net461\\System.Runtime.CompilerServices.Unsafe.dll"));
+                    _project.AddNuGetPackage("System.Runtime.CompilerServices.Unsafe", "6.0.0", new NuGetPackageAssembly("System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "netstandard2.0\\System.Runtime.CompilerServices.Unsafe.dll"));
                 }
 
                 if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0))
                 {
                     // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
-                    _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net461\\TechTalk.SpecFlow.dll"));
+                    _project.AddNuGetPackage("SpecFlow", _currentVersionDriver.SpecFlowNuGetVersion, new NuGetPackageAssembly("TechTalk.SpecFlow", "net462\\TechTalk.SpecFlow.dll"));
                 }
                 else
                 {
-                    _project.AddNuGetPackage("SpecFlow", $"{_currentVersionDriver.SpecFlowNuGetVersion}", new NuGetPackageAssembly($"TechTalk.SpecFlow, Version={_currentVersionDriver.SpecFlowVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net461\\TechTalk.SpecFlow.dll"));
+                    _project.AddNuGetPackage("SpecFlow", $"{_currentVersionDriver.SpecFlowNuGetVersion}", new NuGetPackageAssembly($"TechTalk.SpecFlow, Version={_currentVersionDriver.SpecFlowVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net462\\TechTalk.SpecFlow.dll"));
                 }
 
                 _project.AddNuGetPackage("BoDi", "1.5.0", new NuGetPackageAssembly("BoDi, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
                 _project.AddNuGetPackage("Gherkin", "19.0.3", new NuGetPackageAssembly("Gherkin, Version=19.0.3.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
                 _project.AddNuGetPackage("Cucumber.CucumberExpressions", "16.0.0", new NuGetPackageAssembly("CucumberExpressions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "netstandard2.0\\CucumberExpressions.dll"));
-                _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.4", new NuGetPackageAssembly("System.Threading.Tasks.Extensions", "portable-net45+win8+wp8+wpa81\\System.Threading.Tasks.Extensions.dll"));
-                _project.AddNuGetPackage("Microsoft.Bcl.AsyncInterfaces", "6.0.0", new NuGetPackageAssembly("Microsoft.Bcl.AsyncInterfaces", "net461\\Microsoft.Bcl.AsyncInterfaces.dll"));
+                _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.4", new NuGetPackageAssembly("System.Threading.Tasks.Extensions", "netstandard2.0\\System.Threading.Tasks.Extensions.dll"));
+                _project.AddNuGetPackage("Microsoft.Bcl.AsyncInterfaces", "6.0.0", new NuGetPackageAssembly("Microsoft.Bcl.AsyncInterfaces", "netstandard2.0\\Microsoft.Bcl.AsyncInterfaces.dll"));
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
                 _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
@@ -329,7 +328,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0) && IsSpecFlowFeatureProject)
             {
                 _project.AddNuGetPackage("SpecFlow.NUnit", _currentVersionDriver.SpecFlowNuGetVersion,
-                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"));
+                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"), "net462\\TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll"));
                 Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.NUnit", SpecFlowPluginType.Runtime));
             }
         }
@@ -344,11 +343,11 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             {
                 _project.AddNuGetPackage("xunit.core", XUnitPackageVersion);
                 _project.AddNuGetPackage("xunit.extensibility.core", XUnitPackageVersion,
-                    new NuGetPackageAssembly("xunit.core, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.core.dll"));
+                    new NuGetPackageAssembly("xunit.core, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.core.dll"));
                 _project.AddNuGetPackage("xunit.extensibility.execution", XUnitPackageVersion,
-                    new NuGetPackageAssembly("xunit.execution.desktop, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
+                    new NuGetPackageAssembly("xunit.execution.desktop, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
                 _project.AddNuGetPackage("xunit.assert", XUnitPackageVersion,
-                    new NuGetPackageAssembly("xunit.assert, Version=2.4.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
+                    new NuGetPackageAssembly("xunit.assert, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
                 _project.AddNuGetPackage("xunit.abstractions", "2.0.3",
                     new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
             }
@@ -364,7 +363,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0) && IsSpecFlowFeatureProject)
             {
                 _project.AddNuGetPackage("SpecFlow.xUnit", _currentVersionDriver.SpecFlowNuGetVersion,
-                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
+                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"), "net462\\TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll"));
                 Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.xUnit", SpecFlowPluginType.Runtime));
             }
         }
@@ -385,7 +384,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator
             if (_currentVersionDriver.SpecFlowVersion >= new Version(3, 0) && IsSpecFlowFeatureProject)
             {
                 _project.AddNuGetPackage("SpecFlow.MSTest", _currentVersionDriver.SpecFlowNuGetVersion,
-                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"), "net461\\TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"));
+                    new NuGetPackageAssembly(GetSpecFlowPublicAssemblyName("TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"), "net462\\TechTalk.SpecFlow.MSTest.SpecFlowPlugin.dll"));
                 Configuration.Plugins.Add(new SpecFlowPlugin("TechTalk.SpecFlow.MSTest", SpecFlowPluginType.Runtime));
             }
         }

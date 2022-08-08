@@ -35,7 +35,7 @@ namespace TechTalk.SpecFlow.TestProjectGenerator.Tests
             string folder = Path.Combine(Path.GetTempPath(), "SpecFlow.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
 
             var solution = new Solution("SolutionName");
-            var project = new Project("ProjectName", Guid.NewGuid(), programmingLanguage, TargetFramework.Net461, ProjectFormat.New);
+            var project = new Project("ProjectName", Guid.NewGuid(), programmingLanguage, TargetFramework.Net462, ProjectFormat.New);
 
             solution.AddProject(project);
 
